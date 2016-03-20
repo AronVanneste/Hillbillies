@@ -1,116 +1,178 @@
 package hillbillies.model;
 
+import hillbillies.model.Unit;
+import hillbillies.model.World;
+
 public class Log {
-	/**
-	 * 
-	 * @param world
-	 * 			The world where the log is created
-	 * @param position
-	 * 			The position where the log will occur
-	 * @throws IllegalArgumentException
-	 * 			Throws an IllegalArgumentException if the position is not valid
-	 */
-	public Log(World world, double[] position) throws IllegalArgumentException{
-		if (!world.isValidPosition(position))
+	
+	// INITIALISATION
+	// If position is a double[]
+	public Log(World world, double[] position) throws IllegalArgumentException {
+		if (!isValidPosition(position))
 			throw new IllegalArgumentException("This is not a valid position");
-		else {
-			this.position = position;}
-		this.weight = (int) Math.round(Math.random() * 40 + 10);
+		if (!isValidWorld(world))
+			throw new NullPointerException("World is null");
+		
+		this.setPosition(position);
+		this.weight = ((int) Math.round(Math.random() * 40 + 10));
 		this.setWorld(world);
+		world.addToLogList(this);
+
 	}
 	
+	// If position is an int[]
+	public Log(World world, int[] position) throws IllegalArgumentException, NullPointerException {
+		if (!isValidPosition(position))
+			throw new IllegalArgumentException("This is not a valid position");
+		if (!isValidWorld(world))
+			throw new NullPointerException("World is null");
+		
+		double[] Pos = {(double) (position[0]), (double) (position[1]), (double) (position[2])};
+		this.setPosition(Pos);
+		this.weight = ((int) Math.round(Math.random() * 40 + 10));
+		this.setWorld(world);
+		world.addToLogList(this);
+	}
+
+	// CHECKERS
+	// If position is a double[]
+	private boolean isValidPosition(double[] position) {
+		return this.getWorld().isValidPosition(this.getCube());
+	}
 	
-	/**
-	 * @param world
-	 * 			Assigns the log to a certain world
-	 */
-	public void setWorld(World world) {
-		this.world = world;
+	// If position is an int[]
+	private boolean isValidPosition(int[] position) {
+		return this.getWorld().isValidPosition(this.getCube());
 	}
-	/**
-	 * 
-	 * @return
-	 * 		Returns the world where the log is located
-	 */
-	public World getWorld() {
-		return this.world;
+	
+	//World
+	private boolean isValidWorld(World world) {
+		return (world != null);
 	}
-	/**
-	 * 
-	 * @param position
-	 * 		Changes the position of the log
-	 */
-	public void setPosition(double[] position) {
-		this.position = position;
+	
+	//isPassable
+	private boolean isPassable() {
+		return (world.isPassable(this.getCube()));
 	}
-	/**
-	 * 
-	 * @return
-	 * 		Returns the position of the log
-	 */
+	
+	//isActive
+	public boolean isActive() {
+		if (this.getOwner() != null)
+			return true;
+		else
+			return false;
+	}
+	
+	//shouldFall
+	private boolean shouldFall() {
+		
+		if (this.isPassable())
+			return false;
+		else
+			return true;
+	}
+	
+
+	//GETCUBE
+	public int[] getCube() {
+		
+		int X = (int) Math.floor(this.getPosition()[0]);
+		int Y = (int) Math.floor(this.getPosition()[1]);
+		int Z = (int) Math.floor(this.getPosition()[2]);
+		
+		int[] Cube = {X, Y, Z};
+		return Cube;
+		
+	}
+	
+	// SET and GET POSITION
+	public void setPosition(double[] position) throws IllegalArgumentException {
+		
+		if (!isValidPosition(position))
+			throw new IllegalArgumentException("This is not a valid position");
+		else
+			this.position = position;
+	}
+	
 	public double[] getPosition() {
 		return this.position;
 	}
-
-	public void advanceTime(double time, World world) {
+	
+	// SET AND GET WORLD
+	private void setWorld(World world) {
+		this.world = world;
+		world.addToLogList(this);
+	}
+	
+	public World getWorld() {
+		return this.world;
+	}
+	
+	// GET WEIGHT
+	public int getWeight() {
+		return this.weight;
+	}
+	
+	// SET and GET Owner
+	public void setOwner(Unit owner) {
+		this.owner = owner;
+		this.changeInWorld();
+	}
+	
+	public Unit getOwner() {
+		return this.owner;
+	}
+	
+	
+	
+	// ADVANCE TIME
+	public void advanceTime(double time) throws IllegalArgumentException {
 		
-		for (Log log : world.getAllLogs()) {
-				double[] position = log.getPosition();
-		
-				if (!world.isSupported(position)) {
-					double speed = this.getZSpeed();
-					double[] originalPosition = this.getPosition();
-					double[] newPosition = {originalPosition[0], originalPosition[1], originalPosition[2] + speed * time};
-					this.setPosition(newPosition);
-					}
+		if ((time <= 0) | (time > 0.2))
+			throw new IllegalArgumentException();
+		else {
+			if (this.isActive()) {
+				if (this.shouldFall())
+					this.changePosition(time);
+			}	
 		}
-	}
-	/**
-	 * 
-	 * @return
-	 * 		Returns the speed at which the log will fall if it's not supported
-	 */
-	public double getZSpeed() {
-		return this.ZSpeed;
-	}
-	/**
-	 * 
-	 * @return
-	 * 		Returns the coordinates of the cube where the log is located
-	 */
-	public int[] getCube() {
-		double[] position = this.getPosition();
-		double X = position[0];
-		double Y = position[1];
-		double Z = position[2];	
 		
-		int XCube = (int) Math.floor(X);
-		int YCube = (int) Math.floor(Y);
-		int ZCube = (int) Math.floor(Z);
-		int[] cube = {XCube,YCube,ZCube};
-		return cube;
-	}
-	/**
-	 * 
-	 * @return
-	 * 		Returns wheter the log is carried or just lays on the ground
-	 */
-	public boolean getCarried() {
-		return this.carried;
-	}
-	/**
-	 * 
-	 * @param carried
-	 * 		Changes the carried status of the log
-	 */
-	public void setCarried(boolean carried) {
-		this.carried = carried;
 	}
 	
+	// HELPFUNCTIONS
+	// changePosition
+	public void changePosition(double time) {
+		
+		double[] position = {this.getPosition()[0], this.getPosition()[1],
+				this.getPosition()[2] + ZSpeed * time};
+		this.setPosition(position);
+	}
 	
+	//removeOwner
+	public void removeOwner() {
+		this.setOwner(null);
+	}
+	
+	//changeInWorld
+	private void changeInWorld() {
+		if (this.isActive())
+			world.addToLogList(this);
+		else
+			world.removeFromLogList(this);
+	}
+
+	// VARIABLES 
 	private double[] position;
 	private final int weight;
+	private final double ZSpeed = -3.0;
 	private World world;
-	private double ZSpeed = -3.0;
-	private boolean carried;
+	private Unit owner = null;
+
 }
+
+
+// NOG TE DOEN
+//	Functies om Boulder/Log toe te wijzen aan Unit. Als dit gebeurt, moet ook de Boulder een owner toegewezen krijgen.
+//	Nadat de Unit de Boulder weggooit, moet de connectie tussen beide verdwijnen. Een unit met een boulder heeft een
+//	ander gewicht dat niet meer moet voldoen aan de opgelegde voorwaarden.
+//	Als de unit de boulder dan loslaat, moet de boulder de positie van de unit krijgen
