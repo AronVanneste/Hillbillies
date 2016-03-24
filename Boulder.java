@@ -157,6 +157,22 @@ public class Boulder {
 		else
 			world.removeBoulderFromList(this);
 	}
+	
+	public void terminate() {
+		if (isTerminated == false) {
+			world.removeBoulderFromWorld(this);
+			owner.removeBoulderFromUnit(this);
+			this.removeOwner();
+			this.setWorld(null);
+		}
+	}
+	
+	public boolean isCarriedByUnit() {
+		return this.owner != null;
+	}
+	
+	
+	
 
 	// VARIABLES 
 	private double[] position;
@@ -164,6 +180,7 @@ public class Boulder {
 	private final double ZSpeed = -3.0;
 	private World world;
 	private Unit owner = null;
+	private boolean isTerminated;
 
 }
 

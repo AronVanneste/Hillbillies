@@ -161,6 +161,15 @@ public class Log {
 		else
 			world.removeLogFromList(this);
 	}
+	
+	public void terminate() {
+		if (isTerminated == false) {
+			world.removeLogFromWorld(this);
+			owner.removeLogFromUnit(this);
+			this.removeOwner();
+			this.setWorld(null);
+		}
+	}
 
 	// VARIABLES 
 	private double[] position;
@@ -168,6 +177,7 @@ public class Log {
 	private final double ZSpeed = -3.0;
 	private World world;
 	private Unit owner = null;
+	private boolean isTerminated;
 
 }
 

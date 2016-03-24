@@ -390,6 +390,14 @@ public class World {
 		}
 	}
 	
+	public void removeBoulderFromWorld(Boulder boulder) {
+		boulderInWorld.remove(boulder);
+	}
+	
+	public void removeLogFromWorld(Log log) {
+		logInWorld.remove(log);
+	}
+	
 	
 	
 
@@ -404,6 +412,7 @@ public class World {
 	private Set<Log> logInWorld = new HashSet<>();
 	private Set<Faction> activeFactions = new HashSet<>();
 	private Set<Unit> unitsInWorld = new HashSet<>();
+
 	
 
 	
