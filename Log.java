@@ -1,5 +1,6 @@
 package hillbillies.model;
 
+
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 
@@ -138,10 +139,10 @@ public class Log {
 		}
 		
 	}
-	
+	  
 	// HELPFUNCTIONS
 	// changePosition
-	public void changePosition(double time) {
+	private void changePosition(double time) {
 		
 		double[] position = {this.getPosition()[0], this.getPosition()[1],
 				this.getPosition()[2] + ZSpeed * time};
@@ -158,7 +159,7 @@ public class Log {
 		if (this.isActive())
 			world.addToLogList(this);
 		else
-			world.removeFromLogList(this);
+			world.removeLogFromList(this);
 	}
 
 	// VARIABLES 

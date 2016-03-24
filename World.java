@@ -1,9 +1,8 @@
 package hillbillies.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
@@ -15,39 +14,36 @@ public class World {
 		
 		this.setTerrainTypeWorld(terrainTypes);
 		this.setTerrainChangeListener(modelListener);
-		this.setDimension();
 		
 		
 	}
 	
 	// ADVANCE TIME
-	public void advanceTime(double time) {
+	public void advanceTime(double time) throws IllegalArgumentException {
 		
-		for (int i = 0; i < this.getListToCave().size(); i++) {
-			int[] position = this.getListToCave().get(i);
-			this.cave(position);
-		this.changeSolidToPassable();
-			
+		if ((time <= 0) | (time > 0.2))
+			throw new IllegalArgumentException();
+		else {
+			for (int[] position: this.getListToCave()) {
+				this.cave(position);
+				this.changeSolidToPassable();
+			}
 		}
 		
 	}
 	
 	// CAVE
-	public void cave(int[] position) {
+	private void cave(int[] position) {
 		
 		this.setTerrainType(0, position);
 		
 		double P = Math.random();
-		
 		if (P <= 0.25)
-			new Boulder(this, position);
-		else if (P <= 0.50)
-			new Log(this, position);
+			this.throwRawMaterial(position);
 		
 	}
 	
 	private void throwRawMaterial(int[] position) {
-		
 		
 		if (this.getTerrainType(position) == 1)
 			new Boulder(this, position);
@@ -79,9 +75,7 @@ public class World {
 	}
 	
 	// CHANGE SOLID TO CUBE AND GET ALL CUBES TO CAVE 
-	public void changeSolidToPassable() {
-		
-		
+	private void changeSolidToPassable() {
 		
 		for (int x = 0; x < this.getNbX(); x++) {
 			for (int y = 0; y < this.getNbY(); y++) {
@@ -97,18 +91,45 @@ public class World {
 	}
 	
 	// CHECKER
+	
+	public boolean isValidSpawnPosition(int X, int Y, int Z) {
+		int[] position = {X, Y, Z};
+		return (isPassable(position) && isSupported(position));		
+	}
+	
+	
+	public boolean isValidSpawnPosition(int[] position) {
+		return (isPassable(position) && isSupported(position));		
+	}
+	
+	public boolean isSupported(int[] position) {
+		int X = position[0];
+		int Y = position[1];
+		int Z = position[2];
+		
+		return ((Z == 0) | (isPassable(X, Y, Z-1)));
+		
+
+		
+	}
+	
 	// isPassable
+	
 	public boolean isPassable(int[] position) {
 		
 		int X = position[0];
 		int Y = position[1];
 		int Z = position[2];
+		return this.isPassable(X, Y, Z);
+	}
+
+	public boolean isPassable(int X, int Y, int Z) {
 		return this.isPassable(this.getTerrainTypeWorld()[X][Y][Z]);
 
 	}
 	
 	// isPassable
-	public boolean isPassable(int terrainType) {
+	private boolean isPassable(int terrainType) {
 		return ((terrainType == 0) || (terrainType == 1));
 	}
 	
@@ -121,9 +142,13 @@ public class World {
 	
 	
 	// SET and GET TERRAINTYPEWORLD
-	public void setTerrainTypeWorld(int[][][] terrainType) {
+	private void setTerrainTypeWorld(int[][][] terrainType) {
 		this.terrainTypes = terrainType;
+		this.setDimension();
+		this.connectedToBorder = new ConnectedToBorder(this.getNbX(), this.getNbY(), this.getNbZ());
+
 	}
+	
 	
 	public int[][][] getTerrainTypeWorld() {
 		return this.terrainTypes;
@@ -139,7 +164,7 @@ public class World {
 	}
 	
 	//SET DIMENSION
-	public void setDimension() {
+	private void setDimension() {
 		this.setNbX(this.getTerrainTypeWorld().length);
 		this.setNbY(this.getTerrainTypeWorld()[0].length);
 		this.setNbZ(this.getTerrainTypeWorld()[0][0].length);
@@ -148,7 +173,7 @@ public class World {
 	
 	
 	// SET and GET NbX, NbY, NbZ
-	public void setNbX(int X) {
+	private void setNbX(int X) {
 		this.NbX = X;
 	}
 	
@@ -157,7 +182,7 @@ public class World {
 	}
 	
 	
-	public void setNbY(int Y) {
+	private void setNbY(int Y) {
 		this.NbY = Y;
 	}
 	
@@ -166,7 +191,7 @@ public class World {
 		return this.NbY;
 	}
 	
-	public void setNbZ(int Z) {
+	private void setNbZ(int Z) {
 		this.NbZ = Z;
 	}
 	
@@ -176,45 +201,209 @@ public class World {
 	
 	
 	// ADD TO LIST TO CAVE
-	public void addToListToCave(List<int[]> solidToPassable) {
+	private void addToListToCave(List<int[]> solidToPassable) {
 		this.toCave.addAll(solidToPassable);
 	}
 	
 	// GET LIST TO CAVE
-	public List<int[]> getListToCave() {
+	public Set<int[]> getListToCave() {
 		return this.toCave;
 	}
 	
 	// ADD TO AND GET BOULDER LIST
-	public void addToBoulderList(Boulder boulder) {
+	protected void addToBoulderList(Boulder boulder) {
 		if (!this.getBoulderList().contains(boulder))
 			this.boulderInWorld.add(boulder);
 	}
 	
-	public List<Boulder> getBoulderList() {
+	public Set<Boulder> getBoulderList() {
 		return this.boulderInWorld;
 	}
 	
 	
 	// REMOVE FROM BOULDER LIST
-	public void removeBoulderFromList(Boulder boulder) {
+	protected void removeBoulderFromList(Boulder boulder) {
 		this.boulderInWorld.remove(boulder);
 	}
 	
+	protected void addToLogList(Log log) {
+		if (!this.getLogList().contains(log))
+			this.logInWorld.add(log);
+	}
+	
+	public Set<Log> getLogList() {
+		return this.logInWorld;
+	}
+	
+	protected void removeLogFromList(Log log) {
+		this.logInWorld.remove(log);
+	}
+	
+	protected void addToFactionList(Faction faction) {
+		
+		if (this.getNbFaction() < 5) {	
+			if (!this.getFactionList().contains(faction))
+				this.activeFactions.add(faction);
+		}
+	}
+	
+	public int getNbFaction() {
+		return this.getFactionList().size();
+	}
+	
+	public Set<Faction> getFactionList() {
+		return this.activeFactions;
+	}
+	
+	protected void removeFactionFromList(Faction faction) {
+		this.activeFactions.remove(faction);
+	}
+	
+	protected boolean areBothInThisWorld(Unit unit1, Unit unit2) {
+		if ((this.getUnitList().contains(unit1)) && (this.getUnitList().contains(unit2)))
+			return true;
+		return false;
+	}
+	
+	protected void addToUnitList(Unit unit) {
+		
+		if (!this.getUnitList().contains(unit))
+			this.unitsInWorld.add(unit);
+	}
+	
+	public Set<Unit> getUnitList() {
+		return this.unitsInWorld;
+	}
+	
+	public void addUnit(Unit unit) throws IllegalWorldException, IllegalArgumentException {
+		
+		if (worldIsFull())
+			throw new IllegalWorldException("World is full");
+		if (unit == null)
+			throw new IllegalArgumentException("Unit is null");
+		
+		this.addToUnitList(unit);
+		this.addToRightFaction(unit);
+		
+		
+		
+	}
+	
+	private boolean worldIsFull() {
+		return this.getUnitList().size() >= 50;
+	}
+	
+	private void addToRightFaction(Unit unit) {
+		
+		if (this.getFactionList().size() < 5) {
+			Faction newFaction = new Faction(this);
+			newFaction.addUnit(unit);
+			unit.setFaction(newFaction);		
+		}
+		
+		else {
+			Faction smallestFaction = null;
+			int smallestNbUnits = 51;
+	
+			
+			for (Faction faction : this.getFactionList()) {
+				if (faction.getNbUnit() <= smallestNbUnits)
+					smallestFaction = faction;
+				
+			}
+			
+	
+			smallestFaction.addUnit(unit);
+			unit.setFaction(smallestFaction);
+		}	
+		
+	}
+	
+	public void createFaction() {
+		
+	}
+	
+	public void spawnUnit() throws IllegalArgumentException {
+		
+		Unit unit = createRandomUnit();
+		this.addToRightFaction(unit);
+		
+		
+		
+	}
+	
+	public Unit createRandomUnit() {
+		
+		int randomStrength = (int) Math.round(Math.random() * 75 + 25);
+		int randomAgility = (int) Math.round(Math.random() * 75 + 25);
+		int randomToughness = (int) Math.round(Math.random() * 75 + 25);
+		int minWeight = (int) Math.round((randomStrength + randomAgility) / 2);
+		int randomWeight = (int) Math.round(Math.random() * (100 - minWeight) + minWeight);
+		String randomName = "Unit" + Integer.toString((int) Math.round(Math.random() * 100));
+		int[] position = createRandomSpawnPosition();
+		
+		return new Unit(randomName, position, randomWeight, randomAgility, randomStrength, randomToughness,
+				true);
+	}
+	
+	public int[] createRandomSpawnPosition() {
+		
+		int X = (int) Math.round(Math.random() * 50);
+		int Y = (int) Math.round(Math.random() * 50);
+		int Z = (int) Math.round(Math.random() * 50);
+		
+		if (isValidSpawnPosition(X, Y, Z)) {
+			int[] pos = {X, Y, Z};
+			return pos;
+		} 
+		
+		return createRandomSpawnPosition();
+		
+	}
+	
+	public List<Object> getAllObjectsOccupyingCube(int[] cube) {
+		
+		Set<Boulder> BoulderList = this.getBoulderList();
+		Set<Log> LogList = this.getLogList();
+		Set<Unit> UnitList = this.getUnitList();
+		List<Object> AllObjectsOccupyingCube = null;
+		
+		for(Boulder boulder:BoulderList) {
+			int[] position = boulder.getCube();
+			if (position == cube) {
+				AllObjectsOccupyingCube.add(boulder);
+			}
+		}
+		
+		for(Log log:LogList) {
+			int[] position = log.getCube();
+			if (position == cube) {
+				AllObjectsOccupyingCube.add(log);
+			}
+		}
+		
+		for(Unit unit:UnitList) {
+			int[] position = unit.getCube();
+			if (position == cube) {
+				AllObjectsOccupyingCube.add(unit);
+			}
+		}
+	}
+	
+	
+	
 
-
-	
-	
-	
 	private int[][][] terrainTypes;
 	private TerrainChangeListener modelListener;
 	private ConnectedToBorder connectedToBorder;
 	private int NbX;
 	private int NbY;
 	private int NbZ;
-	private List<int[]> toCave = new ArrayList<>();
-	private List<Boulder> boulderInWorld = new ArrayList<>();
-	private List<Log> logInWorld = new ArrayList<>();
+	private Set<int[]> toCave = new HashSet<>();
+	private Set<Boulder> boulderInWorld = new HashSet<>();
+	private Set<Log> logInWorld = new HashSet<>();
+	private Set<Faction> activeFactions = new HashSet<>();
+	private Set<Unit> unitsInWorld = new HashSet<>();
 	
 
 	

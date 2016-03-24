@@ -187,6 +187,14 @@ public class Unit {
 	
 	}
 	
+	public int[] getCubeInt() {
+		int XCube = (int) Math.floor(this.getPosition().getX());
+		int YCube = (int) Math.floor(this.getPosition().getY());
+		int ZCube = (int) Math.floor(this.getPosition().getZ());
+		int[] cube = {XCube, YCube, ZCube};
+		return cube;
+	}
+	
 	
 	/**
 	 * 
@@ -554,16 +562,6 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @param weight
-	 * 			The weight of the unit
-	 * @return Returns true if the given weight is valid, else false. The weight of a unit is valid
-	 * 		   if it's bigger than or equal to the units strength + the units agility divided by two.
-	 */
-	private boolean isValidWeight(double weight) {
-		return weight >= (this.getAgility()+this.getStrength())/2;
-	}
-	/**
-	 * 
 	 * @param hitpoints
 	 * 			The hitpoints of the unit
 	 * @return Returns true if the given hitpoints are valid, else false. The hitpoints are valid
@@ -654,18 +652,6 @@ public class Unit {
 		
 	}
 	
-	/**
-	 * Indicates whether or not another priority activity occurs
-	 * @return Returns true if the unit's status of isAttacked() or isResting() equals true, else false
-	 * 
-	 */
-	private boolean isStopped() {
-		
-		if (this.isAttacked() | this.isResting())
-			return true;
-		return false;
-		
-	}
 	
 	/**
 	 * 
@@ -1252,10 +1238,6 @@ public class Unit {
 		}
 	}
 	
-	private boolean usefulResting() {
-		return ((this.getHitpoints() != this.getMaxHitpoints()) | (this.getStamina() != this.getMaxStamina()));
-
-	}
 	
 	/**
 	 * @post The unit's resting status equals the given boolean
@@ -1410,13 +1392,6 @@ public class Unit {
 		return this.attackTime;
 	}
 	
-	private void setDefendTime(double time) {
-		this.defendingTime = time;
-	}
-	
-	private double getDefendTime() {
-		return this.defendingTime;
-	}
 	private void setWorkingTime(double time) {
 		this.workingTime = time;
 	}
@@ -1433,21 +1408,6 @@ public class Unit {
 		this.defending = defending;
 	}
 	
-	private void setAttackerAgility(int agility) {
-		this.attAgility = agility;
-	}
-	
-	private void setAttackerStrength(int strength) {
-		this.attStrength = strength;
-	}
-	
-	private int getAttackerAgility() {
-		return this.attAgility;
-	}
-	
-	private int getAttackerStrength() {
-		return this.attStrength;
-	}
 
 	private void setFirstRest(boolean trueorfalse) {
 		this.firstRest = trueorfalse;
@@ -1511,6 +1471,24 @@ public class Unit {
 	private Vector getFinalTarget() {
 		return this.finalTARGET;
 	}
+	
+	public void setFaction(Faction faction) throws IllegalArgumentException {
+		if (!isValidFaction(faction))
+			throw new IllegalArgumentException();
+		this.faction = faction;
+	}
+	
+	private boolean isValidFaction(Faction faction) {
+		if (faction == null)
+			return false;
+		return true;
+	}
+	
+	public Faction getFaction() {
+		return this.faction;
+	}
+	
+	
 
 	
 	
@@ -1533,11 +1511,8 @@ public class Unit {
 	private boolean enableDefaultBehaviour;
 	private boolean attacking;
 	private double attackTime;
-	private double defendingTime;
 	private double workingTime;
 	private boolean defending;
-	private int attAgility;
-	private int attStrength;
 	private boolean firstRest;
 	private double notRestTime = 0;
 	private Unit opponent;
@@ -1547,6 +1522,7 @@ public class Unit {
 	private boolean startedDefaultBehavior;
 	private boolean changedBehavior;
 	private final Vector finalTARGET = new Vector(0,0,0);
+	private Faction faction;
 
 
 

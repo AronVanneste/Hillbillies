@@ -1,7 +1,5 @@
 package hillbillies.model;
 
-import hillbillies.model.Vector;
-
 public class Vector {
 	
 	private double X;
