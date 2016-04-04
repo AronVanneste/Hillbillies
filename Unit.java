@@ -1,6 +1,12 @@
 package hillbillies.model;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+
 import hillbillies.model.Vector;
 
 /**
@@ -72,14 +78,14 @@ public class Unit {
 
 		
 		if (!this.isValidPosition(X,Y,Z))
-			throw new IllegalArgumentException();
-		else 
-			this.setPosition(X, Y, Z);
+			throw new IllegalArgumentException("This is not a valid position");
+		this.setPosition(X, Y, Z);
 		
 		if (!this.isValidName(name))
-				throw new IllegalArgumentException();
-		else
-			this.setName(name);
+			throw new IllegalArgumentException("This is not a valid name");
+		this.setName(name);
+		
+		this.setFaction(null);
 		
 		this.setStrength((Math.abs(strength) - 25) % 75 + 25);
 		this.setAgility((Math.abs(agility) - 25) % 75 + 25);
@@ -91,15 +97,57 @@ public class Unit {
 		this.setStamina((int) Math.ceil(2 * this.getWeight() * this.getToughness() / 100.0));
 		this.setHitpoints((int) Math.ceil(2 * this.getWeight() * this.getToughness() / 100.0));
 		this.setOrientation((float) Math.PI/2);
-		
+				
 		this.setSpeed(0);
 		this.setDefaultBehavior(enableDefaultBehaviour);
 		this.setTarget(this.getPosition().getX(), 
 				this.getPosition().getY(), this.getPosition().getZ());
 		this.setFinalTarget(this.getPosition().getX(), 
 				this.getPosition().getY(), this.getPosition().getZ());
+		this.setExperiencePoints(0);
 
 		
+	}
+	
+	
+	
+	
+	
+	/**
+	 * ##############################################################################
+	 * ##### SETTERS, GETTERS AND OTHER FUNCTIONS OF THE UNIT'S CHARACTERISTICS #####
+	 * ##############################################################################
+	 */
+	
+	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public World getWorld() {
+		try {
+			return this.getFaction().getWorld();
+		} catch (NullPointerException e) {
+			return null;
+		}
+	}
+
+	
+	/**
+	 * 
+	 * @param faction
+	 */
+	protected void setFaction(Faction faction) {
+		this.faction = faction;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Faction getFaction() {
+		return this.faction;
 	}
 
 	
@@ -150,7 +198,7 @@ public class Unit {
 	 * 
 	 */
 	
-	public void setPosition(double X, double Y, double Z) throws IllegalArgumentException {
+	protected void setPosition(double X, double Y, double Z) throws IllegalArgumentException {
 		
 		if (!isValidPosition(X,Y,Z))
 			throw new IllegalArgumentException();
@@ -171,20 +219,33 @@ public class Unit {
 		return this.POS;
 	}
 	
+	public double[] getPositionList() {
+		double X = this.getPosition().getX();
+		double Y = this.getPosition().getY();
+		double Z = this.getPosition().getZ();
+		double[] pos = {X, Y, Z};
+		return pos;
+
+	}
+	
 	/**
 	 * 
 	 * @return Return a list containing the x-axis, y-axis and z-axis position of the cube in which the unit is located. 
 	 * 		   These are the coordinates of the top left corner of this cube.
 	 */
 	public Vector getCube() {
+		return this.getCube(this.getPosition());
+	}
+	
+	private Vector getCube(Vector position) {
 		
-		double XCube = Math.floor(this.getPosition().getX());
-		double YCube = Math.floor(this.getPosition().getY());
-		double ZCube = Math.floor(this.getPosition().getZ());
+		double XCube = Math.floor(position.getX());
+		double YCube = Math.floor(position.getY());
+		double ZCube = Math.floor(position.getZ());
 		Vector CUBE = new Vector(XCube, YCube, ZCube);
 
 		return CUBE;
-	
+
 	}
 	
 	public int[] getCubeInt() {
@@ -271,9 +332,16 @@ public class Unit {
 	 */
 	public void setWeight(int weight) {
 		
+		int unitWeight = weight;
+		if (this.isCarryingBoulder())
+			unitWeight -= this.getCarryingBoulder().getWeight();
+		else if (this.isCarryingLog())
+			unitWeight -= this.getCarryingLog().getWeight();
+		int restWeight = weight - unitWeight;
+		
 		int MIN = (this.getStrength() + this.getAgility()) / 2;
-		this.weight = (Math.abs(weight) - MIN) % (100 - MIN) + MIN;
-
+		unitWeight = (Math.abs(unitWeight) - MIN) % (100 - MIN) + MIN;
+		this.weight = unitWeight + restWeight;
 	}
 	
 	
@@ -311,6 +379,14 @@ public class Unit {
 		return this.stamina;
 	}
 	
+	/**
+	 * 
+	 * @return Returns the maximal stamina points the unit can have
+	 */
+	public int getMaxStamina() {
+		return (int) Math.ceil(2 * this.getWeight() * this.getToughness() / 100.0);
+	}
+	
 	
 	/**
 	 * 
@@ -323,8 +399,9 @@ public class Unit {
 	 * 		| new.getHitpoints() = hitpoints
 	 */
 	public void setHitpoints(int hitpoints) {
-		assert (this.isValidHitpoints(hitpoints));
-		this.hitpoints = hitpoints;
+		assert (isValidHitpoints(hitpoints));
+		this.hitpoints = Math.max(0, hitpoints);
+		this.checkTerminate();
 
 	}
 	
@@ -334,6 +411,51 @@ public class Unit {
 	 */
 	public int getHitpoints() {
 		return this.hitpoints;
+	}
+	
+	/**
+	 * 
+	 * @return Returns the maximal hitpoints the unit can have
+	 */
+	public int getMaxHitpoints() {
+		return (int) Math.ceil(2 * this.getWeight() * this.getToughness() / 100.0);
+	}
+	
+
+	/**
+	 * 
+	 * @param points
+	 */
+	private void setExperiencePoints(int points) {
+		this.experiencePoints = Math.max(points, 0);
+		this.updateExperiencePoints();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getExperiencePoints() {
+		return this.experiencePoints;
+	}
+	
+	/**
+	 * For every 10 experience points, one of the unit's strength, agility or toughness 
+	 * will increase by one point. 
+	 * 
+	 */
+	public void updateExperiencePoints() {
+		
+		while (this.getExperiencePoints() % 10 >= 0) {  
+			this.setExperiencePoints(this.getExperiencePoints() - 10);
+			if (this.getStrength() < 100)
+				this.setStrength(this.getStrength() + 1);
+			else if (this.getAgility() < 100)
+				this.setAgility(this.getAgility() + 1);
+			else
+				this.setToughness(this.getToughness() + 1);
+		}
+		
 	}
 
 	
@@ -348,7 +470,7 @@ public class Unit {
 	 * 		| if (orientation < 0)
 	 * 		|	then new.getOrientation() = 2 * Math.PI - Math.abs(orientation) % (2 * Math.PI)
 	 */
-	public void setOrientation(double orientation) {
+	private void setOrientation(double orientation) {
 		
 		if (orientation >= 0) 
 			this.orientation = Math.abs(orientation) % (double) (2 * Math.PI);
@@ -365,6 +487,16 @@ public class Unit {
 	public double getOrientation() {
 		return this.orientation;
 	}
+	
+	/**
+	 * @post The orientation of the unit equals the atan2(y-component of the unit's speed, x-component of the unit's speed)
+	 * 		 | new.getOrientation() == Math.atan2(this.getSpeedVector.get(1), this.getSpeedVector().get(2))
+	 */
+	private void updateOrientation() {
+		this.setOrientation(Math.atan2(this.getSpeedVector().getY(), 
+				this.getSpeedVector().getX()));
+	}
+
 	
 	
 	/**
@@ -385,7 +517,7 @@ public class Unit {
 	 * 		If the given target (XTarget, YTarget, ZTarget) is not a valid position
 	 * 		| (!isValidPosition(XTarget, YTarget, ZTarget)
 	 */
-	public void setTarget(double XTarget, double YTarget, double ZTarget) throws IllegalArgumentException {
+	private void setTarget(double XTarget, double YTarget, double ZTarget) throws IllegalArgumentException {
 
 		if (!isValidPosition(XTarget, YTarget, ZTarget))
 			throw new IllegalArgumentException();
@@ -401,18 +533,36 @@ public class Unit {
 	 * 
 	 * @return Returns a list containing the x-, y- and z-axis position of the unit's target
 	 */
-	public Vector getTarget() {
+	private Vector getTarget() {
 		return this.TARGET;
 	}
 	
+	/**
+	 * 
+	 * @param X
+	 * @param Y
+	 * @param Z
+	 */
+	private void setFinalTarget(double X, double Y, double Z) {
+		
+		if (!this.isValidPosition(X, Y, Z))
+			throw new IllegalArgumentException();
+		else {
+			this.finalTARGET.setX(X);
+			this.finalTARGET.setY(Y);
+			this.finalTARGET.setZ(Z);
+		}
+	}
 	
 	/**
 	 * 
-	 * @return Returns the current speed of the unit
+	 * @return
 	 */
-	public double getSpeed() {
-		return this.speed;
+	private Vector getFinalTarget() {
+		return this.finalTARGET;
 	}
+
+	
 	
 	
 	/**
@@ -429,58 +579,14 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return Returns a list containing the x-, y- and z- components, respectively, of the unit's velocity
+	 * @return Returns the current speed of the unit
 	 */
-	private Vector getSpeedVector() {
-		double distance = Math.sqrt(Math.pow(this.getTarget().getX() - this.getPosition().getX(),2) + 
-				Math.pow(this.getTarget().getY() - this.getPosition().getY(), 2) + 
-				Math.pow(this.getTarget().getZ() - this.getPosition().getZ(), 2));
-		
-		double XSpeed = this.getSpeed() * (this.getTarget().getX() - this.getPosition().getX()) / distance;
-		double YSpeed = this.getSpeed() * (this.getTarget().getY() - this.getPosition().getY()) / distance;
-		double ZSpeed = this.getSpeed() * (this.getTarget().getZ() - this.getPosition().getZ()) / distance;
-		
-		Vector speedVector = new Vector(XSpeed, YSpeed, ZSpeed);
-		
-		return speedVector;
-
+	public double getSpeed() {
+		if (this.isFalling())
+			return ZSpeed;
+		return this.speed;
 	}
 	
-	
-	/**
-	 * 
-	 * @param working
-	 * 			The working status of the unit
-	 * @post The unit's working status equals the given boolean
-	 * 		| new.isWorking() == working
-	 */
-	private void setWorking(boolean working) {
-		this.working = working;
-	}
-	
-	/**
-	 * 
-	 * @return Returns the status of the boolean working
-	 */
-	public boolean isWorking() {
-		return this.working;
-	}
-	
-	/**
-	 * 
-	 * @return Returns the maximal hitpoints the unit can have
-	 */
-	public int getMaxHitpoints() {
-		return (int) Math.ceil(2 * this.getWeight() * this.getToughness() / 100.0);
-	}
-	
-	/**
-	 * 
-	 * @return Returns the maximal stamina points the unit can have
-	 */
-	public int getMaxStamina() {
-		return (int) Math.ceil(2 * this.getWeight() * this.getToughness() / 100.0);
-	}
 	/**
 	 * 
 	 * @return Returns the unit's allowed speed. The standard velocity equals the strength of the unit plus 
@@ -514,6 +620,66 @@ public class Unit {
 			return velocity;
 		
 	}
+
+
+	
+	/**
+	 * 
+	 * @return Returns a list containing the x-, y- and z- components, respectively, of the unit's velocity
+	 */
+	private Vector getSpeedVector() {
+		double distance = Math.sqrt(Math.pow(this.getTarget().getX() - this.getPosition().getX(),2) + 
+				Math.pow(this.getTarget().getY() - this.getPosition().getY(), 2) + 
+				Math.pow(this.getTarget().getZ() - this.getPosition().getZ(), 2));
+		
+		double XSpeed = this.getSpeed() * (this.getTarget().getX() - this.getPosition().getX()) / distance;
+		double YSpeed = this.getSpeed() * (this.getTarget().getY() - this.getPosition().getY()) / distance;
+		double ZSpeed = this.getSpeed() * (this.getTarget().getZ() - this.getPosition().getZ()) / distance;
+		
+		Vector speedVector = new Vector(XSpeed, YSpeed, ZSpeed);
+		
+		return speedVector;
+
+	}
+	
+	/**
+	 * 
+	 * @param behavior
+	 * 			A boolean indicating whether the unit is allowed 
+	 * 			to behave in a random way or not
+	 * 
+	 * @post The enableDefaultBehavior status of the unit equals the given boolean behavior
+	 * 		| new.getDefaultBehavior() = behavior
+
+	 */
+	public void setDefaultBehavior(boolean behavior) {
+		
+		if (this.getDefaultBehavior() != behavior)
+			this.setChangedDefaultBehavior(true);
+		else
+			this.setChangedDefaultBehavior(false);
+		
+		this.enableDefaultBehaviour = behavior;
+		this.setStartedDefaultBehavior(false);
+	}
+	
+	
+	/**
+	 * 
+	 * @return Returns the enableDefaultBehavior status of the unit
+	 */
+	public boolean getDefaultBehavior() {
+		
+		return this.enableDefaultBehaviour;
+	}
+
+	
+	
+	/**
+	 * #######################################################################
+	 * ##### CHECKERS TO CHECK IF THE GIVEN VALUE MEETS THE REQUIREMENTS #####
+	 * #######################################################################
+	 */
 	
 	
 	/**
@@ -530,16 +696,52 @@ public class Unit {
 	 * 			| 	then false
 	 * 			| else
 	 * 			| 	then true
-
 	 */
-
 	private boolean isValidPosition(double X, double Y, double Z) {
-		if ((X >= 0.0) && (X <= 50.0) && (Y >= 0.0) && (Y <= 50.0) && (Z >= 0.0) && (Z <= 50.0))
+		double[] pos = {X, Y, Z};
+		return isValidPosition(pos);
+	}
+	
+	
+	/**
+	 * 
+	 * @param position
+	 * @return
+	 */
+	private boolean isValidPosition(int[] position) {
+		try {
+			return this.getWorld().isValidPosition(position);
+		} catch (NullPointerException e) {
 			return true;
-		else
-			return false;
+		}
+	}
+	
+	
 
-		
+	
+	/**
+	 * 
+	 * @param position
+	 * @return
+	 */
+	private boolean isValidPosition(double[] position) {
+		try {
+			return this.getWorld().isValidPosition(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}	
+	/**
+	 * 
+	 * @param position
+	 * @return
+	 */
+	private boolean isPassable(int[] position) {
+		try {
+			return this.getWorld().isPassable(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
 	}
 	
 	/**
@@ -552,11 +754,8 @@ public class Unit {
 	 * 			
 	 */
 	private boolean isValidName(String name) {
-		
-		if ((!Character.isUpperCase(name.charAt(0))) | (name.length() < 2) | (!name.matches("[a-zA-Z\\s\'\"]+")))
-			return false;
-		else
-			return true;
+		return !((!Character.isUpperCase(name.charAt(0))) | 
+				(name.length() < 2) | (!name.matches("[a-zA-Z\\s\'\"]+")));
 
 	}
 	
@@ -568,7 +767,7 @@ public class Unit {
 	 * 			if they're nonnegative and smaller than MaxHitpoints
 	 */
 	private boolean isValidHitpoints(double hitpoints) {
-		return (hitpoints >= 0 ) && (hitpoints <= this.getMaxHitpoints());
+		return (hitpoints <= this.getMaxHitpoints());
 	}
 	
 	/**
@@ -583,6 +782,119 @@ public class Unit {
 	}
 	
 
+	/**
+	 * 
+	 * @param defender
+	 * 			The defending unit
+	 * @return Returns true if the cube the unit's in and the cube the defending unit's in are 
+	 * 		   neighboring cubes, else false
+	 * 
+	 */
+	
+	private boolean isValidAttack(Unit attacker, Unit defender) {
+		
+		return ((Math.abs(attacker.getCube().getX()- defender.getCube().getX()) <= 1) &&
+				(Math.abs(attacker.getCube().getY()- defender.getCube().getY()) <= 1) &&
+				(Math.abs(attacker.getCube().getZ()- defender.getCube().getZ()) <= 1) &&
+				(attacker.getFaction() != defender.getFaction()));
+	}
+	
+	private boolean isPositionInWorld(int[] position) {
+		try {
+			return this.getWorld().isPositionInWorld(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+	
+	private boolean isNeighbouringSolidTerrain(int[] position) {
+		
+		if (position[2] == 0) {
+			return true;
+		}
+			
+		
+		Set<int[]> adjacentCubes = getAdjacentCubes(position);
+		
+		for (int[] adjacentCube: adjacentCubes) {
+			try{
+				if (!isPassable(adjacentCube)) {
+					return true;
+				}
+			} catch (IndexOutOfBoundsException e) {
+			}
+		}
+		return false;
+		
+	}
+	
+	private boolean isWorkshop() {
+		return isWorkshop(this.getCubeInt());
+	}
+	
+	
+	private boolean isWorkshop(int[] position) {
+		try {
+			return this.getWorld().isWorkshop(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+		
+	private boolean isWood() {
+		return isWood(this.getCubeInt());
+	}
+	
+	
+	private boolean isWood(int[] position) {
+		try {
+			return this.getWorld().isWood(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+
+	
+	private boolean isRock() {
+		return isRock(this.getCubeInt());
+	}
+	
+	
+	private boolean isRock(int[] position) {
+		try {
+			return this.getWorld().isRock(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+	
+	private boolean isNotInQueue(Queue<Object[]> Queue, int[] position, int n0) {
+		
+		if (Queue.size() == 0) 
+			return true;
+		for (Object[] something: Queue) { 
+			if ((something[0] == position) && (((int) something[1]) >= n0))
+				return true;
+		}
+		return false;
+	}
+	
+	private boolean isInQueue(Queue<Object[]> Queue, int[] position) {
+		for (Object[] something: Queue) {
+			if (((int[]) something[0]) == position)
+				return true;
+		}
+		return false;
+	}
+
+	
+	
+	/**
+	 * ###################################################################
+	 * ##### FUNCTIONS TO INDICATE THE UNIT SHOULD START AN ACTIVITY #####
+	 * ###################################################################
+	 */
+	
 	
 	/**
 	 * @post The status of the boolean sprint of the unit equals false
@@ -590,32 +902,28 @@ public class Unit {
 	 * @post The time the unit has been sprinting equals zero
 	 * 		| this.getSprintingTime == 0
 	 */
-	// CHANGED
-	public void stopSprinting() {
-		this.sprint = false;
-		this.setSprintingTime(0);
-	}
-	
-	
-	/**
-	 * @post The unit's speed equals his previous speed multiplied by two
-	 * 		 | new.getSpeed() == 2 * this.getSpeed()
-	 */
-	// CHANGED
-	public void startSprinting() {
-		assert (this.getStamina() >= 1);
-		this.sprint = true;
+	public void setSprinting(boolean sprinting) {
+		if (!sprinting) {
+			this.setSprintingTime(0);
+			this.sprint = sprinting;
+		}
+		else {
+			assert(this.getStamina() >= 1);
+			this.sprint = true;
+		}
 	}
 	
 	/**
 	 * 
-	 * @return Returns the value (true or false) of the boolean sprint of the unit
+	 * @param X
+	 * @param Y
+	 * @param Z
 	 */
-	public boolean isSprinting() {
-		return this.sprint;
+	public void moveTo(int X, int Y, int Z) {	
+		this.setFinalTarget(((double) X), ((double) Y), ((double) Z));
 	}
-	
 
+	
 	
 	/**
 	 * 
@@ -652,196 +960,62 @@ public class Unit {
 		
 	}
 	
-	
-	/**
-	 * 
-	 * @param seconds
-	 * 			The seconds 
-	 * @throws IllegalArgumentException
-	 * 		| (seconds <= 0) | (seconds >= 0.2)
-	 * @post 
-	 * 		| new.setPosition(this.getPosition().get(0) + this.getSpeedVector().get(0) * seconds,
-	 * 		|	this.getPosition().get(1) + this.getSpeedVector().get(1) * seconds,
-	 * 		|	this.getPosition().get(2) + this.getSpeedVector().get(2) * seconds);
-
-	 */
-	
-	// CHANGED
-	public void advanceTime(double seconds) throws IllegalArgumentException {
-		
-		
-		if ((seconds <= 0) | (seconds > 0.2))
-			throw new IllegalArgumentException();
-		else {
-			
-			if (this.isAttacking()) {
-				if (this.getAttackTime() < 1) {
-					this.setAttackTime(this.getAttackTime() + seconds);
-					this.fightUnitOrientation();
-				} else {
-					this.setAttacking(false);
-					this.setAttackTime(0);
-				}
-			} else if (this.isAttacked()) {
-				if (this.getAttackedTime() < 1) {
-					this.setAttackedTime(this.getAttackedTime() + seconds);
-					this.fightUnitOrientation();
-				} else {
-					this.setAttacked(false);
-					this.setAttackedTime(0);
-					this.defend();
-				}
-			} else { 
-				} if (this.getDefaultBehavior()) {
-					if (!this.getStartedDefaultBehavior())
-						this.startDefaultBehavior();
-				} else if (!this.getDefaultBehavior()) {
-					if (this.getChangedDefaultBehavior())
-						this.stopDefaultBehavior();
-				} 
-				
-				if (this.isResting()) {
-					this.setRestingTime(this.getRestingTime() + seconds);
-					this.changeResting();
-				} else if (!this.isResting()) {
-						this.setNotRestTime(this.getNotRestTime() + seconds);
-						this.checkResting();
-				
-				
-					if (this.isWorking()) {
-						if (this.getWorkingTime() >= this.getTimeToWork())
-							this.setWorking(false);
-						else
-							this.setWorkingTime(this.getWorkingTime() + seconds);
-					} else {
-						if (!this.getPosition().equals(this.getFinalTarget())) {
-							if (!this.getPosition().equals(this.getTarget())) {
-								this.setSpeed(this.determineSpeed());
-								this.changePosition(seconds);
-							} else {
-								this.moveToTarget();
-								this.setSpeed(this.determineSpeed());
-								this.changePosition(seconds);
-							}
-							if (this.isSprinting()) {
-								this.setSprintingTime(this.getSprintingTime() + seconds);
-								this.controlSprinting();
-							}
-						} else
-							this.setSpeed(0);
-					}	
-				}
+	public void pathFindingAlgorithm(int[] destination) {
+		Queue<Object[]> Queue = new LinkedList<>();
+		while (this.getCubeInt() != destination) {
+			Object[] somethingNew = {destination, 0};
+			Queue.add(somethingNew);
+			while ((!isInQueue(Queue, destination)) && (Queue.peek() != null)) {
+				Object[] something = Queue.poll();
+				search(Queue, something);
 			}
-		
+			if (isInQueue(Queue, this.getCubeInt())) {
+				int[] next = takeNext(Queue);
+				moveToAdjacent(next[0], next[1], next[2]);
+			} else
+				break;
+		}
+				
 	}
 	
-	// NEW
-	private void controlSprinting() {
-		
-		assert (this.isSprinting());
-		if (this.getSprintingTime() % 0.1 == 0)
-			this.setStamina(this.getStamina() - 1);
-		if (this.getStamina() < 1)
-			this.stopSprinting();
+	private void search(Queue<Object[]> Queue, Object[] something) {
+		int[] position = ((int[]) something[0]);
+		int n0 = ((int) something[1]);
+		search(Queue, position, n0);
 	}
 	
-	// NEW
-	private void changePosition(double time) {
+	private void search(Queue<Object[]> Queue, int[] position, int n0) {
 		
-		double X = this.getPosition().getX();
-		double Y = this.getPosition().getY();
-		double Z = this.getPosition().getZ();
-		
-		this.setPosition(this.getPosition().getX() + this.getSpeedVector().getX() * time,
-				this.getPosition().getY() + this.getSpeedVector().getY() * time,
-				this.getPosition().getZ() + this.getSpeedVector().getZ() * time);
-		this.updateOrientation();
-		
-		if (this.getPosition().getX() - X > X - this.getTarget().getX())
-			this.setPosition(this.getTarget().getX(), this.getPosition().getY(), this.getPosition().getZ());
-		if (this.getPosition().getY() - Y > Y - this.getTarget().getY())
-			this.setPosition(this.getPosition().getX(), this.getTarget().getY(), this.getPosition().getZ());
-		if (this.getPosition().getZ() - Z > Z - this.getTarget().getZ())
-			this.setPosition(this.getPosition().getX(), this.getPosition().getY(), this.getTarget().getZ());
-
-
-
+		Set<int[]> adjacentCubes = this.getAdjacentCubes();
+		for (int[] cube: adjacentCubes) {
+			if ((isPassable(cube)) && (isNeighbouringSolidTerrain(cube))
+					&& isNotInQueue(Queue, position, n0)) {
+				Object[] somethingNew = {cube, n0+1};
+				Queue.add(somethingNew);
+			}
+		}
 	}
 	
-	
-	/**
-	 * @post The orientation of the unit equals the atan2(y-component of the unit's speed, x-component of the unit's speed)
-	 * 		 | new.getOrientation() == Math.atan2(this.getSpeedVector.get(1), this.getSpeedVector().get(2))
-	 */
-	private void updateOrientation() {
-		this.setOrientation(Math.atan2(this.getSpeedVector().getY(), 
-				this.getSpeedVector().getX()));
-	}
-	
-	
-	/**
-	 * 
-	 * @param X
-	 * 			The x-axis position of the target cube
-	 * @param Y
-	 * 			The y-axis position of the target cube
-	 * @param Z
-	 * 			The z-axis position of the target cube
-	 * @post If the unit was not interrupted, his new position equals the given target (X, Y, Z)µ
-	 * 		 | if (!this.isStopped())
-	 * 		 | 	new.getPosition() == [X, Y, Z]
-	 * @post If the unit was interrupted, his new position equals the position it was when the 
-	 * 		 interruption occurred
-	 */
-	public void moveTo2(int X, int Y, int Z) {
+	private int[] takeNext(Queue<Object[]> Queue) {
+		int maximalN = Integer.MAX_VALUE;
+		int[] next = null;
 		
-		
-		Vector Target = new Vector(((double) X), ((double) Y), ((double) Z));
-		
-		int x, y, z;
-		while (!this.getPosition().equals(Target)) {
-			//if (this.getPosition().equals(this.getTarget())) {
-				if (this.getPosition().getX() == X)
-					x = 0;
-				else if (this.getPosition().getX() < X)
-					x = 1;
-				else 
-					x = -1;
-				if (this.getPosition().getY() == Y)
-					y = 0;
-				else if (this.getPosition().getY() < Y)
-					y = 1;
-				else 
-					y = -1;
-				if (this.getPosition().getZ() == Z)
-					z = 0;
-				else if (this.getPosition().getZ() < Z)
-					z = 1;
-				else 
-					z = -1;
-				this.moveToAdjacent(x, y, z);
-			//}
+		for (Object[] something: Queue) {
+			if (((int) something[1]) <= maximalN) {
+			maximalN = ((int) something[1]);
+			next = ((int[]) something[0]);
+			}
 		}
 		
-		
+		return next;
+			
 	}
+		
+	
+	
 	/**
-	 * The unit starts working and stops after 500 divided by its strength seconds
-	 * unless its working activity is interrupted by an attack or because its need to rest
-	 * @post The working status of the unit equals false after the work is done
-	 * 		 | new.getWorking() == false
-	 * @post The unit's speed is equal to zero
-	 * 		 | new.getSpeed() == 0
-	 * @post The unit's resting status is false
-	 * 		 | new.isResting() == false
+	 * 
 	 */
-	
-	public void moveTo(int X, int Y, int Z) {
-		
-		this.setFinalTarget(((double) X), ((double) Y), ((double) Z));
-		
-	}
-	
 	private void moveToTarget() {
 		
 		double X = this.getFinalTarget().getX();
@@ -871,19 +1045,386 @@ public class Unit {
 		
 	}
 	
+	/**
+	 * 
+	 */
 	public void work() {
-
 		this.setWorking(true);
 		this.setSpeed(0);		
 		this.setResting(false);
-		
-		
-
-	}	
-	
-	private double getTimeToWork() {
-		return (double) (500 / this.getStrength());
 	}
+	
+	protected void finishWorking() {
+		
+		
+		if (this.isCarryingBoulder() | this.isCarryingLog())
+			this.dropEverything();
+		else if (isWorkshop() && logAndBoulderAreAvailable())
+			this.improveEquipment();
+		else if (boulderAvailable())
+			this.carryBoulder();
+		else if (logAvailable())
+			this.carryLog();
+		else if (isWood())
+			this.collapseAndCreate();
+		else if (isRock())
+			this.collapseAndCreate();
+			
+	}
+	
+	
+	private void improveEquipment() {
+		
+		this.setWeight(this.getWeight() + 5);
+		this.setToughness(this.getToughness() + 5);
+		
+		try {
+			this.getBoulder().terminate();
+		} catch (NullPointerException e) {};
+		
+		try {
+			this.getLog().terminate();
+		} catch (NullPointerException e) {};
+	}
+	
+	private void collapseAndCreate() {
+		try {
+			this.getWorld().caveAndThrow(this.getCubeInt());
+		} catch (NullPointerException e) {};
+	}
+	
+	
+	/**
+	 * 
+	 * @param attacker
+	 * 			The attacking unit
+	 * @param defender
+	 * 			The defending unit (attacked by the attacker)
+	 * @pre The attacking unit and defending unit must be located in neighboring cubes
+	 * 		| attacker.isValidAttack(defender)
+	 * @post The attacker's status of getAttacking() equals true
+	 * 		| attacker.getAttacking() == true
+	 * @post The defender's status of isAttacked() equals true
+	 * 		| defender.isAttacked() == true
+	 */
+	public void fight(Unit attacker, Unit defender) {
+		
+		assert isValidAttack(attacker, defender);
+		attacker.setOpponent(defender);
+		defender.setOpponent(attacker);
+		attacker.attack();
+		defender.attacked();
+		
+	}
+	
+	/**
+	 * 
+	 * @pre The hitpoints of the unit as well as the stamina points of the unit must not have reached its maximum
+	 *     |(this.getHitpoints() != this.getMaxHitPoints()) | (this.getStamina() != this.getMaxStamina())
+	 * @post After the unit was resting, its restingTime is set to zero
+	 *	   | new.getRestingTime() == 0
+	 * @post If a previous activity was interrupted because the unit needed to rest, it resumes this activity afterwards
+	 * 	   | if (this.getNotReachedTarget())
+	 * 	   |	then new.getSpeed() > 0
+	 * @post If no previous activity was interrupted by resting, the unit's speed equals zero
+	 * 	   | if (!this.getNotReachedTarget())
+	 * 	   |	then new.getSpeed() == 0  
+	 *
+	 *  	
+	 */
+	public void resting() {
+		
+		this.setResting(true);
+		this.setAttacked(false);
+		this.setAttacking(false);
+		this.setSprinting(false);
+		this.setDefending(false);
+		this.setWorking(false);
+		this.setSpeed(0);
+		
+	}
+	
+	
+	/**
+	 * ##################################################################################################
+	 * ##### FUNCTIONS TO INDICATE THAT THE UNIT'S STATUS HAS CHANGED OR TO CHECK THE UNIT'S STATUS #####
+	 * ##################################################################################################
+	 */
+	
+	
+	/**
+	 * 
+	 * @param working
+	 * 			The working status of the unit
+	 * @post The unit's working status equals the given boolean
+	 * 		| new.isWorking() == working
+	 */
+	private void setWorking(boolean working) {
+		this.working = working;
+		if (working == false)
+			this.setWorkingTime(0);
+	}
+	
+	/**
+	 * 
+	 * @return Returns the status of the boolean working
+	 */
+	public boolean isWorking() {
+		return this.working;
+	}
+	
+	/**
+	 * 
+	 * @return Returns the value (true or false) of the boolean sprint of the unit
+	 */
+	public boolean isSprinting() {
+		return this.sprint;
+	}
+
+	/**
+	 * @param attacked
+	 * 			The attacked status of the unit
+	 * 
+	 * @post The unit's attacked status equals the given boolean attacked
+	 * 		 | new.getAttacked() == true
+	 */
+	
+	private void setAttacked(boolean attacked) {
+		this.attacked = attacked;
+	}
+	
+	/**
+	 * Indicates whether or not the unit is being attacked
+	 * @return Returns the status of the attacked boolean of the unit
+	 */
+	public boolean isAttacked() {
+		return this.attacked;
+	}
+	
+	
+	/**
+	 * @post The unit's resting status equals the given boolean
+	 * 		 | new.isResting() == restingStatus
+	 */
+	private void setResting(boolean restingStatus) {
+		
+		if (!restingStatus && (!this.isAttacked() | !this.isAttacking()) && 
+				!this.getFirstRest())
+			this.resting = true;
+		
+		else
+			if (!restingStatus) {
+				this.setFirstRest(false);
+				this.setRestingTime(0);
+			} else
+				this.setNotRestTime(0);
+		
+			this.resting = restingStatus;
+		
+	}
+	
+	/**
+	 * 
+	 * @return Returns the status of the resting boolean of the unit
+	 */
+	public boolean isResting() {
+		return this.resting;
+	}
+	
+
+	/**
+	 * 
+	 * @param attack
+	 * 			A boolean indicating whether or not the unit should attack
+	 * 
+	 * @post The isAttacking status of the unit equals the given boolean attack
+	 * 		| new.isAttacking() == attack
+	 * 
+	 */
+	private void setAttacking(boolean attack) {
+		this.attacking = attack;
+	}
+
+	/**
+	 * 
+	 * @return Returns the isAttacking status of the unit
+	 * 
+	 */
+	public boolean isAttacking() {
+		return this.attacking;
+	}
+	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isDefending() {
+		return this.defending;
+	}
+	
+	/**
+	 * 
+	 * @param defending
+	 */
+	private void setDefending(boolean defending) {
+		this.defending = defending;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean isFalling() {
+		return this.falling;
+	}
+	
+	/**
+	 * 
+	 * @param trueorfalse
+	 */
+	private void setFirstRest(boolean trueorfalse) {
+		this.firstRest = trueorfalse;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean getFirstRest() {
+		return this.firstRest;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean getStartedDefaultBehavior() {
+		return this.startedDefaultBehavior;
+	}
+	
+	/**
+	 * 
+	 * @param bool
+	 */
+	private void setStartedDefaultBehavior(boolean bool) {
+		this.startedDefaultBehavior = bool;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean getChangedDefaultBehavior() {
+		return this.changedBehavior;
+	}
+	
+	/**
+	 * 
+	 * @param bool
+	 */
+	private void setChangedDefaultBehavior(boolean bool) {
+		this.changedBehavior = bool;
+	}
+	
+
+	
+	/**
+	 * ##########################################################
+	 * ##### FUNCTIONS THAT CHANGE THE UNIT'S CURRENT STATE #####
+	 * ##########################################################
+	 */
+
+
+	/**
+	 * 
+	 * @param seconds
+	 * 			The seconds 
+	 * @throws IllegalArgumentException
+	 * 		| (seconds <= 0) | (seconds >= 0.2)
+	 * @post 
+	 * 		| new.setPosition(this.getPosition().get(0) + this.getSpeedVector().get(0) * seconds,
+	 * 		|	this.getPosition().get(1) + this.getSpeedVector().get(1) * seconds,
+	 * 		|	this.getPosition().get(2) + this.getSpeedVector().get(2) * seconds);
+
+	 */
+	
+	public void advanceTime(double seconds) throws IllegalArgumentException, IllegalUnitException {
+		
+		
+		if ((seconds <= 0) | (seconds > 0.2))
+			throw new IllegalArgumentException();
+		else if (this.isTerminated())
+			throw new IllegalUnitException("The unit is terminated");
+		else {
+			if (this.shouldFall())
+				this.fall(seconds);
+			else {
+				if (this.isAttacking()) {
+					if (this.getAttackTime() < 1) {
+						this.setAttackTime(this.getAttackTime() + seconds);
+						this.fightUnitOrientation();
+					} else {
+						this.setAttacking(false);
+						this.setAttackTime(0);
+					}
+				} else if (this.isAttacked()) {
+					if (this.getAttackedTime() < 1) {
+						this.setAttackedTime(this.getAttackedTime() + seconds);
+						this.fightUnitOrientation();
+					} else {
+						this.setAttacked(false);
+						this.setAttackedTime(0);
+						this.defend();
+					}
+				} else { 
+					} if (this.getDefaultBehavior()) {
+						if (!this.getStartedDefaultBehavior())
+							this.startDefaultBehavior();
+					} else if (!this.getDefaultBehavior()) {
+						if (this.getChangedDefaultBehavior())
+							this.stopDefaultBehavior();
+					} 
+					
+					if (this.isResting()) {
+						this.setRestingTime(this.getRestingTime() + seconds);
+						this.changeResting();
+					} else if (!this.isResting()) {
+							this.setNotRestTime(this.getNotRestTime() + seconds);
+							this.checkResting();
+					
+					
+						if (this.isWorking()) {
+							if (this.getWorkingTime() >= this.getTimeToWork()) {
+								this.setWorking(false);
+								this.setExperiencePoints(this.getExperiencePoints() + 10);
+								this.finishWorking();
+							}
+							else
+								this.setWorkingTime(this.getWorkingTime() + seconds);
+						} else {
+							if (!this.getPosition().equals(this.getFinalTarget())) {
+								if (!this.getPosition().equals(this.getTarget())) {
+									this.setSpeed(this.determineSpeed());
+									this.changePosition(seconds);
+								} else {
+									this.moveToTarget();
+									this.setSpeed(this.determineSpeed());
+									this.changePosition(seconds);
+								}
+								if (this.isSprinting()) {
+									this.setSprintingTime(this.getSprintingTime() + seconds);
+									this.controlSprinting();
+								}
+							} else
+								this.setSpeed(0);
+						}	
+					}
+			}
+		}
+		
+	}
+
 	
 	/**
 	 * 
@@ -898,9 +1439,7 @@ public class Unit {
 	 * @post The unit's speed equals zero
 	 * 		| new.getSpeed() == 0
 	 */
-	
 	private void attack() {
-		
 		
 		this.setAttacking(true);
 		this.setWorking(false);
@@ -912,8 +1451,10 @@ public class Unit {
 		
 	}
 	
+	/**
+	 * 
+	 */
 	private void attacked() {
-		
 		this.setAttacking(false);
 		this.setWorking(false);
 		this.setResting(false);
@@ -921,6 +1462,65 @@ public class Unit {
 		this.setAttacked(true);
 		this.setDefaultBehavior(false);
 		this.setDefending(false);
+	}
+	
+	/**
+	 * 
+	 */
+	private void controlSprinting() {
+		
+		assert (this.isSprinting());
+		if (this.getSprintingTime() % 0.1 == 0)
+			this.setStamina(this.getStamina() - 1);
+		if (this.getStamina() < 1)
+			this.setSprinting(false);
+	}
+
+	/**
+	 * NEW
+	 * De maximale afstand die een unit kan afleggen in een keer advanceTime() is 0.72.
+	 * Dit is omdat zijn maximale snelheid v = 1.5 * (strength + agillity) / (2 * weight) * 2 * 1.2
+	 * deze is dus maximaal als weight minimaal is (d.i. gelijk aan (strength + agility) / 2). Invullen 
+	 * geeft 3.6 m/s, onafhankelijk van strength of agility. Het maximaal aantal seconden is 0.2, de maximale
+	 * afstand is dus 0.72. Binnen één changePosition() blijft de unit dus in dezelfde cube of gaat één cube verder.
+	 * 
+	 * @param time
+	 */
+	private void changePosition(double time) {
+		
+		double X = this.getPosition().getX();
+		double Y = this.getPosition().getY();
+		double Z = this.getPosition().getZ();
+		Vector previousCube = this.getCube();
+		
+		this.setPosition(this.getPosition().getX() + this.getSpeedVector().getX() * time,
+				this.getPosition().getY() + this.getSpeedVector().getY() * time,
+				this.getPosition().getZ() + this.getSpeedVector().getZ() * time);
+		this.updateOrientation();
+		
+		if (this.getPosition().getX() - X > X - this.getTarget().getX())
+			this.setPosition(this.getTarget().getX(), this.getPosition().getY(), this.getPosition().getZ());
+		if (this.getPosition().getY() - Y > Y - this.getTarget().getY())
+			this.setPosition(this.getPosition().getX(), this.getTarget().getY(), this.getPosition().getZ());
+		if (this.getPosition().getZ() - Z > Z - this.getTarget().getZ())
+			this.setPosition(this.getPosition().getX(), this.getPosition().getY(), this.getTarget().getZ());
+		
+		if (previousCube != this.getCube())
+			this.setExperiencePoints(this.getExperiencePoints() + 1);
+	
+	}
+	
+	/**
+	 * 
+	 * @param time
+	 */
+	private void fall(double time) {
+		
+		int previousZLevel = this.getCubeInt()[2];
+		this.setPosition(this.getPosition().getX(), this.getPosition().getY(),
+				this.getPosition().getZ() + ZSpeed * time);
+		int ZLevelsFallen = this.getCubeInt()[2] - previousZLevel;
+		this.setHitpoints(this.getHitpoints() - 10 * ZLevelsFallen);
 
 	}
 	
@@ -943,6 +1543,7 @@ public class Unit {
 				this.getOpponent().getPosition().getX() - this.getPosition().getX()));
 		
 	}
+	
 	/**
 	 * 
 	 * @param attacker
@@ -974,7 +1575,7 @@ public class Unit {
 	 *  	 |	then new.getSpeed() >= 0
 	 * 		 
 	 */
-	public void defend() {
+	private void defend() {
 		
 		this.setResting(false);
 		this.setSpeed(0);
@@ -985,38 +1586,20 @@ public class Unit {
 		double PBlock = 0.25 * (this.getStrength() + this.getAgility()) / 
 				(this.getOpponent().getStrength() + this.getOpponent().getAgility());
 		
-		if (Math.random() <= PDodge)
-			this.moveToRandomAdjacentPosition();		
-		else if (Math.random() > PBlock)
+		if (Math.random() <= PDodge) {
+			this.moveToRandomAdjacentPosition();
+			this.setExperiencePoints(this.getExperiencePoints() + 20);
+		}
+		else if (Math.random() > PBlock) {
 			this.setHitpoints(Math.max(this.getHitpoints() - this.getOpponent().getStrength() / 10, 0));
-		
+			this.getOpponent().setExperiencePoints(this.getOpponent().getExperiencePoints() + 20);
+		}
+		else
+			this.setExperiencePoints(this.getExperiencePoints() + 20);
 		
 		
 	}
 	
-	
-	/**
-	 * 
-	 * @param attacker
-	 * 			The attacking unit
-	 * @param defender
-	 * 			The defending unit (attacked by the attacker)
-	 * @pre The attacking unit and defending unit must be located in neighboring cubes
-	 * 		| attacker.isValidAttack(defender)
-	 * @post The attacker's status of getAttacking() equals true
-	 * 		| attacker.getAttacking() == true
-	 * @post The defender's status of isAttacked() equals true
-	 * 		| defender.isAttacked() == true
-	 */
-	public void fight(Unit attacker, Unit defender) {
-		
-		assert attacker.isValidAttack(defender);
-		attacker.setOpponent(defender);
-		defender.setOpponent(attacker);
-		attacker.attack();
-		defender.attacked();
-		
-	}
 	
 	/**
 	 * The unit moves to a random adjacent position when it succeeds in dodging the attack by another unit
@@ -1046,226 +1629,24 @@ public class Unit {
 
 	}
 	
-	
-
 	/**
 	 * 
-	 * @param defender
-	 * 			The defending unit
-	 * @return Returns true if the cube the unit's in and the cube the defending unit's in are 
-	 * 		   neighboring cubes, else false
-	 * 
 	 */
-	
-	private boolean isValidAttack(Unit defender) {
-		
-		if ((Math.abs(this.getCube().getX()- defender.getCube().getX()) <= 1) &&
-				(Math.abs(this.getCube().getY()- defender.getCube().getY()) <= 1) &&
-				(Math.abs(this.getCube().getZ()- defender.getCube().getZ()) <= 1))
-				return true;
-		else
-			return false;
-		
-	}
-	
-	/**
-	 * @param attacked
-	 * 			The attacked status of the unit
-	 * 
-	 * @post The unit's attacked status equals the given boolean attacked
-	 * 		 | new.getAttacked() == true
-	 */
-	
-	private void setAttacked(boolean attacked) {
-		this.attacked = attacked;
-	}
-	
-	/**
-	 * Indicates whether or not the unit is being attacked
-	 * @return Returns the status of the attacked boolean of the unit
-	 */
-	public boolean isAttacked() {
-		return this.attacked;
-	}
-	
-	/**
-	 * @return Returns the time in seconds that has passed since the last time the unit was resting
-	 */
-	private double getRestingTime() {
-		return this.restingTime;
-	}
-	
-	/**
-	 * 
-	 * @param restingTime
-	 * 			Time in seconds
-	 * @pre	 The given restingTime is a non-negative double and does not equal zero
-	 * 		 | restingTime > 0
-	 * @post The time in seconds that has passed since the last time the unit was resting equals 
-	 * 		 the given time
-	 * 		 | new.getRestingTime() == restingTime
-	 */
-	private void setRestingTime(double restingTime) {
-		assert (restingTime > 0);
-		this.restingTime = restingTime;
-		this.checkResting();
-	}
-	
-	
-	/**
-	 * Checks whether the unit should start resting,
-	 * this is if it hasn't been resting for at least 180 seconds
-	 * @post If the time the unit hasn't been resting is greater than or equal to 180,
-	 * 		 this unit starts resting
-	 * 		 | if (this.getRestingTime() >= 180)
-	 * 		 |	then new.isResting() == true
-	 */
-	private void checkResting() {
-		if (this.getRestingTime() >= 180)
-			this.resting();
-	}
-	
-	
-	/**
-	 * 
-	 * @return Returns the time in seconds a unit has been sprinting
-	 */
-	private double getSprintingTime() {
-		return this.sprintingTime;
-	}
-	
-	
-	/**
-	 * @pre	 The given activityTime is greater than zero 
-	 * 		 | activityTime > 0
-	 * @param activityTime
-	 * 			The time in seconds 
-	 * @post The time in seconds a unit has been sprinting equals the given time
-	 * 		 | new.getSprintingTime() == activityTime
-	 */
-	private void setSprintingTime(double activityTime) {
-		assert (activityTime > 0);
-		if (this.isSprinting())
-			this.sprintingTime = activityTime;
-	}
-	/**
-	 * 
-	 * @pre The hitpoints of the unit as well as the stamina points of the unit must not have reached its maximum
-	 *     |(this.getHitpoints() != this.getMaxHitPoints()) | (this.getStamina() != this.getMaxStamina())
-	 * @post After the unit was resting, its restingTime is set to zero
-	 *	   | new.getRestingTime() == 0
-	 * @post If a previous activity was interrupted because the unit needed to rest, it resumes this activity afterwards
-	 * 	   | if (this.getNotReachedTarget())
-	 * 	   |	then new.getSpeed() > 0
-	 * @post If no previous activity was interrupted by resting, the unit's speed equals zero
-	 * 	   | if (!this.getNotReachedTarget())
-	 * 	   |	then new.getSpeed() == 0  
-	 *
-	 *  	
-	 */
-	public void resting() {
-		
-		this.setResting(true);
-		this.setAttacked(false);
-		this.setAttacking(false);
-		this.stopSprinting();
-		this.setDefending(false);
-		this.setWorking(false);
-		this.setSpeed(0);
-
-		
-//		assert ((this.getHitpoints() != this.getMaxHitpoints()) | (this.getStamina() != this.getMaxStamina()));
-//
-//		this.setResting(true);
-//		
-//		double ricoHitpoints = this.getToughness() / 200;
-//		double ricoStamina = this.getToughness() / 100;
-//		
-//		boolean firstHitpoint = false;
-//		boolean satisfied = false;
-//		
-//		this.setSpeed(0);
-//		
-//		double minTimeH = 0.2 / ricoHitpoints;
-//		double minTimeS = 0.2 / ricoStamina;
-//		
-//		
-//		long timeNow = System.currentTimeMillis();
-//		
-//		while ((!this.isAttacked()) && (!firstHitpoint) && (this.getHitpoints() < this.getMaxHitpoints()))
-//			if (System.currentTimeMillis() == timeNow + (long) (minTimeH * 1000))
-//				this.setHitpoints(this.getHitpoints() + 1);
-//				firstHitpoint = true;
-//		
-//		timeNow = System.currentTimeMillis();
-//		while ((!this.isResting()) && (!satisfied)) {
-//			
-//			if (this.getHitpoints() < this.getMaxHitpoints())
-//				if ((System.currentTimeMillis() - timeNow) % (long) (minTimeH * 1000) == 0)
-//					this.setHitpoints(this.getHitpoints() + 1);
-//			else if (this.getStamina() < this.getMaxStamina())
-//				if ((System.currentTimeMillis() - timeNow) % (long) (minTimeS * 1000) == 0)
-//					this.setStamina(this.getStamina() + 1);
-//			else
-//				satisfied = true;
-//			
-//		if (this.getNotReachedTarget())
-//			this.moveTo(this.getTarget().get(0), this.getTarget().get(1), this.getTarget().get(2));
-//	
-//				
-//
-//		}
-//				
-//		
-//		this.setRestingTime(0);
-		
-	}
-	
 	private void changeResting() {
 		
 		double ricoHitpoints = this.getToughness() / 200;
 		double ricoStamina = this.getToughness() / 100;
 		
 		if (this.getHitpoints() < this.getMaxHitpoints()) {
-			if (this.getRestingTime() % ricoHitpoints == 0) {
+			if (this.getRestingTime() % ricoHitpoints >= 0) {
 				this.setHitpoints(this.getHitpoints() + 1);
 				if (!this.getFirstRest())
 					this.setFirstRest(true);
 			}
 		} else if (this.getStamina() < this.getMaxStamina()) {
-			if (this.getRestingTime() % ricoStamina == 0)
+			if (this.getRestingTime() % ricoStamina >= 0)
 				this.setStamina(this.getStamina() + 1);
 		}
-	}
-	
-	
-	/**
-	 * @post The unit's resting status equals the given boolean
-	 * 		 | new.isResting() == restingStatus
-	 */
-	private void setResting(boolean restingStatus) {
-		
-		if (!restingStatus && (!this.isAttacked() | !this.isAttacking()) && 
-				!this.getFirstRest())
-			this.resting = true;
-		
-		else
-			if (!restingStatus) {
-				this.setFirstRest(false);
-				this.setRestingTime(0);
-			} else
-				this.setNotRestTime(0);
-		
-			this.resting = restingStatus;
-		
-	}
-	
-	/**
-	 * 
-	 * @return Returns the status of the resting boolean of the unit
-	 */
-	public boolean isResting() {
-		return this.resting;
 	}
 	
 	
@@ -1329,171 +1710,489 @@ public class Unit {
 
 	}
 	
-	/**
-	 * 
-	 * @param attack
-	 * 			A boolean indicating whether or not the unit should attack
-	 * 
-	 * @post The isAttacking status of the unit equals the given boolean attack
-	 * 		| new.isAttacking() == attack
-	 * 
-	 */
-	private void setAttacking(boolean attack) {
-		this.attacking = attack;
-	}
-	/**
-	 * 
-	 * @return Returns the isAttacking status of the unit
-	 * 
-	 */
-	public boolean isAttacking() {
-		return this.attacking;
-	}
 	
 	
 	/**
-	 * 
-	 * @param behavior
-	 * 			A boolean indicating whether the unit is allowed 
-	 * 			to behave in a random way or not
-	 * 
-	 * @post The enableDefaultBehavior status of the unit equals the given boolean behavior
-	 * 		| new.getDefaultBehavior() = behavior
+	 * ####################################################################
+	 * ##### FUNCTIONS TO CHECK WHETHER TO UNIT'S STATE SHOULD CHANGE #####
+	 * ####################################################################
+	 */
 
+	/**
+	 * Checks whether the unit should start resting,
+	 * this is if it hasn't been resting for at least 180 seconds
+	 * @post If the time the unit hasn't been resting is greater than or equal to 180,
+	 * 		 this unit starts resting
+	 * 		 | if (this.getRestingTime() >= 180)
+	 * 		 |	then new.isResting() == true
 	 */
-	public void setDefaultBehavior(boolean behavior) {
-		
-		if (this.getDefaultBehavior() != behavior)
-			this.setChangedDefaultBehavior(true);
-		else
-			this.setChangedDefaultBehavior(false);
-		
-		this.enableDefaultBehaviour = behavior;
-		this.setStartedDefaultBehavior(false);
-		
-		
-		
-	
+	private void checkResting() {
+		if (this.getRestingTime() >= 180)
+			this.resting();
 	}
+	
+	
 	/**
 	 * 
-	 * @return Returns the enableDefaultBehavior status of the unit
+	 * @return
 	 */
-	public boolean getDefaultBehavior() {
+	public boolean shouldFall() {
 		
-		return this.enableDefaultBehaviour;
+		if (this.getCubeInt()[2] == 0) {
+			falling = false;
+			return false;
+		}
+			
+		
+		Set<int[]> directlyAdjacentPositionList = this.getDirectlyAdjacentCubes();
+		
+		for (int[] adjacentPosition: directlyAdjacentPositionList) {
+			try{
+				if (!isPassable(adjacentPosition)) {
+					falling = false;
+					return false;
+				}
+			} catch (IndexOutOfBoundsException e) {
+			}
+		}
+		falling = true;
+		return true;
+		
 	}
 	
+
+
+
+	/**
+	 * #####################################################
+	 * ##### FUNCTIONS ABOUT CARRYING BOULDERS OR LOGS #####
+	 * #####################################################
+	 */
+	
+	/**
+	 * 
+	 * @param log
+	 * @throws IllegalArgumentException
+	 */
+	public void carryLog(Log log) throws IllegalArgumentException {
+		if (log == null)
+			throw new IllegalArgumentException("Log is null");
+		
+		this.carriedLog = log;
+		this.setWeight(this.getWeight() + log.getWeight());
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Log getCarryingLog() {
+		return this.carriedLog;
+	}
+	
+	public void carryBoulder() {
+		try {
+			carryBoulder(this.getWorld().getBoulder(this.getCubeInt()));
+		} catch (NullPointerException e) {};
+		
+	}
+	
+	public void carryLog() {
+		try {
+			carryLog(this.getWorld().getLog(this.getCubeInt()));
+		} catch (NullPointerException e) {};
+		
+	}
+	
+	/**
+	 * 
+	 * @param boulder
+	 * @throws IllegalArgumentException
+	 */
+	public void carryBoulder(Boulder boulder) throws IllegalArgumentException {
+		if (boulder == null)
+			throw new IllegalArgumentException("Boulder is null");
+			
+		this.carriedBoulder = boulder;
+		this.setWeight(this.getWeight() + boulder.getWeight());;
+			
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Boulder getCarryingBoulder() {
+		return this.carriedBoulder;
+	}
+
+ 	/**
+ 	 * 
+ 	 */
+	public void dropEverything() {
+		this.dropLog();
+		this.dropBoulder();
+	}
+	
+	/**
+	 * 
+	 */
+	public void dropLog() {
+		
+		try {
+			this.getCarryingLog().setPosition(this.getPositionList());
+			this.getCarryingLog().setOwner(null);
+			this.removeLog();
+		} catch (NullPointerException e) {}
+	}
+	
+	/**
+	 * 
+	 */
+	public void dropBoulder() {
+		
+		try {
+			this.getCarryingBoulder().setPosition(this.getPositionList());
+			this.getCarryingBoulder().setOwner(null);	
+			this.removeBoulder();
+		} catch (NullPointerException e) {}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCarryingLog() {
+		return this.getCarryingLog() != null;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isCarryingBoulder() {
+		return this.getCarryingLog() != null;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removeBoulder() {
+		this.setWeight(this.getWeight() - this.getCarryingBoulder().getWeight());
+		carriedBoulder = null;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removeLog() {
+		this.setWeight(this.getWeight() - this.getCarryingLog().getWeight());
+		carriedLog = null;
+	}
+	
+	
+	private boolean logAvailable() {
+		return logAvailable(this.getCubeInt());
+	}
+	
+	
+	private boolean logAvailable(int[] position) {
+		try {
+			return this.getWorld().logAvailable(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+	
+	private boolean boulderAvailable() {
+		return boulderAvailable(this.getCubeInt());
+	}
+	
+	
+	private boolean boulderAvailable(int[] position) {
+		try {
+			return this.getWorld().boulderAvailable(position);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+	
+	private boolean logAndBoulderAreAvailable() {
+		return logAndBoulderAreAvailable(this.getCubeInt());
+	}
+	
+	private boolean logAndBoulderAreAvailable(int[] position) {
+		return (boulderAvailable(position) && logAvailable(position));
+	}
+	
+	private Boulder getBoulder() {
+		try {
+			return this.getWorld().getBoulder(this.getCubeInt());
+		} catch (NullPointerException e) {
+			return null;
+		}
+	}
+	
+	private Log getLog() {
+		try {
+			return this.getWorld().getLog(this.getCubeInt());
+		} catch (NullPointerException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * ################################################
+	 * ##### FUNCTIONS ABOUT TERMINATING THE UNIT #####
+	 * ################################################
+	 */
+	
+	/**
+	 * 
+	 */
+	public void terminate() {
+		if (!this.isTerminated()) {
+			this.dropEverything();
+			try {
+				this.getWorld().removeUnit(this);
+			} catch (NullPointerException e) {};
+			this.getFaction().removeUnit(this);
+			this.setFaction(null);
+			this.isTerminated = true;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private void checkTerminate() {
+		if (this.getHitpoints() <= 0)
+			this.terminate();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isTerminated() {
+		return this.isTerminated;
+	}
+
+
+	
+	/**
+	 * #########################
+	 * ##### HELPFUNCTIONS #####
+	 * #########################
+	 */
+	
+	/**
+	 * The unit starts working and stops after 500 divided by its strength seconds
+	 * unless its working activity is interrupted by an attack or because its need to rest
+	 * @post The working status of the unit equals false after the work is done
+	 * 		 | new.getWorking() == false
+	 * @post The unit's speed is equal to zero
+	 * 		 | new.getSpeed() == 0
+	 * @post The unit's resting status is false
+	 * 		 | new.isResting() == false
+	 */
+	private double getTimeToWork() {
+		return (double) (500 / this.getStrength());
+	}
+	
+	/**
+	 * @return Returns the time in seconds that has passed since the last time the unit was resting
+	 */
+	private double getRestingTime() {
+		return this.restingTime;
+	}
+	
+	/**
+	 * 
+	 * @param restingTime
+	 * 			Time in seconds
+	 * @pre	 The given restingTime is a non-negative double and does not equal zero
+	 * 		 | restingTime > 0
+	 * @post The time in seconds that has passed since the last time the unit was resting equals 
+	 * 		 the given time
+	 * 		 | new.getRestingTime() == restingTime
+	 */
+	private void setRestingTime(double restingTime) {
+		assert (restingTime > 0);
+		this.restingTime = restingTime;
+		this.checkResting();
+	}
+	
+	
+	
+	
+	/**
+	 * 
+	 * @return Returns the time in seconds a unit has been sprinting
+	 */
+	private double getSprintingTime() {
+		return this.sprintingTime;
+	}
+	
+	
+	/**
+	 * @pre	 The given activityTime is greater than zero 
+	 * 		 | activityTime > 0
+	 * @param activityTime
+	 * 			The time in seconds 
+	 * @post The time in seconds a unit has been sprinting equals the given time
+	 * 		 | new.getSprintingTime() == activityTime
+	 */
+	private void setSprintingTime(double activityTime) {
+		assert (activityTime > 0);
+		if (this.isSprinting())
+			this.sprintingTime = activityTime;
+	}
+	
+	/**
+	 * 
+	 * @param time
+	 */
 	private void setAttackTime(double time) {
 		this.attackTime = time;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	private double getAttackTime() {
 		return this.attackTime;
 	}
 	
+	/**
+	 * 
+	 * @param time
+	 */
 	private void setWorkingTime(double time) {
 		this.workingTime = time;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	private double getWorkingTime() {
 		return this.workingTime;
 	}
 	
-	public boolean isDefending() {
-		return this.defending;
-	}
-	
-	private void setDefending(boolean defending) {
-		this.defending = defending;
-	}
-	
-
-	private void setFirstRest(boolean trueorfalse) {
-		this.firstRest = trueorfalse;
-	}
-	
-	private boolean getFirstRest() {
-		return this.firstRest;
-	}
-	
+	/**
+	 * 
+	 * @param time
+	 */
 	private void setNotRestTime(double time) {
 		this.notRestTime = time;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	private double getNotRestTime() {
 		return this.notRestTime;
 	}
 	
+	/**
+	 * 
+	 * @param opponent
+	 */
 	private void setOpponent(Unit opponent) {
 		this.opponent = opponent;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	private Unit getOpponent() {
 		return this.opponent;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	private double getAttackedTime() {
 		return this.attackedTime;
 	}
 	
+	/**
+	 * 
+	 * @param time
+	 */
 	private void setAttackedTime(double time) {
 		this.attackedTime = time;
 	}
 	
-	private boolean getStartedDefaultBehavior() {
-		return this.startedDefaultBehavior;
-	}
 	
-	private void setStartedDefaultBehavior(boolean bool) {
-		this.startedDefaultBehavior = bool;
-	}
 	
-	private boolean getChangedDefaultBehavior() {
-		return this.changedBehavior;
-	}
+
 	
-	private void setChangedDefaultBehavior(boolean bool) {
-		this.changedBehavior = bool;
-	}
+
 	
-	private void setFinalTarget(double X, double Y, double Z) {
-		
-		if (!this.isValidPosition(X, Y, Z))
-			throw new IllegalArgumentException();
-		else {
-			this.finalTARGET.setX(X);
-			this.finalTARGET.setY(Y);
-			this.finalTARGET.setZ(Z);
-		}
-	}
-	
-	private Vector getFinalTarget() {
-		return this.finalTARGET;
-	}
-	
-	public void setFaction(Faction faction) throws IllegalArgumentException {
-		if (!isValidFaction(faction))
-			throw new IllegalArgumentException();
-		this.faction = faction;
-	}
-	
-	private boolean isValidFaction(Faction faction) {
-		if (faction == null)
-			return false;
-		return true;
-	}
-	
-	public Faction getFaction() {
-		return this.faction;
-	}
+
 	
 	
 
 	
 	
+
+	
+
 	
 	
+	
+	public Set<int[]> getDirectlyAdjacentCubes() {
+		
+		int X = this.getCubeInt()[0];
+		int Y = this.getCubeInt()[1];
+		int Z = this.getCubeInt()[2];
+		
+		int[] pos1 = {X+1,Y,Z};
+		int[] pos2 = {X-1,Y,Z};
+		int[] pos3 = {X,Y+1,Z};
+		int[] pos4 = {X,Y-1,Z};
+		int[] pos5 = {X,Y,Z+1};
+		int[] pos6 = {X,Y,Z-1};
+		
+		Set<int[]> cubes = new HashSet<int[]>(Arrays.asList(pos1, pos2, pos3, pos4, pos5, pos6));
+		
+		return cubes;
+	}
+	
+	public Set<int[]> getAdjacentCubes() {
+		return this.getAdjacentCubes(this.getCubeInt());
+	}
+	
+	public Set<int[]> getAdjacentCubes(int[] position) {
+		Set<int[]> adjacentCubes = new HashSet<>();
+		
+		int X = position[0];
+		int Y = position[1];
+		int Z = position[2];
+		
+		for (int x = -1; x <= 1; x++) {
+			for (int y = -1; y <= 1; y++) {
+				for (int z = -1; z <= 1; z++) {
+					if (x != 0 | y != 0 | z != 0) {
+						int[] adjacentPosition = {X + x, Y + y, Z + z};
+						if (isPositionInWorld(adjacentPosition))
+							adjacentCubes.add(adjacentPosition);
+
+					}
+				}
+			}
+		}
+		
+		return adjacentCubes;
+	}
+
+
 	
 	
 	
@@ -1522,14 +2221,24 @@ public class Unit {
 	private boolean startedDefaultBehavior;
 	private boolean changedBehavior;
 	private final Vector finalTARGET = new Vector(0,0,0);
+	private int experiencePoints;
 	private Faction faction;
+	private boolean  isTerminated;
+	private Boulder carriedBoulder;
+	private Log carriedLog;
+	private final double ZSpeed = -3.0;
+	private boolean falling;
+
 
 
 
 }
 	
 
+// Functies die de 'state of the unit' veranderen, moeten een IllegalStateException() throwen als 
+// deze unit isTerminated() is.
 
+// Zelfde geldt voor Boulder, Log, Faction en World
 
 
 

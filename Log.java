@@ -8,31 +8,31 @@ public class Log {
 	
 	// INITIALISATION
 	// If position is a double[]
-	public Log(World world, double[] position) throws IllegalArgumentException {
+	public Log(World world, double[] position) throws IllegalArgumentException, IllegalWorldException {
 		if (!isValidPosition(position))
 			throw new IllegalArgumentException("This is not a valid position");
 		if (!isValidWorld(world))
-			throw new NullPointerException("World is null");
+			throw new IllegalWorldException("World is null");
 		
 		this.setPosition(position);
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
 		this.setWorld(world);
-		world.addToLogList(this);
+		world.addLog(this);
 
 	}
 	
 	// If position is an int[]
-	public Log(World world, int[] position) throws IllegalArgumentException, NullPointerException {
+	public Log(World world, int[] position) throws IllegalArgumentException, IllegalWorldException {
 		if (!isValidPosition(position))
 			throw new IllegalArgumentException("This is not a valid position");
 		if (!isValidWorld(world))
-			throw new NullPointerException("World is null");
+			throw new IllegalWorldException("World is null");
 		
 		double[] Pos = {(double) (position[0]), (double) (position[1]), (double) (position[2])};
 		this.setPosition(Pos);
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
 		this.setWorld(world);
-		world.addToLogList(this);
+		world.addLog(this);
 	}
 
 	// CHECKERS
@@ -53,24 +53,23 @@ public class Log {
 	
 	//isPassable
 	private boolean isPassable() {
-		return (world.isPassable(this.getCube()));
+		return (this.getWorld().isPassable(this.getCube()));
+	}
+	
+	
+	private boolean isSolidBelow() {
+		return (this.getCube()[2] == 0 | (!this.getWorld().isPassable(this.getCube()[0], this.getCube()[1],
+				this.getCube()[2] - 1)));
 	}
 	
 	//isActive
 	public boolean isActive() {
-		if (this.getOwner() != null)
-			return true;
-		else
-			return false;
+		return this.getOwner() == null;
 	}
 	
 	//shouldFall
 	private boolean shouldFall() {
-		
-		if (this.isPassable())
-			return false;
-		else
-			return true;
+		return !(this.isPassable() && this.isSolidBelow());
 	}
 	
 
@@ -81,8 +80,8 @@ public class Log {
 		int Y = (int) Math.floor(this.getPosition()[1]);
 		int Z = (int) Math.floor(this.getPosition()[2]);
 		
-		int[] Cube = {X, Y, Z};
-		return Cube;
+		int[] cube = {X, Y, Z};
+		return cube;
 		
 	}
 	
@@ -100,9 +99,11 @@ public class Log {
 	}
 	
 	// SET AND GET WORLD
-	private void setWorld(World world) {
+	private void setWorld(World world) throws IllegalWorldException {
+		if (!isValidWorld(world))
+			throw new IllegalWorldException("This world is not valid");
 		this.world = world;
-		world.addToLogList(this);
+		world.addLog(this);
 	}
 	
 	public World getWorld() {
@@ -127,10 +128,13 @@ public class Log {
 	
 	
 	// ADVANCE TIME
-	public void advanceTime(double time) throws IllegalArgumentException {
+	public void advanceTime(double time) throws IllegalArgumentException, IllegalStateException {
+		
+		if (this.isTerminated())
+			throw new IllegalStateException("Terminated");
 		
 		if ((time <= 0) | (time > 0.2))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Given time is not valid");
 		else {
 			if (this.isActive()) {
 				if (this.shouldFall())
@@ -139,9 +143,13 @@ public class Log {
 		}
 		
 	}
-	  
+	
 	// HELPFUNCTIONS
 	// changePosition
+	// In tegenstelling tot bij Unit moet hier nooit de positie worden teruggezet. De maximale afstand die 
+	// de boulder kan afleggen is ZSpeed * time en time is maximaal 0.2, dus maximale afstand = -3 * 0.2 = -0.6.
+	// M.a.w., de boulder/log blijft in dezelfde cube of zakt er 1. Hij kan er dus nooit twee zakken in 1 stap en
+	// terechtkomen in een cube die niet bestaat.
 	private void changePosition(double time) {
 		
 		double[] position = {this.getPosition()[0], this.getPosition()[1],
@@ -151,25 +159,49 @@ public class Log {
 	
 	//removeOwner
 	public void removeOwner() {
-		this.setOwner(null);
+		try {
+			this.getOwner().removeLog();
+			this.setOwner(null);
+		} catch (NullPointerException e) {};
 	}
 	
 	//changeInWorld
 	private void changeInWorld() {
-		if (this.isActive())
-			world.addToLogList(this);
-		else
-			world.removeLogFromList(this);
+		if (this.getWorld().isTerminated())
+			this.terminate();
+		else {
+			if (this.isActive())
+				this.getWorld().addLog(this);
+			else
+				this.getWorld().removeLog(this);
+		}
 	}
 	
 	public void terminate() {
-		if (isTerminated == false) {
-			world.removeLogFromWorld(this);
-			owner.removeLogFromUnit(this);
+		if (!this.isTerminated()) {
 			this.removeOwner();
-			this.setWorld(null);
+			this.removeWorld();
+			this.isTerminated = true;
 		}
 	}
+	
+	public boolean isTerminated() {
+		return this.isTerminated;
+	}
+	
+	public boolean isCarriedByUnit() {
+		return this.getOwner() != null;
+	}
+	
+	private void removeWorld() {
+		try {
+			this.getWorld().removeLog(this);
+			this.setWorld(null);
+		} catch (NullPointerException e) {};
+	}
+	
+	
+	
 
 	// VARIABLES 
 	private double[] position;
@@ -182,8 +214,3 @@ public class Log {
 }
 
 
-// NOG TE DOEN
-//	Functies om Boulder/Log toe te wijzen aan Unit. Als dit gebeurt, moet ook de Boulder een owner toegewezen krijgen.
-//	Nadat de Unit de Boulder weggooit, moet de connectie tussen beide verdwijnen. Een unit met een boulder heeft een
-//	ander gewicht dat niet meer moet voldoen aan de opgelegde voorwaarden.
-//	Als de unit de boulder dan loslaat, moet de boulder de positie van de unit krijgen
