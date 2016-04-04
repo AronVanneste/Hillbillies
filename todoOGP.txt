@@ -1,0 +1,9 @@
+TO DO LIST: OGP
+
+- Faction inactive maken als ze geen units bevat
+- Stoppen met moven wanneer hij wordt aangevallen
+- moving wordt niet onderbroken door rusten of werken
+- pathing terminated als cube not reachable is
+- na verplicht rusten terug verder bewegen
+- bij dodging: moveToRandomAdjacentPosition() -> validPosition
+- defaultBehavior: fight potential enemies toevoegen
