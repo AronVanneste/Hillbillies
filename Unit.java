@@ -118,9 +118,9 @@ public class Unit {
 	
 	
 	/**
-	 * ##############################################################################
-	 * ##### SETTERS, GETTERS AND OTHER FUNCTIONS OF THE UNIT'S CHARACTERISTICS #####
-	 * ##############################################################################
+	 * #####################################################################################
+	 * ##### SETTERS, GETTERS AND OTHER FUNCTIONS TO CHANGE THE UNIT'S CHARACTERISTICS #####
+	 * #####################################################################################
 	 */
 	
 	
@@ -795,6 +795,11 @@ public class Unit {
 		return (log != null && log.isActive());
 	}
 	
+	private boolean isAdjacent(int X, int Y, int Z) {
+		return !(((Math.abs(X) != 1) && (X != 0)) | ((Math.abs(Y) != 1) && (Y != 0)) 
+				| ((Math.abs(Z) != 1) && (Z != 0)));
+	}
+	
 	private boolean isPositionInWorld(int[] position) {
 		try {
 			return this.getWorld().isPositionInWorld(position);
@@ -906,7 +911,9 @@ public class Unit {
 	}
 	
 	
-	public void moveTo(int[] target) throws IllegalPositionException {
+	public void moveTo(int[] target) throws IllegalPositionException, IllegalStateException {
+		if (this.isTerminated())
+			throw new IllegalStateException("Unit is terminated");
 		try {
 			this.moveTo(target[0], target[1], target[2]);
 		} catch (IllegalPositionException invalidPosition) {
@@ -920,7 +927,9 @@ public class Unit {
 	 * @param Y
 	 * @param Z
 	 */
-	public void moveTo(int X, int Y, int Z) throws IllegalPositionException {
+	public void moveTo(int X, int Y, int Z) throws IllegalPositionException , IllegalStateException {
+		if (this.isTerminated())
+			throw new IllegalStateException("Unit is terminated");
 		try {
 			this.setFinalTarget(((double) X), ((double) Y), ((double) Z));
 		} catch (IllegalPositionException invalidPosition) {
@@ -951,12 +960,12 @@ public class Unit {
 	 * 		| (((Math.abs(X) != 1) && (X != 0)) | ((Math.abs(Y) != 1) && (Y != 0)) 
 	 * 		|	| ((Math.abs(Z) != 1) && (Z != 0)))
 	 */
-	public void moveToAdjacent(int X, int Y, int Z) throws IllegalPositionException {
+	public void moveToAdjacent(int X, int Y, int Z) throws IllegalPositionException, IllegalStateException {
 		
-		if (((Math.abs(X) != 1) && (X != 0)) | ((Math.abs(Y) != 1) && (Y != 0)) 
-				| ((Math.abs(Z) != 1) && (Z != 0)))
+		if (!isAdjacent(X, Y, Z))
 			throw new IllegalPositionException("Not an adjacent cube");
-		
+		if (this.isTerminated())
+			throw new IllegalStateException("Unit is terminated");
 		else {
 			this.setTarget(this.getPosition().getX() + ((double) (X)), 
 					this.getPosition().getY() + ((double) (Y)), 
@@ -1053,10 +1062,20 @@ public class Unit {
 	/**
 	 * 
 	 */
-	public void work() {
+	public void work() throws IllegalStateException {
+		if (this.isTerminated())
+			throw new IllegalStateException("Unit is terminated");
 		this.setWorking(true);
 		this.setSpeed(0);		
 		this.setResting(false);
+	}
+	
+	public void workAt(int x, int y, int z) {
+		if (this.isTerminated())
+			throw new IllegalStateException("Unit is terminated");
+		this.setWorking(true);
+		this.setResting(false);
+		this.moveTo(x, y, z);
 	}
 	
 	protected void finishWorking() {
@@ -1112,9 +1131,12 @@ public class Unit {
 	 * @post The defender's status of isAttacked() equals true
 	 * 		| defender.isAttacked() == true
 	 */
-	public void fight(Unit attacker, Unit defender) {
-		
+	public void fight(Unit attacker, Unit defender) throws IllegalStateException {
 		assert isValidAttack(attacker, defender);
+		
+		if (attacker.isTerminated() | defender.isTerminated())
+			throw new IllegalStateException("One of the units is terminated");
+		
 		attacker.setOpponent(defender);
 		defender.setOpponent(attacker);
 		attacker.attack();
@@ -1137,7 +1159,10 @@ public class Unit {
 	 *
 	 *  	
 	 */
-	public void resting() {
+	public void resting() throws IllegalStateException {
+		
+		if (this.isTerminated())
+			throw new IllegalStateException("The unit is terminated");
 		
 		this.setResting(true);
 		this.setAttacked(false);
@@ -1365,6 +1390,7 @@ public class Unit {
 			if (this.shouldFall())
 				this.fall(seconds);
 			else {
+				this.setSpeed(0);
 				if (this.isAttacking()) {
 					if (this.getAttackTime() < 1) {
 						this.setAttackTime(this.getAttackTime() + seconds);
@@ -1390,41 +1416,34 @@ public class Unit {
 						if (this.getChangedDefaultBehavior())
 							this.stopDefaultBehavior();
 					} 
-					
-					if (this.isResting()) {
+					if (!this.isResting()) {
+						this.setNotRestTime(this.getNotRestTime() + seconds);
+						this.checkResting();
+					} if (!this.getPosition().equals(this.getFinalTarget())) {
+						if (!this.getPosition().equals(this.getTarget())) {
+							this.setSpeed(this.determineSpeed());
+							this.changePosition(seconds);
+						} else {
+							this.moveToTarget();
+							this.setSpeed(this.determineSpeed());
+							this.changePosition(seconds);
+						}
+						if (this.isSprinting()) {
+							this.setSprintingTime(this.getSprintingTime() + seconds);
+							this.controlSprinting();
+						}
+					} else if (this.isResting()) {
 						this.setRestingTime(this.getRestingTime() + seconds);
 						this.changeResting();
-					} else if (!this.isResting()) {
-							this.setNotRestTime(this.getNotRestTime() + seconds);
-							this.checkResting();
-					
-					
-						if (this.isWorking()) {
-							if (this.getWorkingTime() >= this.getTimeToWork()) {
-								this.setWorking(false);
-								this.setExperiencePoints(this.getExperiencePoints() + 10);
-								this.finishWorking();
-							}
-							else
-								this.setWorkingTime(this.getWorkingTime() + seconds);
-						} else {
-							if (!this.getPosition().equals(this.getFinalTarget())) {
-								if (!this.getPosition().equals(this.getTarget())) {
-									this.setSpeed(this.determineSpeed());
-									this.changePosition(seconds);
-								} else {
-									this.moveToTarget();
-									this.setSpeed(this.determineSpeed());
-									this.changePosition(seconds);
-								}
-								if (this.isSprinting()) {
-									this.setSprintingTime(this.getSprintingTime() + seconds);
-									this.controlSprinting();
-								}
-							} else
-								this.setSpeed(0);
-						}	
-					}
+					} else if (this.isWorking()) {
+						if (this.getWorkingTime() >= this.getTimeToWork()) {
+							this.setWorking(false);
+							this.setExperiencePoints(this.getExperiencePoints() + 10);
+							this.finishWorking();
+						}
+						else
+							this.setWorkingTime(this.getWorkingTime() + seconds);
+					}			
 			}
 		}
 		
@@ -1605,6 +1624,16 @@ public class Unit {
 		
 	}
 	
+	private void fightPotentialEnemies() {
+		try {
+			Unit enemy = this.getWorld().getEnemy(this);
+			if (enemy != null)
+				fight(this, enemy);
+		} catch (NullPointerException e) {
+			this.startDefaultBehavior();
+		}
+	}
+	
 	
 	/**
 	 * The unit moves to a random adjacent position when it succeeds in dodging the attack by another unit
@@ -1661,12 +1690,14 @@ public class Unit {
 		
 		//assert (this.getDefaultBehavior());
 		double P = Math.random();
-		if (P <= 0.3333333333333)
+		if (P <= 0.25)
 			this.moveToRandomPosition(); 
-		else if (P <= 0.666666666666)
+		else if (P <= 0.50)
 			this.work();
-		else
+		else if (P <= 0.75)
 			this.resting();
+		else
+			this.fightPotentialEnemies();
 		
 		this.setStartedDefaultBehavior(true);
 		
