@@ -30,21 +30,26 @@ public class Log {
 	 * 		Throws an IllegalWorldException if the given world is null
 	 * 		
 	 */
-	public Log(World world, double[] position) throws IllegalArgumentException, IllegalWorldException {
-		if (!isValidPosition(position))
-			throw new IllegalArgumentException("This is not a valid position");
-		if (!isValidWorld(world))
-			throw new IllegalWorldException("World is null");
+	public Log(World world, double[] position) throws IllegalPositionException, IllegalWorldException {
+
+		try {
+			this.setPosition(position);
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
+	
+		try { 
+			this.setWorld(world);
+		} catch (IllegalWorldException invalidWorld) {
+			throw invalidWorld;
+		}
 		
-		this.setPosition(position);
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
-		this.setWorld(world);
 		world.addLog(this);
 
 	}
 	
 	// If position is an int[]
-	
 	/**
 	 * 
 	 * @param world
@@ -67,26 +72,31 @@ public class Log {
 	 * 		Throws an IllegalWorldException if the given world is null
 	 * 		
 	 */
-	public Log(World world, int[] position) throws IllegalArgumentException, IllegalWorldException {
-		if (!isValidPosition(position))
-			throw new IllegalArgumentException("This is not a valid position");
-		if (!isValidWorld(world))
-			throw new IllegalWorldException("World is null");
+	public Log(World world, int[] position) throws IllegalPositionException, IllegalWorldException {
+
+
+		try {
+			this.setPosition(position);
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
+	
+		try { 
+			this.setWorld(world);
+		} catch (IllegalWorldException invalidWorld) {
+			throw invalidWorld;
+		}
 		
-		double[] Pos = {(double) (position[0]), (double) (position[1]), (double) (position[2])};
-		this.setPosition(Pos);
+		
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
-		this.setWorld(world);
 		world.addLog(this);
 	}
 
 	// CHECKERS
 	// If position is a double[]
-	
 	/**
 	 * @return Returns true if the given position is within the range of the world of the log
 	 */
-	
 	private boolean isValidPosition(double[] position) {
 		return this.getWorld().isValidPosition(this.getCube());
 	}
@@ -95,14 +105,11 @@ public class Log {
 	/**
 	 * @return Returns true if the given position is within the range of the world of the log
 	 */
-	
 	private boolean isValidPosition(int[] position) {
 		return this.getWorld().isValidPosition(this.getCube());
 	}
 	
 	//World
-	
-	
 	/**
 	 * @return Returns whether or not the world is valid (i.e. not null)
 	 */
@@ -122,21 +129,18 @@ public class Log {
 	 * @return Returns whether or not the log is supported by a solid cube
 	 */
 	private boolean isSolidBelow() {
-		return (this.getCube()[2] == 0 | (!this.getWorld().isPassable(this.getCube()[0], this.getCube()[1],
-				this.getCube()[2] - 1)));
+		return (this.getWorld().isSupported(this.getCube()));
 	}
 	
 	//isActive
-	
 	/**
 	 * @return Returns wheter or not the log is active (i.e. is ownerless)
 	 */
 	public boolean isActive() {
-		return this.getOwner() == null;
+		return (this.getOwner() == null && !this.isTerminated());
 	}
 	
 	//shouldFall
-	
 	/**
 	 * @return Returns true if the log is not supported
 	 */
@@ -146,7 +150,6 @@ public class Log {
 	
 
 	//GETCUBE
-	
 	/**
 	 * @return Returns the coordinates of the cube of the log
 	 */
@@ -162,7 +165,6 @@ public class Log {
 	}
 	
 	// SET and GET POSITION
-	
 	/**
 	 * @param position
 	 * 		The new position of the log
@@ -173,12 +175,36 @@ public class Log {
 	 *  of the world of the log
 	 * 		
 	 */
-	public void setPosition(double[] position) throws IllegalArgumentException {
+	protected void setPosition(double[] position) throws IllegalPositionException {
 		
 		if (!isValidPosition(position))
-			throw new IllegalArgumentException("This is not a valid position");
+			throw new IllegalPositionException("This is not a valid position");
 		else
 			this.position = position;
+	}
+	
+	// SET and GET POSITION
+	/**
+	 * @param position
+	 * 		The new position of the log
+	 * @post
+	 * 		The position of the log will be the given position, if it's a valid position
+	 * @throws IllegalArgumentException
+	 * 		Throws an IllegalArgumentException if the given position wou
+	 *  of the world of the log
+	 * 		
+	 */
+	protected void setPosition(int[] position) throws IllegalPositionException {
+		
+		if (!isValidPosition(position))
+			throw new IllegalPositionException("This is not a valid position");
+		else {
+			double X = ((double) position[0]);
+			double Y = ((double) position[1]);
+			double Z = ((double) position[2]);
+			double[] pos = {X, Y, Z};
+			this.position = pos; 
+		}
 	}
 	
 	/**
@@ -189,7 +215,6 @@ public class Log {
 	}
 	
 	// SET AND GET WORLD
-	
 	/**
 	 * @param world
 	 * 		The world where the log is located
@@ -215,7 +240,6 @@ public class Log {
 	}
 	
 	// GET WEIGHT
-	
 	/**
 	 * @return Returns the weight of the log
 	 */
@@ -224,7 +248,6 @@ public class Log {
 	}
 	
 	// SET and GET Owner
-	
 	/**
 	 * @param owner
 	 * 		The new owner of the log
@@ -232,10 +255,12 @@ public class Log {
 	 * 		The owner of the log will be the given owner
 	 * @post
 	 * 		The log could be terminated if its world is terminated
-	 * and the log is added to the log list of the world if it's active
-	 * and deleted from the list if it's unactive ????????
+	 * 		and the log is added to the log list of the world if it's active
+	 * 		and deleted from the list if it's inactive ????????
 	 */
-	public void setOwner(Unit owner) {
+	protected void setOwner(Unit owner) throws IllegalStateException {
+		if (this.isTerminated())
+			throw new IllegalStateException("Terminated");
 		this.owner = owner;
 		this.changeInWorld();
 	}
@@ -250,6 +275,7 @@ public class Log {
 	
 	
 	// ADVANCE TIME
+	
 	public void advanceTime(double time) throws IllegalArgumentException, IllegalStateException {
 		
 		if (this.isTerminated())
@@ -269,8 +295,8 @@ public class Log {
 	// HELPFUNCTIONS
 	// changePosition
 	// In tegenstelling tot bij Unit moet hier nooit de positie worden teruggezet. De maximale afstand die 
-	// de log kan afleggen is ZSpeed * time en time is maximaal 0.2, dus maximale afstand = -3 * 0.2 = -0.6.
-	// M.a.w., de log/log blijft in dezelfde cube of zakt er 1. Hij kan er dus nooit twee zakken in 1 stap en
+	// de boulder kan afleggen is ZSpeed * time en time is maximaal 0.2, dus maximale afstand = -3 * 0.2 = -0.6.
+	// M.a.w., de boulder/log blijft in dezelfde cube of zakt er 1. Hij kan er dus nooit twee zakken in 1 stap en
 	// terechtkomen in een cube die niet bestaat.
 	
 	/**
@@ -287,13 +313,12 @@ public class Log {
 	}
 	
 	//removeOwner
-	
 	/**
 	 * @post
 	 * 		The log will be ownerless
 	 * 		The owner will lose that log
 	 */
-	public void removeOwner() {
+	protected void removeOwner() {
 		try {
 			this.getOwner().removeLog();
 			this.setOwner(null);
@@ -322,7 +347,6 @@ public class Log {
 	 * @post
 	 * 		The log is terminated, it has no owner, no world
 	 */
-	
 	public void terminate() {
 		if (!this.isTerminated()) {
 			this.removeOwner();
@@ -332,6 +356,7 @@ public class Log {
 	}
 	
 	/**
+	 * 
 	 * @return Returns whether or not the log is terminated
 	 */
 	public boolean isTerminated() {

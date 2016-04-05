@@ -18,8 +18,6 @@ public class World {
 		this.NbY = (this.getTerrainTypeWorld()[0].length);
 		this.NbZ = (this.getTerrainTypeWorld()[0][0].length);
 
-		
-		
 	}
 	
 	public void advanceTime(double time) throws IllegalArgumentException {
@@ -37,6 +35,11 @@ public class World {
 				log.advanceTime(time);
 			for (Boulder boulder: this.getBoulders())
 				boulder.advanceTime(time);
+			for (Faction faction: this.getActiveFactions()) {
+				if (faction.getNbUnit() == 0)
+					this.removeFaction(faction);
+			}
+				
 		}
 		
 	}
@@ -123,7 +126,7 @@ public class World {
 		return (isPassable(position) && isSupported(position));		
 	}
 	
-	private boolean isSupported(int[] position) {
+	protected boolean isSupported(int[] position) {
 		int X = position[0];
 		int Y = position[1];
 		int Z = position[2];
@@ -131,7 +134,7 @@ public class World {
 	}
 	
 	private boolean isSupported(int X, int Y, int Z) {
-		return ((Z == 0) || (isPassable(X, Y, Z-1)));
+		return ((Z == 0) || (!isPassable(X, Y, Z-1)));
 	}
 	
 	// isPassable
@@ -197,11 +200,11 @@ public class World {
 	
 	
 	// isValidPosition
-	public boolean isValidPosition(int[] position) {
+	protected boolean isValidPosition(int[] position) {
 		return (isPositionInWorld(position) && isPassable(position));
 	}
 	
-	public boolean isValidPosition(double[] position) {
+	protected boolean isValidPosition(double[] position) {
 		return (isPositionInWorld(position) && isPassable(getCube(position)));
 	}
 	
@@ -214,6 +217,10 @@ public class World {
 	public boolean isPositionInWorld(double[] position) {
 		return (((int) position[0] <= this.getNbX()) && ((int) position[1] <= this.getNbY())
 				&& ((int) position[2] <= this.getNbZ()));
+	}
+	
+	public boolean isValidUnit(Unit unit) {
+		return (unit != null && isValidPosition(unit.getPositionList()));
 	}
 	
 	protected boolean logAvailable(int[] position) {
@@ -340,16 +347,16 @@ public class World {
 		
 		if (this.getNbFaction() >= 5) 
 			throw new IllegalFactionException();
-		if (!this.getFactions().contains(faction))
+		if (!this.getActiveFactions().contains(faction))
 			this.activeFactions.add(faction);
 		
 	}
 	
 	public int getNbFaction() {
-		return this.getFactions().size();
+		return this.getActiveFactions().size();
 	}
 	
-	public Set<Faction> getFactions() {
+	public Set<Faction> getActiveFactions() {
 		return this.activeFactions;
 	}
 	
@@ -375,14 +382,12 @@ public class World {
 		return this.getUnits().size();
 	}
 	
-	public void addUnit(Unit unit) throws IllegalWorldException, IllegalArgumentException, IllegalUnitException {
+	public void addUnit(Unit unit) throws IllegalWorldException, IllegalUnitException {
 		
 		if (worldIsFull())
 			throw new IllegalWorldException("World is full");
-		if (unit == null)
-			throw new IllegalArgumentException("Unit is null");
-		if (!isPositionInWorld(unit.getPositionList()))
-			throw new IllegalUnitException("The unit's position is not in this world");
+		if (!isValidUnit(unit))
+			throw new IllegalUnitException("Unit cannot be added to this world");
 		this.addToUnitList(unit);
 		
 		
@@ -402,7 +407,7 @@ public class World {
 		} catch (IllegalFactionException e) {
 			int smallestNbUnits = 51;
 			Faction smallestFaction = null;
-			for (Faction faction: this.getFactions()) {
+			for (Faction faction: this.getActiveFactions()) {
 				if (faction.getNbUnit() <= smallestNbUnits) {
 					smallestFaction = faction;
 					smallestNbUnits = smallestFaction.getNbUnit();
@@ -493,7 +498,7 @@ public class World {
 	
 	public void terminate() {
 		if (!this.isTerminated()) {
-			for (Faction faction: this.getFactions())
+			for (Faction faction: this.getActiveFactions())
 				faction.terminate();
 			this.isTerminated = true;
 		}

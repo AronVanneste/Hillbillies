@@ -60,30 +60,34 @@ public class Unit {
 	 * 		| new.getSpeed() = 0
 	 * @post The defaultBehavior status of the unit equals the given boolean enableDefaultBehavior
 	 * 		| new.getDefaultBehavior() = enableDefaultBehavior
-	 * @throws IllegalArgumentException
+	 * @throws IllegalNameException
 	 * 		If the name does not start with an upper case letter, doesn't have a length of at least two characters
 	 * 		or has a character other than letters or quotes
 	 * 		| ((!Character.isUpperCase(name.charAt(0))) | (name.length() < 2) | (!name.matches("[a-zA-Z\\s\'\"]+")))
-	 * @throws IllegalArgumentException
+	 * @throws IllegalPositionException
 	 * 		 If one of given X, Y or Z is negative or larger than 50.
 	 * 		| !isValidPosition(X, Y, Z)
 	 */
 
 	public Unit(String name, int[] initialPosition, int weight,
-			int agility,int strength,  int toughness, boolean enableDefaultBehaviour) throws IllegalArgumentException {
+			int agility,int strength,  int toughness, boolean enableDefaultBehaviour) 
+					throws IllegalNameException, IllegalPositionException {
 		
 		int X = initialPosition[0];
 		int Y = initialPosition[1];
 		int Z = initialPosition[2];
 
+		try {
+			this.setPosition(X, Y, Z);
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
 		
-		if (!this.isValidPosition(X,Y,Z))
-			throw new IllegalArgumentException("This is not a valid position");
-		this.setPosition(X, Y, Z);
-		
-		if (!this.isValidName(name))
-			throw new IllegalArgumentException("This is not a valid name");
-		this.setName(name);
+		try {
+			this.setName(name);
+		} catch (IllegalNameException invalidName) {
+			throw invalidName;
+		}
 		
 		this.setFaction(null);
 		
@@ -157,15 +161,15 @@ public class Unit {
 	 * 			The name of the unit
 	 * @post The name of the unit equals the given name
 	 * 		| new.getName() == name
-	 * @throws IllegalArgumentException
+	 * @throws IllegalNameException
 	 * 		If the name does not start with an upper case letter, doesn't have a length of at least two characters
 	 * 		or has a character other than letters or quotes
 	 * 		| ((!Character.isUpperCase(name.charAt(0))) | (name.length() < 2) | (!name.matches("[a-zA-Z\\s\'\"]+")))
 	 */
-	public void setName(String name) throws IllegalArgumentException {
+	public void setName(String name) throws IllegalNameException {
 		
 		if (!this.isValidName(name))
-			throw new IllegalArgumentException();
+			throw new IllegalNameException();
 		else
 			this.name = name;
 	}
@@ -192,16 +196,16 @@ public class Unit {
 	 * 		| new.POS.get(0) == X
 	 * 		| new.POS.get(1) == Y
 	 * 		| new.POS.get(2) == Z 
-	 * @throws IllegalArgumentException
+	 * @throws IllegalPositionException
 	 * 		 If one of given X, Y or Z is negative or larger than 50.
 	 * 		| (!isValidPosition(X,Y,Z))
 	 * 
 	 */
 	
-	protected void setPosition(double X, double Y, double Z) throws IllegalArgumentException {
+	protected void setPosition(double X, double Y, double Z) throws IllegalPositionException {
 		
 		if (!isValidPosition(X,Y,Z))
-			throw new IllegalArgumentException();
+			throw new IllegalPositionException();
 		else {
 			this.POS.setX(X);
 			this.POS.setY(Y);
@@ -513,14 +517,14 @@ public class Unit {
 	 * 		| new.TARGET.get(0) == XTarget
 	 * 		| new.TARGET.get(1) == YTarget
 	 * 		| new.TARGET.get(2) == ZTarget
-	 * @throws IllegalArgumentException
+	 * @throws IllegalPositionException
 	 * 		If the given target (XTarget, YTarget, ZTarget) is not a valid position
 	 * 		| (!isValidPosition(XTarget, YTarget, ZTarget)
 	 */
-	private void setTarget(double XTarget, double YTarget, double ZTarget) throws IllegalArgumentException {
+	private void setTarget(double XTarget, double YTarget, double ZTarget) throws IllegalPositionException {
 
 		if (!isValidPosition(XTarget, YTarget, ZTarget))
-			throw new IllegalArgumentException();
+			throw new IllegalPositionException();
 		
 		else {
 			this.TARGET.setX(XTarget);
@@ -543,10 +547,10 @@ public class Unit {
 	 * @param Y
 	 * @param Z
 	 */
-	private void setFinalTarget(double X, double Y, double Z) {
+	private void setFinalTarget(double X, double Y, double Z) throws IllegalPositionException {
 		
 		if (!this.isValidPosition(X, Y, Z))
-			throw new IllegalArgumentException();
+			throw new IllegalPositionException();
 		else {
 			this.finalTARGET.setX(X);
 			this.finalTARGET.setY(Y);
@@ -708,22 +712,6 @@ public class Unit {
 	 * @param position
 	 * @return
 	 */
-	private boolean isValidPosition(int[] position) {
-		try {
-			return this.getWorld().isValidPosition(position);
-		} catch (NullPointerException e) {
-			return true;
-		}
-	}
-	
-	
-
-	
-	/**
-	 * 
-	 * @param position
-	 * @return
-	 */
 	private boolean isValidPosition(double[] position) {
 		try {
 			return this.getWorld().isValidPosition(position);
@@ -799,6 +787,14 @@ public class Unit {
 				(attacker.getFaction() != defender.getFaction()));
 	}
 	
+	private boolean isValidBoulder(Boulder boulder) {
+		return (boulder != null && boulder.isActive());
+	}
+	
+	private boolean isValidLog(Log log) {
+		return (log != null && log.isActive());
+	}
+	
 	private boolean isPositionInWorld(int[] position) {
 		try {
 			return this.getWorld().isPositionInWorld(position);
@@ -809,20 +805,16 @@ public class Unit {
 	
 	private boolean isNeighbouringSolidTerrain(int[] position) {
 		
-		if (position[2] == 0) {
+		if (position[2] == 0)
 			return true;
-		}
-			
-		
+
 		Set<int[]> adjacentCubes = getAdjacentCubes(position);
 		
 		for (int[] adjacentCube: adjacentCubes) {
 			try{
-				if (!isPassable(adjacentCube)) {
+				if (!isPassable(adjacentCube))
 					return true;
-				}
-			} catch (IndexOutOfBoundsException e) {
-			}
+			} catch (IndexOutOfBoundsException e) {};
 		}
 		return false;
 		
@@ -913,14 +905,27 @@ public class Unit {
 		}
 	}
 	
+	
+	public void moveTo(int[] target) throws IllegalPositionException {
+		try {
+			this.moveTo(target[0], target[1], target[2]);
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
+	}
+	
 	/**
 	 * 
 	 * @param X
 	 * @param Y
 	 * @param Z
 	 */
-	public void moveTo(int X, int Y, int Z) {	
-		this.setFinalTarget(((double) X), ((double) Y), ((double) Z));
+	public void moveTo(int X, int Y, int Z) throws IllegalPositionException {
+		try {
+			this.setFinalTarget(((double) X), ((double) Y), ((double) Z));
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
 	}
 
 	
@@ -946,11 +951,11 @@ public class Unit {
 	 * 		| (((Math.abs(X) != 1) && (X != 0)) | ((Math.abs(Y) != 1) && (Y != 0)) 
 	 * 		|	| ((Math.abs(Z) != 1) && (Z != 0)))
 	 */
-	public void moveToAdjacent(int X, int Y, int Z) throws IllegalArgumentException {
+	public void moveToAdjacent(int X, int Y, int Z) throws IllegalPositionException {
 		
 		if (((Math.abs(X) != 1) && (X != 0)) | ((Math.abs(Y) != 1) && (Y != 0)) 
 				| ((Math.abs(Z) != 1) && (Z != 0)))
-			throw new IllegalArgumentException();
+			throw new IllegalPositionException("Not an adjacent cube");
 		
 		else {
 			this.setTarget(this.getPosition().getX() + ((double) (X)), 
@@ -1349,13 +1354,13 @@ public class Unit {
 
 	 */
 	
-	public void advanceTime(double seconds) throws IllegalArgumentException, IllegalUnitException {
+	public void advanceTime(double seconds) throws IllegalArgumentException, IllegalStateException {
 		
 		
 		if ((seconds <= 0) | (seconds > 0.2))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Given seconds should be a double value between 0 and 0.2");
 		else if (this.isTerminated())
-			throw new IllegalUnitException("The unit is terminated");
+			throw new IllegalStateException("The unit is terminated");
 		else {
 			if (this.shouldFall())
 				this.fall(seconds);
@@ -1610,23 +1615,13 @@ public class Unit {
 	 */
 	private void moveToRandomAdjacentPosition() {
 		
-		boolean newPos = false; 
-		boolean catched = false;
-		
-		while (!newPos) {
-			try {
-				this.setPosition(this.getPosition().getX() + (Math.random() - 0.5) * 2, 
-						this.getPosition().getY() + (Math.random() - 0.5) * 2,
-						this.getPosition().getZ() + (Math.random() - 0.5) * 2);
-			} catch (IllegalArgumentException e) {
-				catched = true;
-			} 
-			if (!catched) 
-				newPos = true;
-			catched = false;
-			
+		try {
+			this.setPosition(this.getPosition().getX() + (Math.random() - 0.5) * 2, 
+					this.getPosition().getY() + (Math.random() - 0.5) * 2,
+					this.getPosition().getZ() + (Math.random() - 0.5) * 2);
+		} catch (IllegalPositionException e) {
+			this.moveToRandomAdjacentPosition();
 		}
-
 	}
 	
 	/**
@@ -1689,7 +1684,11 @@ public class Unit {
 		int Y = (int) (Math.round(Math.random() * 50));
 		int Z = (int) (Math.round(Math.random() * 50));
 		
-		this.moveTo(X, Y, Z);
+		try {
+			this.moveTo(X, Y, Z);
+		} catch (IllegalPositionException e) {
+			this.moveToRandomPosition();
+		}
 		
 	}
 	
@@ -1752,8 +1751,7 @@ public class Unit {
 					falling = false;
 					return false;
 				}
-			} catch (IndexOutOfBoundsException e) {
-			}
+			} catch (IndexOutOfBoundsException e) {};
 		}
 		falling = true;
 		return true;
@@ -1772,13 +1770,14 @@ public class Unit {
 	/**
 	 * 
 	 * @param log
-	 * @throws IllegalArgumentException
+	 * @throws IllegalLogException
 	 */
-	public void carryLog(Log log) throws IllegalArgumentException {
-		if (log == null)
-			throw new IllegalArgumentException("Log is null");
+	public void carryLog(Log log) throws IllegalLogException {
+		if (isValidLog(log))
+			throw new IllegalLogException("Log is null");
 		
 		this.carriedLog = log;
+		log.setOwner(this);
 		this.setWeight(this.getWeight() + log.getWeight());
 	}
 	
@@ -1807,13 +1806,14 @@ public class Unit {
 	/**
 	 * 
 	 * @param boulder
-	 * @throws IllegalArgumentException
+	 * @throws IllegalBoulderException
 	 */
-	public void carryBoulder(Boulder boulder) throws IllegalArgumentException {
-		if (boulder == null)
-			throw new IllegalArgumentException("Boulder is null");
+	public void carryBoulder(Boulder boulder) throws IllegalBoulderException {
+		if (isValidBoulder(boulder))
+			throw new IllegalBoulderException("Boulder is null");
 			
 		this.carriedBoulder = boulder;
+		boulder.setOwner(this);
 		this.setWeight(this.getWeight() + boulder.getWeight());;
 			
 	}
@@ -2235,10 +2235,6 @@ public class Unit {
 }
 	
 
-// Functies die de 'state of the unit' veranderen, moeten een IllegalStateException() throwen als 
-// deze unit isTerminated() is.
-
-// Zelfde geldt voor Boulder, Log, Faction en World
 
 
 

@@ -55,7 +55,7 @@ public class Faction {
 			throw new IllegalWorldException("Unit and faction are part of two different worlds");
 		if (this.isFull())
 			throw new IllegalFactionException("This faction is full");
-		if (unit.getFaction() != null)
+		if (isValidUnit(unit))
 			throw new IllegalUnitException("Unit already belongs to faction");
 		this.unitInFaction.add(unit);
 		
@@ -99,6 +99,10 @@ public class Faction {
 	 */
 	private boolean isValidWorld(World world) {
 		return world != null;
+	}
+	
+	private boolean isValidUnit(Unit unit) {
+		return unit != null;
 	}
 	
 	/**

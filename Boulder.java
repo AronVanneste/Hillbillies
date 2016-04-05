@@ -20,22 +20,27 @@ public class Boulder {
 	 * 
 	 * @post The world will contain the boulder in its boulderlist
 	 * 
-	 * @throws IllegalArgumentException
-	 * 		Throws an IllegalArgumentException if the given position is not valid
+	 * @throws IllegalPositionException
+	 * 		Throws an IllegalPositionException if the given position is not valid
 	 * 
 	 * @throws IllegalWorldException
 	 * 		Throws an IllegalWorldException if the given world is null
 	 * 		
 	 */
-	public Boulder(World world, double[] position) throws IllegalArgumentException, IllegalWorldException {
-		if (!isValidPosition(position))
-			throw new IllegalArgumentException("This is not a valid position");
-		if (!isValidWorld(world))
-			throw new IllegalWorldException("World is null");
+	public Boulder(World world, double[] position) throws IllegalPositionException, IllegalWorldException {
+		try {
+			this.setPosition(position);
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
+	
+		try { 
+			this.setWorld(world);
+		} catch (IllegalWorldException invalidWorld) {
+			throw invalidWorld;
+		}
 		
-		this.setPosition(position);
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
-		this.setWorld(world);
 		world.addBoulder(this);
 
 	}
@@ -57,23 +62,28 @@ public class Boulder {
 	 * 
 	 * @post The world will contain the boulder in its boulderlist
 	 * 
-	 * @throws IllegalArgumentException
+	 * @throws IllegalPositionException
 	 * 		Throws an IllegalArgumentException if the given position is not valid
 	 * 
 	 * @throws IllegalWorldException
 	 * 		Throws an IllegalWorldException if the given world is null
 	 * 		
 	 */
-	public Boulder(World world, int[] position) throws IllegalArgumentException, IllegalWorldException {
-		if (!isValidPosition(position))
-			throw new IllegalArgumentException("This is not a valid position");
-		if (!isValidWorld(world))
-			throw new IllegalWorldException("World is null");
+	public Boulder(World world, int[] position) throws IllegalPositionException, IllegalWorldException {
+		try {
+			this.setPosition(position);
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
+	
+		try { 
+			this.setWorld(world);
+		} catch (IllegalWorldException invalidWorld) {
+			throw invalidWorld;
+		}
 		
-		double[] Pos = {(double) (position[0]), (double) (position[1]), (double) (position[2])};
-		this.setPosition(Pos);
+		
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
-		this.setWorld(world);
 		world.addBoulder(this);
 	}
 
@@ -118,8 +128,7 @@ public class Boulder {
 	 * @return Returns whether or not the boulder is supported by a solid cube
 	 */
 	private boolean isSolidBelow() {
-		return (this.getCube()[2] == 0 | (!this.getWorld().isPassable(this.getCube()[0], this.getCube()[1],
-				this.getCube()[2] - 1)));
+		return (this.getWorld().isSupported(this.getCube()));
 	}
 	
 	//isActive
@@ -128,7 +137,7 @@ public class Boulder {
 	 * @return Returns wheter or not the boulder is active (i.e. is ownerless)
 	 */
 	public boolean isActive() {
-		return this.getOwner() == null;
+		return (this.getOwner() == null && !this.isActive());
 	}
 	
 	//shouldFall
@@ -162,17 +171,40 @@ public class Boulder {
 	 * 		The new position of the boulder
 	 * @post
 	 * 		The position of the boulder will be the given position, if it's a valid position
-	 * @throws IllegalArgumentException
-	 * 		Throws an IllegalArgumentException if the given position wou
+	 * @throws IllegalPositionException
+	 * 		Throws an IllegalPositionException if the given position wou
 	 *  of the world of the boulder
 	 * 		
 	 */
-	public void setPosition(double[] position) throws IllegalArgumentException {
+	protected void setPosition(double[] position) throws IllegalPositionException {
 		
 		if (!isValidPosition(position))
-			throw new IllegalArgumentException("This is not a valid position");
+			throw new IllegalPositionException("This is not a valid position");
 		else
 			this.position = position;
+	}
+	
+	/**
+	 * @param position
+	 * 		The new position of the log
+	 * @post
+	 * 		The position of the log will be the given position, if it's a valid position
+	 * @throws IllegalArgumentException
+	 * 		Throws an IllegalArgumentException if the given position wou
+	 *  of the world of the log
+	 * 		
+	 */
+	protected void setPosition(int[] position) throws IllegalPositionException {
+		
+		if (!isValidPosition(position))
+			throw new IllegalPositionException("This is not a valid position");
+		else {
+			double X = ((double) position[0]);
+			double Y = ((double) position[1]);
+			double Z = ((double) position[2]);
+			double[] pos = {X, Y, Z};
+			this.position = pos; 
+		}
 	}
 	/**
 	 * @return Returns the position as a list of doubles of the boulder
@@ -225,7 +257,9 @@ public class Boulder {
 	 * and the boulder is added to the boulder list of the world if it's active
 	 * and deleted from the list if it's unactive ????????
 	 */
-	public void setOwner(Unit owner) {
+	protected void setOwner(Unit owner) throws IllegalStateException {
+		if (this.isTerminated())
+			throw new IllegalStateException("Terminated");
 		this.owner = owner;
 		this.changeInWorld();
 	}
@@ -282,7 +316,7 @@ public class Boulder {
 	 * 		The boulder will be ownerless
 	 * 		The owner will lose that boulder
 	 */
-	public void removeOwner() {
+	protected void removeOwner() {
 		try {
 			this.getOwner().removeBoulder();
 			this.setOwner(null);
