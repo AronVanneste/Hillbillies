@@ -28,6 +28,7 @@ public class Boulder {
 	 * 		
 	 */
 	public Boulder(World world, double[] position) throws IllegalPositionException, IllegalWorldException {
+		
 		try {
 			this.setPosition(position);
 		} catch (IllegalPositionException invalidPosition) {
@@ -277,7 +278,6 @@ public class Boulder {
 		
 		if (this.isTerminated())
 			throw new IllegalStateException("Terminated");
-		
 		if ((time <= 0) | (time > 0.2))
 			throw new IllegalArgumentException("Given time is not valid");
 		else {

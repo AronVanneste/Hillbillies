@@ -49,14 +49,16 @@ public class Faction {
 	 * 		Throws IllegalUnitException if the unit already belongs to a faction
 	 */
 	public void addUnit(Unit unit) throws IllegalWorldException, IllegalFactionException, 
-		IllegalUnitException {
+		IllegalUnitException, IllegalStateException {
 		
 		if (!this.isInSameWorld(unit))
 			throw new IllegalWorldException("Unit and faction are part of two different worlds");
 		if (this.isFull())
 			throw new IllegalFactionException("This faction is full");
-		if (isValidUnit(unit))
+		if (!isValidUnit(unit))
 			throw new IllegalUnitException("Unit already belongs to faction");
+		if (this.isTerminated())
+			throw new IllegalStateException("Faction is terminated");
 		this.unitInFaction.add(unit);
 		
 	}
@@ -102,7 +104,7 @@ public class Faction {
 	}
 	
 	private boolean isValidUnit(Unit unit) {
-		return unit != null;
+		return unit != null && !unit.isTerminated();
 	}
 	
 	/**
@@ -135,6 +137,7 @@ public class Faction {
 	 * 		The world of the faction is null
 	 */
 	private void removeWorld() {
+		
 		try {
 			this.getWorld().removeFaction(this);
 			this.setWorld(null);

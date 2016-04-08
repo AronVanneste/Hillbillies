@@ -1,11 +1,15 @@
 package hillbillies.model;
 
 
+import java.awt.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+
 
 import hillbillies.model.Vector;
 
@@ -60,6 +64,14 @@ public class Unit {
 	 * 		| new.getSpeed() = 0
 	 * @post The defaultBehavior status of the unit equals the given boolean enableDefaultBehavior
 	 * 		| new.getDefaultBehavior() = enableDefaultBehavior
+	 * @post The faction of the unit is null
+	 * 		|new.getFaction = null
+	 * @post The target of the unit is it's initial position
+	 * 		|new.getTarget = position
+	 * @post The finaltarget of the unit is it's initial position
+	 * 		|new.getFinalTarget = position
+	 * @post The experiencepoints of the unit will be zero
+	 * 		|new.getExperiencepoints = 0
 	 * @throws IllegalNameException
 	 * 		If the name does not start with an upper case letter, doesn't have a length of at least two characters
 	 * 		or has a character other than letters or quotes
@@ -127,7 +139,7 @@ public class Unit {
 
 	/**
 	 * 
-	 * @return
+	 * @return Returns the world the unit is in
 	 */
 	public World getWorld() {
 		try {
@@ -141,6 +153,9 @@ public class Unit {
 	/**
 	 * 
 	 * @param faction
+	 * 		The faction of the unit
+	 * @post The faction of the unit is the given faction
+	 * 		|new.getFaction = faction
 	 */
 	protected void setFaction(Faction faction) {
 		this.faction = faction;
@@ -148,7 +163,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the faction of the unit
 	 */
 	public Faction getFaction() {
 		return this.faction;
@@ -190,18 +205,20 @@ public class Unit {
 	 * 		The y-axis position of the center of the unit
 	 * @param Z
 	 * 		The z-axis position of the center of the unit
-	 * @post The double at index 0 of the list POS equals the given X and is the x-axis position of the center of the unit
-	 * 		 The double at index 1 of the list POS equals the given Y and is the y-axis position of the center of the unit
-	 * 		 The double at index 2 of the list POS equals the given Z and is the z-axis position of the center of the unit
-	 * 		| new.POS.get(0) == X
-	 * 		| new.POS.get(1) == Y
-	 * 		| new.POS.get(2) == Z 
+	 * @post The double at index 0 of the list POS equals the given X and is the x-axis position 
+	 * 		 of the center of the unit
+	 * 		 The double at index 1 of the list POS equals the given Y and is the y-axis position 
+	 * 		 of the center of the unit
+	 * 		 The double at index 2 of the list POS equals the given Z and is the z-axis position
+	 * 		 of the center of the unit
+	 * 		| new.getPosition().getX == X
+	 * 		| new.getPosition().getY == Y
+	 * 		| new.getPosition().getZ == Z 
 	 * @throws IllegalPositionException
 	 * 		 If one of given X, Y or Z is negative or larger than 50.
 	 * 		| (!isValidPosition(X,Y,Z))
 	 * 
 	 */
-	
 	protected void setPosition(double X, double Y, double Z) throws IllegalPositionException {
 		
 		if (!isValidPosition(X,Y,Z))
@@ -223,6 +240,10 @@ public class Unit {
 		return this.POS;
 	}
 	
+	/**
+	 * @return Returns a list of doubles containing the x-axis, y-axis and z-axis position 
+	 * of the center of the unit
+	 */
 	public double[] getPositionList() {
 		double X = this.getPosition().getX();
 		double Y = this.getPosition().getY();
@@ -234,13 +255,20 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return Return a list containing the x-axis, y-axis and z-axis position of the cube in which the unit is located. 
+	 * @return Returns a Vector containing the x-axis, y-axis and z-axis position of the cube in which the unit is located. 
 	 * 		   These are the coordinates of the top left corner of this cube.
 	 */
 	public Vector getCube() {
 		return this.getCube(this.getPosition());
 	}
 	
+	/**
+	 * 
+	 * @param position
+	 * 		The position of which the cube coordinates are returned
+	 *  @return Returns a Vector containing the x-axis, y-axis and z-axis position of the cube of 
+	 *  		the given position
+	 */
 	private Vector getCube(Vector position) {
 		
 		double XCube = Math.floor(position.getX());
@@ -252,6 +280,12 @@ public class Unit {
 
 	}
 	
+	/**
+	 * 
+	 * @return Returns a list of ints containing the x-axis, y-axis and z-axis position of the cube in 
+	 * 		   which the unit is located. 
+	 * 		   These are the coordinates of the top left corner of this cube.
+	 */
 	public int[] getCubeInt() {
 		int XCube = (int) Math.floor(this.getPosition().getX());
 		int YCube = (int) Math.floor(this.getPosition().getY());
@@ -329,7 +363,8 @@ public class Unit {
 	 * 
 	 * @param weight
 	 * 			The weight of the unit
-	 * @post The weight of the unit equals the absolute value of the given weight minus MIN modulo 75 plus MIN
+	 * @post The weight of the unit equals the absolute value of the given weight minus the weight of a carried bolder or log 
+	 * 		 minus MIN modulo 75 plus MIN plus the weight of the boulder or log
 	 * 		 in which MIN equals the strength of the unit plus the agility of the unit divided by two.
 	 * 		| new.getWeight() == (Math.abs(weight) - (this.getStrength() + this.getAgility()/2) % 75 
 	 * 			+ (this.getStrength() + this.getAgility())/2
@@ -364,7 +399,7 @@ public class Unit {
 	 * 			The stamina of the unit
 	 * @pre The stamina of the unit is not negative and is smaller than the weight of the unit multiplied by the toughness of the 
 	 * 		unit divided by 50 rounded up to an integer
-	 * 		| (stamina >=) 0 && (stamina <= Math.ceil(2 * this.getWeight() * getToughness() / 100.0))) 
+	 * 		| (isValidStamina(stamina) 
 	 * @post The stamina of the unit equals the given stamina
 	 * 		| new.getStamina() = stamina
 	 */
@@ -398,7 +433,7 @@ public class Unit {
 	 * 			The hitpoints of the unit
 	 * @pre The hitpoints of the unit is not negative and is smaller than the weight of the unit multiplied by the toughness of the 
 	 * 		unit divided by 50 rounded up to an integer
-	 * 		| (hitpoints >=) 0 && (hitpoints <= Math.ceil(2 * this.getWeight() * getToughness() / 100.0))) 
+	 * 		| (isValidHitpoints(hitpoints) 
 	 * @post The hitpoints of the unit equals the given hitpoints
 	 * 		| new.getHitpoints() = hitpoints
 	 */
@@ -429,35 +464,53 @@ public class Unit {
 	/**
 	 * 
 	 * @param points
+	 * 		The experiencepoints of the unit
+	 * @post
+	 * 		The experiencepoints equal the maximum of the given experiencepoints an zero
+	 * 		| new.getExperiencePoints = Math.max(experiencepoints, 0)
 	 */
 	private void setExperiencePoints(int points) {
 		this.experiencePoints = Math.max(points, 0);
-		this.updateExperiencePoints();
+		if (this.getExperiencePoints() % 10 >= 0 && this.getExperiencePoints() != 0)
+			this.updateExperiencePoints();
 	}
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the experiencepoints of the unit
 	 */
 	public int getExperiencePoints() {
 		return this.experiencePoints;
 	}
 	
 	/**
-	 * For every 10 experience points, one of the unit's strength, agility or toughness 
-	 * will increase by one point. 
+	 *@post The strength, agility or toughness will increase by one points if the unit has more than 
+	 *		10 experience points and its experience points will decrease with 10. If strength, agility
+	 *		and toughness all are at their maximum, then the unit's experience points will remain unchanged.
+	 *		|if (new.getExperiencePoints() % 10 >= 0
+	 *		|	new.getExperiencePoints == this.getExperiencePoints() - 10
+	 * 		|	if (this.getStrength() < 100)
+	 *		|		then new.getStrength == this.getStrength() + 1
+	 *		|	else if (this.getAgility() < 100)
+	 *		|		then new.getAgility == this.getAgility() + 1
+	 *		|	else if (this.getToughness() < 100)
+	 *		|		then new.getToughness == this.getToughness() + 1
+	 *		|	else
+	 *		|		then new.getExperiencePoints() == this.getExperiencePoints() + 10
 	 * 
 	 */
 	public void updateExperiencePoints() {
 		
-		while (this.getExperiencePoints() % 10 >= 0) {  
+		if (this.getExperiencePoints() % 10 >= 0) {  
 			this.setExperiencePoints(this.getExperiencePoints() - 10);
 			if (this.getStrength() < 100)
 				this.setStrength(this.getStrength() + 1);
 			else if (this.getAgility() < 100)
 				this.setAgility(this.getAgility() + 1);
-			else
+			else if (this.getToughness() < 100)
 				this.setToughness(this.getToughness() + 1);
+			else
+				this.setExperiencePoints(this.getExperiencePoints() + 10);
 		}
 		
 	}
@@ -514,9 +567,9 @@ public class Unit {
 	 * @post The double at index 0 of the list TARGET equals the given XTarget and is the x-axis position of the center of the unit
 	 * 		 The double at index 1 of the list TARGET equals the given YTarget and is the y-axis position of the center of the unit
 	 * 		 The double at index 2 of the list TARGET equals the given ZTarget and is the z-axis position of the center of the unit
-	 * 		| new.TARGET.get(0) == XTarget
-	 * 		| new.TARGET.get(1) == YTarget
-	 * 		| new.TARGET.get(2) == ZTarget
+	 * 		| new.getTarget().getX() == XTarget
+	 * 		| new.getTarget().getY() == YTarget
+	 * 		| new.getTarget().getZ() == ZTarget
 	 * @throws IllegalPositionException
 	 * 		If the given target (XTarget, YTarget, ZTarget) is not a valid position
 	 * 		| (!isValidPosition(XTarget, YTarget, ZTarget)
@@ -544,8 +597,17 @@ public class Unit {
 	/**
 	 * 
 	 * @param X
+	 * 		The X coordinate of the final target
 	 * @param Y
+	 * 		The Y coordinate of the final target
 	 * @param Z
+	 * 		The Z coordinate of the final target
+	 * @post The final target of the unit will equal the vector {X,Y,Z}
+	 * 		new.getFinalTarget().equals(Vector(X,Y,Z))
+	 * @throws IllegalPositionException
+	 * 		Throws IllegalPositionException is the position is not valid
+	 * 		|!(isValidPosition(X, Y, Z))
+	 * 
 	 */
 	private void setFinalTarget(double X, double Y, double Z) throws IllegalPositionException {
 		
@@ -560,7 +622,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the finalTarget of the unit
 	 */
 	private Vector getFinalTarget() {
 		return this.finalTARGET;
@@ -656,15 +718,8 @@ public class Unit {
 	 * 		| new.getDefaultBehavior() = behavior
 
 	 */
-	public void setDefaultBehavior(boolean behavior) {
-		
-		if (this.getDefaultBehavior() != behavior)
-			this.setChangedDefaultBehavior(true);
-		else
-			this.setChangedDefaultBehavior(false);
-		
+	public void setDefaultBehavior(boolean behavior) {		
 		this.enableDefaultBehaviour = behavior;
-		this.setStartedDefaultBehavior(false);
 	}
 	
 	
@@ -677,7 +732,6 @@ public class Unit {
 		return this.enableDefaultBehaviour;
 	}
 
-	
 	
 	/**
 	 * #######################################################################
@@ -695,8 +749,8 @@ public class Unit {
 	 * @param Z
 	 * 			The given z-axis position
 	 * @return	Returns true if X, Y and Z form a valid position. This is when X, Y and Z
-	 * 			are a non-negative value and not larger than 50
-	 * 			| if ((X < 0) | (X > 50) | (Y < 0) |(Y > 50) | (Z < 0) | (Z > 50))
+	 * 			are a non-negative value and do not exceed the borders of the units world
+	 * 			| if ((X < 0) | (X > new.getWorld.getNbX) | (Y < 0) |(Y > new.getWorld.getNbY) | (Z < 0) | (Z > new.getWorld.getNbZ))
 	 * 			| 	then false
 	 * 			| else
 	 * 			| 	then true
@@ -706,11 +760,27 @@ public class Unit {
 		return isValidPosition(pos);
 	}
 	
+	private boolean isValidPosition(int X, int Y, int Z) {
+		double[] pos = {(double) X, (double) Y, (double) Z};
+		return isValidPosition(pos);
+	}
+
+	
+	private boolean isValidTarget(int X, int Y, int Z) {
+		return (isValidPosition(X, Y, Z) && isNeighbouringSolidTerrain(X, Y, Z));
+	}
+	
 	
 	/**
 	 * 
 	 * @param position
-	 * @return
+	 * 		The position to be checked
+	 * @return	Returns true if position is a valid position. This is when X, Y and Z
+	 * 			are a non-negative value and do not exceed the borders of the units world
+	 * 			| if ((X < 0) | (X > new.getWorld.getNbX) | (Y < 0) |(Y > new.getWorld.getNbY) | (Z < 0) | (Z > new.getWorld.getNbZ))
+	 * 			| 	then false
+	 * 			| else
+	 * 			| 	then true	
 	 */
 	private boolean isValidPosition(double[] position) {
 		try {
@@ -719,10 +789,13 @@ public class Unit {
 			return true;
 		}
 	}	
+	
 	/**
 	 * 
 	 * @param position
-	 * @return
+	 * 		The position to be checked
+	 * @return Returns whether or not the position is passable
+	 * 		
 	 */
 	private boolean isPassable(int[] position) {
 		try {
@@ -775,7 +848,7 @@ public class Unit {
 	 * @param defender
 	 * 			The defending unit
 	 * @return Returns true if the cube the unit's in and the cube the defending unit's in are 
-	 * 		   neighboring cubes, else false
+	 * 		   neighboring cubes, they're not falling and their factions differ, else false
 	 * 
 	 */
 	
@@ -784,22 +857,60 @@ public class Unit {
 		return ((Math.abs(attacker.getCube().getX()- defender.getCube().getX()) <= 1) &&
 				(Math.abs(attacker.getCube().getY()- defender.getCube().getY()) <= 1) &&
 				(Math.abs(attacker.getCube().getZ()- defender.getCube().getZ()) <= 1) &&
-				(attacker.getFaction() != defender.getFaction()));
+				(attacker.getFaction() != defender.getFaction()) && 
+				(!attacker.isFalling() && !defender.isFalling()));
 	}
 	
+	
+	private boolean canRest() {
+		return ((this.getNotRestTime() >= 180 | this.getSpeed() == 0)
+				&& (!this.isAttacked() && !this.isAttacking()));
+	}
+	
+	private boolean canWork() {
+		return (this.canOverruleResting() && this.getSpeed() == 0 && !this.isAttacked() && !this.isAttacking());
+	}
+	
+	private boolean canMove() {
+		return (!this.isFalling() && !this.isAttacked() && !this.isAttacking()
+				&& this.getNotRestTime() < 180 && this.canOverruleResting());
+	}
+ 	
+	/**
+	 * @return Returns whether or not a boulder is valid
+	 * 		A boulder is valid if it's active and when it's not null
+	 */
 	private boolean isValidBoulder(Boulder boulder) {
 		return (boulder != null && boulder.isActive());
 	}
 	
+	/**
+	 * @return Returns whether or not a log is valid
+	 * 		A log is valid if it's active and when it's not null
+	 */
 	private boolean isValidLog(Log log) {
 		return (log != null && log.isActive());
 	}
 	
+	/**
+	 * @param X
+	 * 		The distance on the x-axis
+	 * @param Y
+	 * 		The distance on the y-axis
+	 * @param Z
+	 * 		The distance on the z-axis
+	 * @return Returns whether or not X, Y and Z point on adjacent cubes
+	 */
 	private boolean isAdjacent(int X, int Y, int Z) {
 		return !(((Math.abs(X) != 1) && (X != 0)) | ((Math.abs(Y) != 1) && (Y != 0)) 
 				| ((Math.abs(Z) != 1) && (Z != 0)));
 	}
 	
+	/**
+	 * @param position
+	 * 		The position to be examined
+	 * @return Returns whether or not the position is in the borders of the world of the unit
+	 */
 	private boolean isPositionInWorld(int[] position) {
 		try {
 			return this.getWorld().isPositionInWorld(position);
@@ -808,12 +919,23 @@ public class Unit {
 		}
 	}
 	
+	private boolean isNeighbouringSolidTerrain(int X, int Y, int Z) {
+		int[] pos = {X, Y, Z};
+		return isNeighbouringSolidTerrain(pos);	
+	}
+	
+	
+	/**
+	 * @param cube
+	 * 		The cube to be examined
+	 * @return Returns true if the cube is at the bottom of the terrain or when one of it's adjacent cubes if solid
+	 */
 	private boolean isNeighbouringSolidTerrain(int[] position) {
 		
 		if (position[2] == 0)
 			return true;
 
-		Set<int[]> adjacentCubes = getAdjacentCubes(position);
+		ArrayList<int[]> adjacentCubes = getAdjacentCubes(position);
 		
 		for (int[] adjacentCube: adjacentCubes) {
 			try{
@@ -825,11 +947,18 @@ public class Unit {
 		
 	}
 	
+	/**
+	 * @return Returns whether or not the units cube is a workshop
+	 */
 	private boolean isWorkshop() {
 		return isWorkshop(this.getCubeInt());
 	}
 	
-	
+	/**
+	 * @param cube
+	 * 		The cube to be examined
+	 * @return Returns whether or not the position is a workshop
+	 */
 	private boolean isWorkshop(int[] position) {
 		try {
 			return this.getWorld().isWorkshop(position);
@@ -838,11 +967,18 @@ public class Unit {
 		}
 	}
 		
+	/**
+	 * @return Returns whether or not the units cube is wood
+	 */
 	private boolean isWood() {
 		return isWood(this.getCubeInt());
 	}
 	
-	
+	/**
+	 * @param cube
+	 * 		The cube to be examined
+	 * @return Returns whether or not the position is wood
+	 */
 	private boolean isWood(int[] position) {
 		try {
 			return this.getWorld().isWood(position);
@@ -851,12 +987,18 @@ public class Unit {
 		}
 	}
 
-	
+	/**
+	 * @return Returns whether or not the units cube is rock
+	 */
 	private boolean isRock() {
 		return isRock(this.getCubeInt());
 	}
 	
-	
+	/**
+	 * @param cube
+	 * 		The cube to be examined
+	 * @return Returns whether or not the position is rock
+	 */
 	private boolean isRock(int[] position) {
 		try {
 			return this.getWorld().isRock(position);
@@ -865,26 +1007,45 @@ public class Unit {
 		}
 	}
 	
-	private boolean isNotInQueue(Queue<Object[]> Queue, int[] position, int n0) {
+
+	
+	/**
+	 *@param Queue
+	 *		The queue that's checked
+	 *@position
+	 *		The position of which
+	 */
+	private boolean isNotInQueue(ArrayList<Object[]> Queue, int[] position, int n0) {
 		
 		if (Queue.size() == 0) 
 			return true;
-		for (Object[] something: Queue) { 
-			if ((something[0] == position) && (((int) something[1]) >= n0))
-				return true;
+		for (int i = 0; i < Queue.size(); i++) {
+			Object[] something = ((Object[]) Queue.get(i));
+			if ((something[0] == position) && (((int) something[1]) <= n0))
+				return false;
 		}
-		return false;
+		return true;
 	}
 	
-	private boolean isInQueue(Queue<Object[]> Queue, int[] position) {
-		for (Object[] something: Queue) {
-			if (((int[]) something[0]) == position)
+	
+	/**
+	 * @param Queue
+	 * 		The queue that's checked
+	 * @param position
+	 * 		The position of which we want to know if it's in the Queue
+	 * @return Returns true if the Queue contains a list with the position, else false
+	 */
+	private boolean isInQueue(ArrayList<Object[]> Queue, int[] position) {
+		for (int i = 0; i < Queue.size(); i++) {
+			int[] comparable = (int[])(Queue.get(i)[0]);
+			if (comparable[0] == position[0] && comparable[1] == position[1] 
+					&& comparable[2] == position[2])
 				return true;
 		}
 		return false;
 	}
 
-	
+
 	
 	/**
 	 * ###################################################################
@@ -894,10 +1055,13 @@ public class Unit {
 	
 	
 	/**
-	 * @post The status of the boolean sprint of the unit equals false
-	 * 		| new.isSprinting() == false
-	 * @post The time the unit has been sprinting equals zero
-	 * 		| this.getSprintingTime == 0
+	 * @param sprinting
+	 * 		The boolean status of sprinting of the unit
+	 * @post The status of the boolean sprint of the unit equals sprinting
+	 * 		| new.isSprinting() == sprinting
+	 * @post The time the unit has been sprinting equals zero if sprinting is false
+	 * 		|if (!sprinting)
+	 * 		| 	this.getSprintingTime == 0
 	 */
 	public void setSprinting(boolean sprinting) {
 		if (!sprinting) {
@@ -911,27 +1075,64 @@ public class Unit {
 	}
 	
 	
-	public void moveTo(int[] target) throws IllegalPositionException, IllegalStateException {
-		if (this.isTerminated())
-			throw new IllegalStateException("Unit is terminated");
+	/**
+	 * @param target
+	 * 		The cube where the unit should move to
+	 * @post the finaltarget of the unit will be target
+	 * 		|new.getFinalTarget == target
+	 * @throws IllegalPositionException
+	 * 		Throws IllegalPositionException if the position if invalid
+	 * 		|if (!isValidPosition(target))
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
+	 */
+	public void moveTo(int[] target) throws IllegalPositionException, IllegalStateException, 
+		IllegalArgumentException, IllegalTargetException {
+		
 		try {
 			this.moveTo(target[0], target[1], target[2]);
 		} catch (IllegalPositionException invalidPosition) {
 			throw invalidPosition;
+		} catch (IllegalArgumentException otherPriority) {
+			throw otherPriority;
+		} catch (IllegalStateException unitTerminated) {
+			throw unitTerminated;
+		} catch (IllegalTargetException unreachableTarget) {
+			throw unreachableTarget;
 		}
 	}
 	
 	/**
 	 * 
 	 * @param X
+	 * 		The X-coordinate of the cube where the unit should move to
 	 * @param Y
+	 * 		The Y-coordinate of the cube where the unit should move to
 	 * @param Z
+ 	 * 		The Z-coordinate of the cube where the unit should move to
+	 * @post the finaltarget of the unit will be {X,Y,Z}
+	 * 		|new.getFinalTarget == {X,Y,Z}
+	 * @throws IllegalPositionException
+	 * 		Throws IllegalPositionException if the position {X,Y,Z}if invalid
+	 * 		|if (!isValidPosition(target))
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
 	 */
-	public void moveTo(int X, int Y, int Z) throws IllegalPositionException , IllegalStateException {
+	public void moveTo(int X, int Y, int Z) throws IllegalPositionException , IllegalStateException, 
+		IllegalArgumentException, IllegalTargetException {
+		
+		if (!this.canMove())
+			throw new IllegalArgumentException("Unit is doing another activity with higher priority"); 
 		if (this.isTerminated())
 			throw new IllegalStateException("Unit is terminated");
+		if (!isValidTarget(X, Y, Z))
+			throw new IllegalTargetException("Target is unreachable");
 		try {
 			this.setFinalTarget(((double) X), ((double) Y), ((double) Z));
+			this.setWorking(false);
+			this.setResting(false);
 		} catch (IllegalPositionException invalidPosition) {
 			throw invalidPosition;
 		}
@@ -947,6 +1148,7 @@ public class Unit {
 	 * 			The distance the unit has to travel in the direction of the y-axis
 	 * @param Z
 	 * 			The distance the unit has to travel in the direction of the z-axis
+	 * 
 	 * @post The new position of the unit equals his previous position plus (X, Y, Z)
 	 * 		 if the unit was not interrupted during his activity
 	 * 		| if (!this.isStopped())
@@ -955,10 +1157,12 @@ public class Unit {
 	 * 		 to indicate the unit's moveToAdjacent activity was aborted
 	 * 		| if (this.isStopped())
 	 * 		|	then new.getNotReachedTarget() == true
-	 * @throws IllegalArgumentException
-	 * 			If the X, Y or Z value is not -1, 0 or 1
-	 * 		| (((Math.abs(X) != 1) && (X != 0)) | ((Math.abs(Y) != 1) && (Y != 0)) 
-	 * 		|	| ((Math.abs(Z) != 1) && (Z != 0)))
+	 * @throws IllegalPositionException
+	 * 		Throws IllegalPositionException if the unit has to travel to a non-adjacent cube
+	 * 		|if (!isAdjacent(X, Y, Z))
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
 	 */
 	public void moveToAdjacent(int X, int Y, int Z) throws IllegalPositionException, IllegalStateException {
 		
@@ -974,43 +1178,74 @@ public class Unit {
 		
 	}
 	
-	public void pathFindingAlgorithm(int[] destination) {
-		Queue<Object[]> Queue = new LinkedList<>();
-		while (this.getCubeInt() != destination) {
+
+	
+	/**
+	 * 
+	 * @throws IllegalPositionException
+	 */
+	public void pathFindingAlgorithm() throws IllegalPositionException {
+		
+		int X = (int) Math.round(this.getFinalTarget().getX());
+		int Y = (int) Math.round(this.getFinalTarget().getY());
+		int Z = (int) Math.round(this.getFinalTarget().getZ());
+		int[] destination = {X, Y, Z};
+		
+		ArrayList<Object[]> Queue = new ArrayList<>();
+		if (this.getCubeInt() != destination) {
 			Object[] somethingNew = {destination, 0};
 			Queue.add(somethingNew);
-			while ((!isInQueue(Queue, destination)) && (Queue.peek() != null)) {
-				Object[] something = Queue.poll();
+			int i = 0;
+			while ((!isInQueue(Queue, this.getCubeInt())) && (i < Queue.size())) {
+				Object[] something = ((Object[]) Queue.get(i));
 				search(Queue, something);
+				i += 1;
 			}
 			if (isInQueue(Queue, this.getCubeInt())) {
 				int[] next = takeNext(Queue);
-				moveToAdjacent(next[0], next[1], next[2]);
-			} else
-				break;
+				moveToAdjacent(this.getCubeInt()[0] - next[0], 
+						this.getCubeInt()[1] - next[1], 
+						this.getCubeInt()[2] - next[2]);
+			} else	{
+				throw new IllegalPositionException("Destination is unreachable");
+			}
 		}
+		
 				
 	}
+
 	
-	private void search(Queue<Object[]> Queue, Object[] something) {
+
+	
+	/**
+	 * @param Queue 
+	 */
+	private void search(ArrayList<Object[]> Queue, Object[] something) {
 		int[] position = ((int[]) something[0]);
 		int n0 = ((int) something[1]);
 		search(Queue, position, n0);
 	}
 	
-	private void search(Queue<Object[]> Queue, int[] position, int n0) {
+	/**
+	 * @param Queue 
+	 */
+	private void search(ArrayList<Object[]> Queue, int[] position, int n0) {
 		
-		Set<int[]> adjacentCubes = this.getAdjacentCubes();
+		ArrayList<int[]> adjacentCubes = this.getAdjacentCubes(position);
 		for (int[] cube: adjacentCubes) {
 			if ((isPassable(cube)) && (isNeighbouringSolidTerrain(cube))
-					&& isNotInQueue(Queue, position, n0)) {
+					&& isNotInQueue(Queue, cube, n0)) {
 				Object[] somethingNew = {cube, n0+1};
 				Queue.add(somethingNew);
 			}
 		}
 	}
+
 	
-	private int[] takeNext(Queue<Object[]> Queue) {
+	
+	
+	private int[] takeNext(ArrayList<Object[]> Queue) {
+		
 		int maximalN = Integer.MAX_VALUE;
 		int[] next = null;
 		
@@ -1024,11 +1259,13 @@ public class Unit {
 		return next;
 			
 	}
+	
 		
 	
 	
 	/**
-	 * 
+	 * @post The unit will be at its final target
+	 * 		new.getPosition() == this.getFinalTarget
 	 */
 	private void moveToTarget() {
 		
@@ -1060,26 +1297,68 @@ public class Unit {
 	}
 	
 	/**
-	 * 
+	 * @post The unit starts working, it stops moving and stops resting
+	 * 		new.getWorking == true
+	 * 		new.getSpeed == 0
+	 * 		new.getResting == false
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
 	 */
-	public void work() throws IllegalStateException {
+	public void work() throws IllegalStateException, IllegalArgumentException {
 		if (this.isTerminated())
 			throw new IllegalStateException("Unit is terminated");
+		if (!this.canWork())
+			throw new IllegalArgumentException("Unit is doing another activity with higher priority");
 		this.setWorking(true);
-		this.setSpeed(0);		
-		this.setResting(false);
+		this.workAfterMoving(false);
 	}
 	
-	public void workAt(int x, int y, int z) {
+	
+	/**
+	 * @param x
+	 * 		The x coordinate of the cube where the unit should start moving
+	 * @param y
+	 * 		The y coordinate of the cube where the unit should start moving
+	 * @param z
+	 * 		The z coordinate of the cube where the unit should start moving
+	 * 
+	 * @post
+	 * 		The unit starts working, stops resting and starts moving towards position {x,y,z}
+	 * 		new.getWorking == true
+	 * 		new.getResting == false
+	 * 		new.getFinalTarget == {x,y,z}
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
+	 */
+	public void workAt(int x, int y, int z) throws IllegalStateException, IllegalArgumentException {
 		if (this.isTerminated())
 			throw new IllegalStateException("Unit is terminated");
-		this.setWorking(true);
-		this.setResting(false);
+		if (!this.canWork())
+			throw new IllegalArgumentException("Unit is doing another activity with higher priority");
+		this.workAfterMoving(true);
 		this.moveTo(x, y, z);
 	}
 	
+	/**
+	 * @post
+	 * 		if (new.isCarryingBoulder() | new.isCarryingLog())
+	 *			new.isCarryingLog == false
+	 *			new.isCarryingBoulder == false
+	 *		else if (isWorkshop() && logAndBoulderAreAvailable())
+	 *			new.isCarryingLog == false
+	 *			new.isCarryingBoulder == false
+	 *			new.getWeight == this.getWeight + 5
+	 *			new.getToughness == this.getToughness + 5				
+	 *		else if (boulderAvailable())
+	 *			new.isCarryingBoulder == true
+	 *		else if (logAvailable())
+	 *			new.isCarryingLog == true
+	 */
 	protected void finishWorking() {
 		
+		this.setExperiencePoints(this.getExperiencePoints() + 10);
 		
 		if (this.isCarryingBoulder() | this.isCarryingLog())
 			this.dropEverything();
@@ -1096,7 +1375,13 @@ public class Unit {
 			
 	}
 	
-	
+	/**
+	 * @post
+	 * 		| new.isCarryingLog == false
+	 *		| new.isCarryingBoulder == false
+	 *		| new.getWeight == this.getWeight + 5
+	 *		| new.getToughness == this.getToughness + 5	
+	 */
 	private void improveEquipment() {
 		
 		this.setWeight(this.getWeight() + 5);
@@ -1130,12 +1415,20 @@ public class Unit {
 	 * 		| attacker.getAttacking() == true
 	 * @post The defender's status of isAttacked() equals true
 	 * 		| defender.isAttacked() == true
+	 * @post The attackers opponent is defender
+	 * 		| attacker.getOpponent == defender
+	 * @post The defenders opponent is attacker
+	 * 		| defender.getOpponent == attacker
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
 	 */
 	public void fight(Unit attacker, Unit defender) throws IllegalStateException {
 		assert isValidAttack(attacker, defender);
 		
 		if (attacker.isTerminated() | defender.isTerminated())
 			throw new IllegalStateException("One of the units is terminated");
+		
 		
 		attacker.setOpponent(defender);
 		defender.setOpponent(attacker);
@@ -1146,31 +1439,33 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @pre The hitpoints of the unit as well as the stamina points of the unit must not have reached its maximum
-	 *     |(this.getHitpoints() != this.getMaxHitPoints()) | (this.getStamina() != this.getMaxStamina())
-	 * @post After the unit was resting, its restingTime is set to zero
-	 *	   | new.getRestingTime() == 0
-	 * @post If a previous activity was interrupted because the unit needed to rest, it resumes this activity afterwards
-	 * 	   | if (this.getNotReachedTarget())
-	 * 	   |	then new.getSpeed() > 0
-	 * @post If no previous activity was interrupted by resting, the unit's speed equals zero
-	 * 	   | if (!this.getNotReachedTarget())
-	 * 	   |	then new.getSpeed() == 0  
-	 *
+	 * @post The unit starts resting
+	 * 		|new.getResting == true
+	 * @post The units attackedstate, attackingstate, sprintingstate, defendingstate and workingstate are all false
+	 * 		|new.getAttacked == false;
+	 * 		|new.getAttacking == false;
+	 * 		|new.getSprinting == false;
+	 * 		|new.getDefending == false;
+	 * 		|new.getWorking == false;
+	 * @post The units speed is set 0
+	 * 		|new.getSpeed == 0
+	 * 
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
 	 *  	
 	 */
-	public void resting() throws IllegalStateException {
+	public void resting() throws IllegalStateException, IllegalArgumentException, IllegalStateException {
 		
 		if (this.isTerminated())
 			throw new IllegalStateException("The unit is terminated");
+		if (!this.canRest())
+			throw new IllegalArgumentException("Unit is doing another activity with higher priority");
 		
 		this.setResting(true);
-		this.setAttacked(false);
-		this.setAttacking(false);
-		this.setSprinting(false);
-		this.setDefending(false);
 		this.setWorking(false);
-		this.setSpeed(0);
+		this.workAfterMoving(false);
+		
 		
 	}
 	
@@ -1188,6 +1483,10 @@ public class Unit {
 	 * 			The working status of the unit
 	 * @post The unit's working status equals the given boolean
 	 * 		| new.isWorking() == working
+	 * @post workingTime is zero if the unit stops working
+	 * 		|if (working == false)
+			|	new.getWorkingTime == 0
+	 * 		
 	 */
 	private void setWorking(boolean working) {
 		this.working = working;
@@ -1208,7 +1507,7 @@ public class Unit {
 	 * @return Returns the value (true or false) of the boolean sprint of the unit
 	 */
 	public boolean isSprinting() {
-		return this.sprint;
+		return (this.sprint && this.getSpeed() != 0 && !this.isFalling());
 	}
 
 	/**
@@ -1237,20 +1536,18 @@ public class Unit {
 	 * 		 | new.isResting() == restingStatus
 	 */
 	private void setResting(boolean restingStatus) {
+	
+		if (restingStatus && !this.isResting())
+			this.setOverruleResting(false);
 		
-		if (!restingStatus && (!this.isAttacked() | !this.isAttacking()) && 
-				!this.getFirstRest())
-			this.resting = true;
+		this.resting = restingStatus;
 		
+		if (this.isResting())
+			this.setNotRestTime(0);
 		else
-			if (!restingStatus) {
-				this.setFirstRest(false);
-				this.setRestingTime(0);
-			} else
-				this.setNotRestTime(0);
-		
-			this.resting = restingStatus;
-		
+			this.setRestingTime(0);
+			
+			
 	}
 	
 	/**
@@ -1285,27 +1582,12 @@ public class Unit {
 	}
 	
 
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isDefending() {
-		return this.defending;
-	}
 	
 	/**
 	 * 
-	 * @param defending
+	 * @return Returns whether or not the unit is falling
 	 */
-	private void setDefending(boolean defending) {
-		this.defending = defending;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private boolean isFalling() {
+	public boolean isFalling() {
 		return this.falling;
 	}
 	
@@ -1313,7 +1595,7 @@ public class Unit {
 	 * 
 	 * @param trueorfalse
 	 */
-	private void setFirstRest(boolean trueorfalse) {
+	private void setOverruleResting(boolean trueorfalse) {
 		this.firstRest = trueorfalse;
 	}
 	
@@ -1321,40 +1603,8 @@ public class Unit {
 	 * 
 	 * @return
 	 */
-	private boolean getFirstRest() {
+	private boolean canOverruleResting() {
 		return this.firstRest;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private boolean getStartedDefaultBehavior() {
-		return this.startedDefaultBehavior;
-	}
-	
-	/**
-	 * 
-	 * @param bool
-	 */
-	private void setStartedDefaultBehavior(boolean bool) {
-		this.startedDefaultBehavior = bool;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	private boolean getChangedDefaultBehavior() {
-		return this.changedBehavior;
-	}
-	
-	/**
-	 * 
-	 * @param bool
-	 */
-	private void setChangedDefaultBehavior(boolean bool) {
-		this.changedBehavior = bool;
 	}
 	
 
@@ -1365,90 +1615,98 @@ public class Unit {
 	 * ##########################################################
 	 */
 
-
-	/**
-	 * 
-	 * @param seconds
-	 * 			The seconds 
-	 * @throws IllegalArgumentException
-	 * 		| (seconds <= 0) | (seconds >= 0.2)
-	 * @post 
-	 * 		| new.setPosition(this.getPosition().get(0) + this.getSpeedVector().get(0) * seconds,
-	 * 		|	this.getPosition().get(1) + this.getSpeedVector().get(1) * seconds,
-	 * 		|	this.getPosition().get(2) + this.getSpeedVector().get(2) * seconds);
-
-	 */
 	
 	public void advanceTime(double seconds) throws IllegalArgumentException, IllegalStateException {
 		
-		
 		if ((seconds <= 0) | (seconds > 0.2))
 			throw new IllegalArgumentException("Given seconds should be a double value between 0 and 0.2");
-		else if (this.isTerminated())
+		if (this.isTerminated())
 			throw new IllegalStateException("The unit is terminated");
-		else {
-			if (this.shouldFall())
-				this.fall(seconds);
-			else {
+		
+		// Falling:
+		if (this.shouldFall()) {
+			this.fall(seconds);
+			return;
+		}
+		
+		// Fight:
+		if (this.isAttacking()) {
+			if (this.getFightTime() < 1) {
+				this.setFightTime(this.getFightTime() + seconds);
+				this.fightUnitOrientation();
+			} else {
+				this.setAttacking(false);
+				this.setFightTime(0);
+			}
+			return;
+		} else if (this.isAttacked()) {
+			if (this.getFightTime() < 1) {
+				this.setFightTime(this.getFightTime() + seconds);
+				this.fightUnitOrientation();
+			} else {
+				this.setAttacked(false);
+				this.setFightTime(0);
+				this.defend();
+			}
+			return;
+		}
+		
+		// checkResting:
+		if (!this.isResting()) {
+			this.setNotRestTime(this.getNotRestTime() + seconds);
+			this.checkResting();
+		}
+		
+		if (this.isResting()) {
+			this.setRestingTime(this.getRestingTime() + seconds);
+			this.changeResting();
+			return;
+		}
+		
+		if (!this.getPosition().equals(this.getFinalTarget())) {
+			if (!this.getPosition().equals(this.getTarget())) {
+				this.setSpeed(this.determineSpeed());
+				this.changePosition(seconds);
+			} else {
+				try {
+					this.pathFindingAlgorithm();
+					this.setSpeed(this.determineSpeed());
+					this.changePosition(seconds);
+				} catch (IllegalPositionException e) {
+					this.setFinalTarget(this.getPosition().getX(), this.getPosition().getY(),
+							this.getPosition().getZ());;
+				}
+			}
+			if (this.isSprinting()) {
+				this.setSprintingTime(this.getSprintingTime() + seconds);
+				this.controlSprinting();
+			} 
+			return;
+		} else {
+			if (!this.isFalling())
 				this.setSpeed(0);
-				if (this.isAttacking()) {
-					if (this.getAttackTime() < 1) {
-						this.setAttackTime(this.getAttackTime() + seconds);
-						this.fightUnitOrientation();
-					} else {
-						this.setAttacking(false);
-						this.setAttackTime(0);
-					}
-				} else if (this.isAttacked()) {
-					if (this.getAttackedTime() < 1) {
-						this.setAttackedTime(this.getAttackedTime() + seconds);
-						this.fightUnitOrientation();
-					} else {
-						this.setAttacked(false);
-						this.setAttackedTime(0);
-						this.defend();
-					}
-				} else { 
-					} if (this.getDefaultBehavior()) {
-						if (!this.getStartedDefaultBehavior())
-							this.startDefaultBehavior();
-					} else if (!this.getDefaultBehavior()) {
-						if (this.getChangedDefaultBehavior())
-							this.stopDefaultBehavior();
-					} 
-					if (!this.isResting()) {
-						this.setNotRestTime(this.getNotRestTime() + seconds);
-						this.checkResting();
-					} if (!this.getPosition().equals(this.getFinalTarget())) {
-						if (!this.getPosition().equals(this.getTarget())) {
-							this.setSpeed(this.determineSpeed());
-							this.changePosition(seconds);
-						} else {
-							this.moveToTarget();
-							this.setSpeed(this.determineSpeed());
-							this.changePosition(seconds);
-						}
-						if (this.isSprinting()) {
-							this.setSprintingTime(this.getSprintingTime() + seconds);
-							this.controlSprinting();
-						}
-					} else if (this.isResting()) {
-						this.setRestingTime(this.getRestingTime() + seconds);
-						this.changeResting();
-					} else if (this.isWorking()) {
-						if (this.getWorkingTime() >= this.getTimeToWork()) {
-							this.setWorking(false);
-							this.setExperiencePoints(this.getExperiencePoints() + 10);
-							this.finishWorking();
-						}
-						else
-							this.setWorkingTime(this.getWorkingTime() + seconds);
-					}			
+			if (this.shouldWorkAfterMoving()) {
+				this.work();
 			}
 		}
 		
+		
+		if (this.isWorking()) {
+			if (this.getWorkingTime() >= this.getTimeToWork()) {
+				this.setWorking(false);
+				this.finishWorking();
+			}
+			else
+				this.setWorkingTime(this.getWorkingTime() + seconds);
+			return;
+		}
+		
+		// DefaultBehavior:
+		if (this.getDefaultBehavior())
+			this.startDefaultBehavior();
+		else
+			this.stopDefaultBehavior();	
 	}
-
 	
 	/**
 	 * 
@@ -1468,10 +1726,8 @@ public class Unit {
 		this.setAttacking(true);
 		this.setWorking(false);
 		this.setResting(false);
-		this.setSpeed(0);
 		this.setAttacked(false);
-		this.setDefaultBehavior(false);
-		this.setDefending(false);
+		this.workAfterMoving(false);
 		
 	}
 	
@@ -1479,13 +1735,12 @@ public class Unit {
 	 * 
 	 */
 	private void attacked() {
+		
 		this.setAttacking(false);
 		this.setWorking(false);
 		this.setResting(false);
-		this.setSpeed(0);
 		this.setAttacked(true);
-		this.setDefaultBehavior(false);
-		this.setDefending(false);
+		this.workAfterMoving(false);
 	}
 	
 	/**
@@ -1494,8 +1749,10 @@ public class Unit {
 	private void controlSprinting() {
 		
 		assert (this.isSprinting());
-		if (this.getSprintingTime() % 0.1 == 0)
+		while (this.getSprintingTime() - 0.1 >= 0 && this.getStamina() >= 1) {
 			this.setStamina(this.getStamina() - 1);
+			this.setSprintingTime(this.getSprintingTime() - 0.1);
+		}
 		if (this.getStamina() < 1)
 			this.setSprinting(false);
 	}
@@ -1522,11 +1779,11 @@ public class Unit {
 				this.getPosition().getZ() + this.getSpeedVector().getZ() * time);
 		this.updateOrientation();
 		
-		if (this.getPosition().getX() - X > X - this.getTarget().getX())
+		if (Math.abs(this.getPosition().getX() - X) > Math.abs(X - this.getTarget().getX()))
 			this.setPosition(this.getTarget().getX(), this.getPosition().getY(), this.getPosition().getZ());
-		if (this.getPosition().getY() - Y > Y - this.getTarget().getY())
+		if (Math.abs(this.getPosition().getY() - Y) > Math.abs(Y - this.getTarget().getY()))
 			this.setPosition(this.getPosition().getX(), this.getTarget().getY(), this.getPosition().getZ());
-		if (this.getPosition().getZ() - Z > Z - this.getTarget().getZ())
+		if (Math.abs(this.getPosition().getZ() - Z) > Math.abs(Z - this.getTarget().getZ()))
 			this.setPosition(this.getPosition().getX(), this.getPosition().getY(), this.getTarget().getZ());
 		
 		if (previousCube != this.getCube())
@@ -1661,15 +1918,21 @@ public class Unit {
 		double ricoHitpoints = this.getToughness() / 200;
 		double ricoStamina = this.getToughness() / 100;
 		
-		if (this.getHitpoints() < this.getMaxHitpoints()) {
-			if (this.getRestingTime() % ricoHitpoints >= 0) {
+		while (this.getHitpoints() < this.getMaxHitpoints() 
+				&& this.getRestingTime() - ricoHitpoints >= 0) {
 				this.setHitpoints(this.getHitpoints() + 1);
-				if (!this.getFirstRest())
-					this.setFirstRest(true);
+				this.setRestingTime(this.getRestingTime() - ricoHitpoints);
+				if (!this.canOverruleResting()) {
+					this.setOverruleResting(true);;
 			}
-		} else if (this.getStamina() < this.getMaxStamina()) {
-			if (this.getRestingTime() % ricoStamina >= 0)
+			
+		} 
+		this.setOverruleResting(true);
+		
+		while (this.getStamina() < this.getMaxStamina() 
+				&& this.getRestingTime() - ricoStamina >= 0) {
 				this.setStamina(this.getStamina() + 1);
+				this.setRestingTime(this.getRestingTime() - ricoStamina);
 		}
 	}
 	
@@ -1699,7 +1962,6 @@ public class Unit {
 		else
 			this.fightPotentialEnemies();
 		
-		this.setStartedDefaultBehavior(true);
 		
 				
 	}
@@ -1736,7 +1998,6 @@ public class Unit {
 		this.setResting(false);
 		this.setSpeed(0);
 		this.setTarget(this.getPosition().getX(), this.getPosition().getY(), this.getPosition().getZ());
-		this.setStartedDefaultBehavior(false);
 
 	}
 	
@@ -1757,7 +2018,7 @@ public class Unit {
 	 * 		 |	then new.isResting() == true
 	 */
 	private void checkResting() {
-		if (this.getRestingTime() >= 180)
+		if (this.getNotRestTime() >= 180)
 			this.resting();
 	}
 	
@@ -1785,6 +2046,13 @@ public class Unit {
 			} catch (IndexOutOfBoundsException e) {};
 		}
 		falling = true;
+		
+		this.setResting(false);
+		this.setWorking(false);
+		this.setAttacked(false);
+		this.setAttacking(false);
+		this.workAfterMoving(false);
+		
 		return true;
 		
 	}
@@ -2049,8 +2317,7 @@ public class Unit {
 	 * 		 | new.getRestingTime() == restingTime
 	 */
 	private void setRestingTime(double restingTime) {
-		assert (restingTime > 0);
-		this.restingTime = restingTime;
+		this.restingTime = Math.max(restingTime, 0);
 		this.checkResting();
 	}
 	
@@ -2075,25 +2342,24 @@ public class Unit {
 	 * 		 | new.getSprintingTime() == activityTime
 	 */
 	private void setSprintingTime(double activityTime) {
-		assert (activityTime > 0);
 		if (this.isSprinting())
-			this.sprintingTime = activityTime;
+			this.sprintingTime = Math.max(activityTime, 0);
 	}
 	
 	/**
 	 * 
 	 * @param time
 	 */
-	private void setAttackTime(double time) {
-		this.attackTime = time;
+	private void setFightTime(double time) {
+		this.fightTime = Math.max(time, 0);
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	private double getAttackTime() {
-		return this.attackTime;
+	private double getFightTime() {
+		return this.fightTime;
 	}
 	
 	/**
@@ -2101,7 +2367,7 @@ public class Unit {
 	 * @param time
 	 */
 	private void setWorkingTime(double time) {
-		this.workingTime = time;
+		this.workingTime = Math.max(time, 0);
 	}
 	
 	/**
@@ -2117,7 +2383,7 @@ public class Unit {
 	 * @param time
 	 */
 	private void setNotRestTime(double time) {
-		this.notRestTime = time;
+		this.notRestTime = Math.max(time, 0);
 	}
 	
 	/**
@@ -2126,6 +2392,14 @@ public class Unit {
 	 */
 	private double getNotRestTime() {
 		return this.notRestTime;
+	}
+	
+	private void workAfterMoving(boolean value) {
+		this.workAfterMoving = value;
+	}
+	
+	private boolean shouldWorkAfterMoving() {
+		return this.workAfterMoving;
 	}
 	
 	/**
@@ -2144,40 +2418,7 @@ public class Unit {
 		return this.opponent;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	private double getAttackedTime() {
-		return this.attackedTime;
-	}
-	
-	/**
-	 * 
-	 * @param time
-	 */
-	private void setAttackedTime(double time) {
-		this.attackedTime = time;
-	}
-	
-	
-	
 
-	
-
-	
-
-	
-	
-
-	
-	
-
-	
-
-	
-	
-	
 	public Set<int[]> getDirectlyAdjacentCubes() {
 		
 		int X = this.getCubeInt()[0];
@@ -2196,12 +2437,12 @@ public class Unit {
 		return cubes;
 	}
 	
-	public Set<int[]> getAdjacentCubes() {
+	public ArrayList<int[]> getAdjacentCubes() {
 		return this.getAdjacentCubes(this.getCubeInt());
 	}
 	
-	public Set<int[]> getAdjacentCubes(int[] position) {
-		Set<int[]> adjacentCubes = new HashSet<>();
+	public ArrayList<int[]> getAdjacentCubes(int[] position) {
+		ArrayList<int[]> adjacentCubes = new ArrayList<>();
 		
 		int X = position[0];
 		int Y = position[1];
@@ -2210,7 +2451,7 @@ public class Unit {
 		for (int x = -1; x <= 1; x++) {
 			for (int y = -1; y <= 1; y++) {
 				for (int z = -1; z <= 1; z++) {
-					if (x != 0 | y != 0 | z != 0) {
+					if (!(x == 0 && y == 0 && z == 0)) {
 						int[] adjacentPosition = {X + x, Y + y, Z + z};
 						if (isPositionInWorld(adjacentPosition))
 							adjacentCubes.add(adjacentPosition);
@@ -2234,23 +2475,15 @@ public class Unit {
 	private double speed;
 	private boolean sprint;
 	private boolean working;
-	private double restingTime = 0;
-	private double sprintingTime = 0;
+	private double restingTime, sprintingTime, fightTime, workingTime, notRestTime;
 	private boolean resting;
 	private boolean attacked;
 	private boolean enableDefaultBehaviour;
 	private boolean attacking;
-	private double attackTime;
-	private double workingTime;
-	private boolean defending;
-	private boolean firstRest;
-	private double notRestTime = 0;
+	private boolean firstRest = true;
 	private Unit opponent;
 	private final Vector TARGET = new Vector(0,0,0);
 	private final Vector POS = new Vector(0,0,0);
-	private double attackedTime;
-	private boolean startedDefaultBehavior;
-	private boolean changedBehavior;
 	private final Vector finalTARGET = new Vector(0,0,0);
 	private int experiencePoints;
 	private Faction faction;
@@ -2259,6 +2492,7 @@ public class Unit {
 	private Log carriedLog;
 	private final double ZSpeed = -3.0;
 	private boolean falling;
+	private boolean workAfterMoving;
 
 
 

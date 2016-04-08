@@ -280,7 +280,6 @@ public class Log {
 		
 		if (this.isTerminated())
 			throw new IllegalStateException("Terminated");
-		
 		if ((time <= 0) | (time > 0.2))
 			throw new IllegalArgumentException("Given time is not valid");
 		else {

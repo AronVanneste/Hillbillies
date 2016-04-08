@@ -33,10 +33,12 @@ public class World {
 
 	}
 	
-	public void advanceTime(double time) throws IllegalArgumentException {
+	public void advanceTime(double time) throws IllegalArgumentException, IllegalStateException {
 		
 		if ((time <= 0) | (time > 0.2))
 			throw new IllegalArgumentException();
+		if (this.isTerminated)
+			throw new IllegalStateException("World is terminated");
 		else {
 			for (int[] position: this.getListToCave()) {
 				this.cave(position);
@@ -114,7 +116,6 @@ public class World {
 	}
 	
 	// SET TERRAIN TYPE FOR ONE CUBE
-	
 	/**
 	 * @param terrainType
 	 * 		The new terrainType
@@ -146,6 +147,7 @@ public class World {
 		return this.getTerrainType(X, Y, Z);
 	}
 	
+
 	/**
 	 * @param X
 	 * 		The X coordinate of the position of which the terraintype will be returned
@@ -159,7 +161,7 @@ public class World {
 		return this.getTerrainTypeWorld()[X][Y][Z];
 		
 	}
-}
+	
 	/**
 	 * @post
 	 * 		??????
@@ -193,6 +195,7 @@ public class World {
 		int[] position = {X, Y, Z};
 		return isValidSpawnPosition(position);	
 	}
+
 	
 	/**
 	 * @param position
@@ -245,7 +248,7 @@ public class World {
 		int Z = position[2];
 		return this.isPassable(X, Y, Z);
 	}
-	
+
 	/**
 	 * @param X
 	 * 		The X coordinate of the position
@@ -258,16 +261,15 @@ public class World {
 	 */
 	public boolean isPassable(int X, int Y, int Z) {
 		return this.isPassable(this.getTerrainTypeWorld()[X][Y][Z]);
-
 	}
 	
 	// isPassable
-	/**
-	 * @param terrainType
-	 * 		The terrainType
-	 * @return Returns whether or not the terrainType is a passable one
-	 */
-	
+	// isPassable
+		/**
+		 * @param terrainType
+		 * 		The terrainType
+		 * @return Returns whether or not the terrainType is a passable one
+		 */
 	private boolean isPassable(int terrainType) {
 		return ((terrainType == 0) || (terrainType == 1));
 	}
@@ -335,11 +337,13 @@ public class World {
 	private boolean isWood(int terrainType) {
 		return (terrainType == 2);
 	}
+
 	/**
 	 * @param position
 	 * 		The position of which is checked if it's rock
 	 * @return Returns whether or not the position is rock (i.e., has terrainType 1)
 	 */
+
 	protected boolean isRock(int[] position) {
 		return this.isRock(position[0], position[1], position[2]);
 	}
@@ -364,11 +368,13 @@ public class World {
 	 * @return Returns whether or not the terrainType is rock
 	 */
 	private boolean isRock(int terrainType) {
-		return (terrainType == 1);
+		return (terrainType == 2);
 	}
 	
-	// isValidPosition
 	
+	
+	// isValidPosition
+
 	/**
 	 * @param position
 	 * 		The position of which is checked if it's valid
@@ -387,24 +393,32 @@ public class World {
 		return (isPositionInWorld(position) && isPassable(getCube(position)));
 	}
 	
+	
 	/**
 	 * @param position
-	 * 		The position of which is checked if it's in th eworld
+	 * 		The position of which is checked if it's in the world
 	 * @return Returns whether or not the position is the the borders of the world
 	 */
 	public boolean isPositionInWorld(int[] position) {
-		return ((position[0] <= this.getNbX()) && (position[1] <= this.getNbY())
-				&& (position[2] <= this.getNbZ()));
+		return ((position[0] < this.getNbX()) && (position[1] < this.getNbY())
+				&& (position[2] < this.getNbZ()) && (position[0] >= 0 && position[1] >= 0 &&
+				position[2] >= 0));
 	}
 	
 	/**
 	 * @param position
-	 * 		The position of which is checked if it's in th eworld
+	 * 		The position of which is checked if it's in theworld
 	 * @return Returns whether or not the position is the the borders of the world
 	 */
 	public boolean isPositionInWorld(double[] position) {
 		return (((int) position[0] <= this.getNbX()) && ((int) position[1] <= this.getNbY())
-				&& ((int) position[2] <= this.getNbZ()));
+				&& ((int) position[2] <= this.getNbZ())&& (position[0] >= 0 && position[1] >= 0 &&
+				position[2] >= 0));
+	}
+	
+	
+	public boolean isSolidConnectedToBorder(int x, int y, int z) {
+		return connectedToBorder.isSolidConnectedToBorder(x, y, z);
 	}
 	
 	/**
@@ -413,7 +427,14 @@ public class World {
 	 * @return Returns true if the unit is not null and the unit has a valid position
 	 */
 	public boolean isValidUnit(Unit unit) {
-		return (unit != null && isValidPosition(unit.getPositionList()));
+		return (unit != null && isValidPosition(unit.getPositionList()) && !unit.isTerminated());
+	}
+	
+	
+	protected boolean areAdjacentCubes(int[] cube1, int[] cube2) {
+		return ((Math.abs(cube1[0] - cube2[0]) <= 1) && 
+				(Math.abs(cube1[1] - cube2[1]) <= 1) &&
+				(Math.abs(cube1[2] - cube2[2]) <= 1));
 	}
 	
 	/**
@@ -441,7 +462,7 @@ public class World {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * @param position
 	 * 		The position of which it's cube coordinates will be returned
@@ -457,7 +478,6 @@ public class World {
 	}
 	
 	// SET and GET TERRAINTYPEWORLD
-	
 	/**
 	 * @param terrainType
 	 * 		The 3D-matrix with the terrainTypes at all positions of the world
@@ -465,13 +485,15 @@ public class World {
 	 * 		The terraintypes of the world shall equal terrainType
 	 * @post
 	 * 		??????
-	 */		
+	 */	
 	private void setTerrainTypeWorld(int[][][] terrainType) {
 		this.terrainTypes = terrainType;
 		this.connectedToBorder = new ConnectedToBorder(this.getNbX(), this.getNbY(), this.getNbZ());
 
 	}
 	
+	
+
 	/**
 	 * @return Returns a 3D-matrix with the terrainTypes of the world 
 	 */
@@ -480,7 +502,6 @@ public class World {
 	}
 	
 	// SET and GET modelListener
-	
 	/**
 	 * @param modelListener
 	 * 		The modellistener of the world
@@ -490,6 +511,7 @@ public class World {
 	public void setTerrainChangeListener(TerrainChangeListener modelListener) {
 		this.modelListener = modelListener;
 	}
+	
 	/**
 	 * @return Returns the terrainchangelistener of the world
 	 */
@@ -525,8 +547,8 @@ public class World {
 	}
 	
 	
-	// ADD TO LIST TO CAVE
 	
+	// ADD TO LIST TO CAVE
 	/**
 	 * @param solidToPassable
 	 * 		List of all coordinates that has to be caved
@@ -539,8 +561,8 @@ public class World {
 	
 	// GET LIST TO CAVE
 	/**
-	 * @return Returns the set with all cubes that has to be caved
-	 */
+	* @return Returns the set with all cubes that has to be caved
+	*/
 	public Set<int[]> getListToCave() {
 		return this.toCave;
 	}
@@ -591,6 +613,17 @@ public class World {
 	}
 	
 	
+	protected Unit getEnemy(Unit unit) {
+		
+		for (Unit enemy: this.getUnits()) {
+			if (areAdjacentCubes(unit.getCubeInt(), enemy.getCubeInt()) &&
+					unit.getFaction() != enemy.getFaction())
+				return enemy;
+		}
+		return null;
+		
+	}
+	
 	
 	// REMOVE FROM BOULDER LIST
 	
@@ -628,12 +661,14 @@ public class World {
 			this.activeFactions.add(faction);
 		
 	}
+	
 	/**
 	 * @return Returns the nb of active factions in the world
 	 */
 	public int getNbFaction() {
 		return this.getActiveFactions().size();
 	}
+	
 	/**
 	 * @return returns a set with all the active factions of the world
 	 */
@@ -650,6 +685,7 @@ public class World {
 	protected void removeFaction(Faction faction) {
 		this.activeFactions.remove(faction);
 	}
+	
 	/**
 	 * @param unit 1
 	 * 		The first unit that has to be compared
@@ -674,6 +710,7 @@ public class World {
 			this.unitsInWorld.add(unit);
 	}
 	
+
 	/**
 	 * @return Returns a set with all the units in the world
 	 */
@@ -705,6 +742,8 @@ public class World {
 			throw new IllegalWorldException("World is full");
 		if (!isValidUnit(unit))
 			throw new IllegalUnitException("Unit cannot be added to this world");
+		if (this.isTerminated())
+			throw new IllegalStateException("The world is terminated");
 		this.addToUnitList(unit);
 		
 		
@@ -717,6 +756,7 @@ public class World {
 	private boolean worldIsFull() {
 		return this.getUnits().size() >= 100;
 	}
+	
 	
 	/**
 	 * @return Returns the faction to which a unit should be assigned
@@ -745,40 +785,61 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		Throws IllegalArgumentException if the world is full
 	 */
-	public void spawnUnit() throws IllegalArgumentException {
+	public Unit spawnUnit() throws IllegalArgumentException, IllegalStateException {
+		try {
+			return this.spawnUnit(true);
+		} catch (IllegalArgumentException nbUnits) {
+			throw nbUnits;
+		} catch (IllegalStateException terminated) {
+			throw terminated;
+		}
+	}
+
+	/**
+	 * @post
+	 * 		A new unit is added to the world, and is assigned to a faction
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the world is full
+	 */
+	public Unit spawnUnit(boolean defaultBehavior) throws IllegalArgumentException, IllegalStateException {
 		if (this.getNbUnits() >= 100)
 			throw new IllegalArgumentException("This world has reached his maximum"
 					+ "number of units");
-		Unit unit = createRandomUnit();
+		if (this.isTerminated())
+			throw new IllegalStateException("World is terminated");
+		Unit unit = createRandomUnit(defaultBehavior);
 		unit.setFaction(this.getRightFaction());
 		unit.getFaction().addUnit(unit);
+		this.addUnit(unit);
+		return unit;
 	}
 	
 	/**
 	 * @return Returns a new random unit
 	 */
-	private Unit createRandomUnit() {
+	private Unit createRandomUnit(boolean defaultBehavior) {
 		
 		int randomStrength = (int) Math.round(Math.random() * 75 + 25);
 		int randomAgility = (int) Math.round(Math.random() * 75 + 25);
 		int randomToughness = (int) Math.round(Math.random() * 75 + 25);
 		int minWeight = (int) Math.round((randomStrength + randomAgility) / 2);
 		int randomWeight = (int) Math.round(Math.random() * (100 - minWeight) + minWeight);
-		String randomName = "Unit" + Integer.toString((int) Math.round(Math.random() * 100));
+		String randomName = "SpawnedUnit";
 		int[] position = createRandomSpawnPosition();
 		
 		return new Unit(randomName, position, randomWeight, randomAgility, randomStrength, 
-				randomToughness, true);
+				randomToughness, defaultBehavior);
 	}
 	
+
 	/**
 	 * @return Returns the coordinates of a random valid spawn position
 	 */
 	public int[] createRandomSpawnPosition() {
 		
-		int X = (int) Math.round(Math.random() * this.getNbX());
-		int Y = (int) Math.round(Math.random() * this.getNbY());
-		int Z = (int) Math.round(Math.random() * this.getNbZ());
+		int X = ((int) Math.round(Math.random() * (this.getNbX() - 1)));
+		int Y = ((int) Math.round(Math.random() * (this.getNbY() - 1)));
+		int Z = ((int) Math.round(Math.random() * (this.getNbZ() - 1)));
 		
 		if (isValidSpawnPosition(X, Y, Z)) {
 			int[] pos = {X, Y, Z};
@@ -788,6 +849,7 @@ public class World {
 		return createRandomSpawnPosition();
 		
 	}
+	
 	/**
 	 * @param cube
 	 * 		The cube that has to be examined
@@ -871,6 +933,8 @@ public class World {
 	public boolean isTerminated() {
 		return this.isTerminated;
 	}
+	
+	
 	
 	
 	
