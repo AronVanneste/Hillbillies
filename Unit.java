@@ -22,6 +22,7 @@ import hillbillies.model.Vector;
 public class Unit {
 	
 	/**
+	 * Creates a new Unit
 	 * 
 	 * @param initialPosition
 	 * 		A list containing the (x, y, z) coordinates of the initial position of the unit
@@ -484,6 +485,9 @@ public class Unit {
 	}
 	
 	/**
+	 * Update the units skills when it has reached enough experiencePoints
+	 * 
+	 * 
 	 *@post The strength, agility or toughness will increase by one points if the unit has more than 
 	 *		10 experience points and its experience points will decrease with 10. If strength, agility
 	 *		and toughness all are at their maximum, then the unit's experience points will remain unchanged.
@@ -546,6 +550,8 @@ public class Unit {
 	}
 	
 	/**
+	 * Updates the units orientation according to the direction it's walking/running
+	 * 
 	 * @post The orientation of the unit equals the atan2(y-component of the unit's speed, x-component of the unit's speed)
 	 * 		 | new.getOrientation() == Math.atan2(this.getSpeedVector.get(1), this.getSpeedVector().get(2))
 	 */
@@ -654,6 +660,7 @@ public class Unit {
 	}
 	
 	/**
+	 * Returns the units  speed, according to if it's walking or running and if it's moving upwards or downwards
 	 * 
 	 * @return Returns the unit's allowed speed. The standard velocity equals the strength of the unit plus 
 	 * 		   the agility of the unit multiplied by 1.5 and divided by the weight of the unit 
@@ -741,6 +748,7 @@ public class Unit {
 	
 	
 	/**
+	 * Checks whether a position is valid for the unit, according to it's world dimensions
 	 * 
 	 * @param X
 	 * 			The given x-axis position
@@ -760,18 +768,50 @@ public class Unit {
 		return isValidPosition(pos);
 	}
 	
+	/**
+	 * Checks whether a position is valid for the unit, according to it's world dimensions
+	 * 
+	 * @param X
+	 * 			The given x-axis position
+	 * @param Y
+	 * 			The given y-axis position
+	 * @param Z
+	 * 			The given z-axis position
+	 * @return	Returns true if X, Y and Z form a valid position. This is when X, Y and Z
+	 * 			are a non-negative value and do not exceed the borders of the units world
+	 * 			| if ((X < 0) | (X > new.getWorld.getNbX) | (Y < 0) |(Y > new.getWorld.getNbY) | (Z < 0) | (Z > new.getWorld.getNbZ))
+	 * 			| 	then false
+	 * 			| else
+	 * 			| 	then true
+	*/
 	private boolean isValidPosition(int X, int Y, int Z) {
 		double[] pos = {(double) X, (double) Y, (double) Z};
 		return isValidPosition(pos);
 	}
 
-	
+	/**
+	 * Checks whether a position is a valid target
+	 * 
+	 * @param X
+	 * 			The given x-axis position
+	 * @param Y
+	 * 			The given y-axis position
+	 * @param Z
+	 * 			The given z-axis position
+	 * @return	Returns true if X, Y and Z form a valid target. This is when {X,Y,Z} is a valid position and
+	 * 			when {X,Y,Z} is neighbouring valid terrain
+	 * 			| if (isValidPosition(X, Y, Z) && isNeighbouringSolidTerrain(X, Y, Z))
+	 * 			| 	then true
+	 * 			| else
+	 * 			| 	then false
+	*/
 	private boolean isValidTarget(int X, int Y, int Z) {
 		return (isValidPosition(X, Y, Z) && isNeighbouringSolidTerrain(X, Y, Z));
 	}
 	
 	
 	/**
+	 *  Checks whether a position is valid for the unit, according to it's world dimensions
 	 * 
 	 * @param position
 	 * 		The position to be checked
@@ -791,6 +831,7 @@ public class Unit {
 	}	
 	
 	/**
+	 * Returns whether or not the position is passable
 	 * 
 	 * @param position
 	 * 		The position to be checked
@@ -806,6 +847,7 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether or not the given name is a valid name for the unit
 	 * 
 	 * @param name
 	 * 			The name of the unit
@@ -821,6 +863,7 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether the given hitpoints are valid hitpoints for the unit, according to it's weight etc.
 	 * 
 	 * @param hitpoints
 	 * 			The hitpoints of the unit
@@ -832,6 +875,7 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether the given stamina is valid stamina for the unit, according to it's weight etc.
 	 * 
 	 * @param stamina
 	 * 			The stamina of the unit
@@ -844,6 +888,7 @@ public class Unit {
 	
 
 	/**
+	 * Checks whether an attack between two units is valid
 	 * 
 	 * @param defender
 	 * 			The defending unit
@@ -861,22 +906,58 @@ public class Unit {
 				(!attacker.isFalling() && !defender.isFalling()));
 	}
 	
-	
+	/**
+	 * Checks whether or not a unit is allowed to rest
+	 * 
+	 * @return Returns whether or not the unit is allowed to rest. 
+	 * 			It is allowed if it's standing still or it has been active for too long and it's not attacked or attacking. 
+	 * 			if ((this.getNotRestTime() >= 180 | this.getSpeed() == 0) && (!this.isAttacked() && !this.isAttacking()))
+	 * 				then true
+	 * 			else
+	 * 				then false
+	 * 
+	 */
 	private boolean canRest() {
 		return ((this.getNotRestTime() >= 180 | this.getSpeed() == 0)
 				&& (!this.isAttacked() && !this.isAttacking()));
 	}
 	
+	
+	/**
+	 * Checks whether or not a unit is allowed to work
+	 * 
+	 * @return Returns whether or not the unit is allowed to rest.
+	 * 			It is allowed if work can overrule resting, if the unit's standing still, and if it's not attacking or attacked
+	 * 
+	 * 			if (this.canOverruleResting() && this.getSpeed() == 0 && !this.isAttacked() && !this.isAttacking())
+	 * 				then true
+	 * 			else
+	 * 				then false
+	 */
 	private boolean canWork() {
 		return (this.canOverruleResting() && this.getSpeed() == 0 && !this.isAttacked() && !this.isAttacking());
 	}
 	
+	/**
+	 * Checks whether or not a unit is allowed to move
+	 * 
+	 * @return Returns whether or not the unit is allowed to move.
+	 * 			It is allowed if work can overrule resting, if the unit's not falling, if it's not attacking or attacked and it has rested in the last three minutes
+	 * 
+	 * 			if (!this.isFalling() && !this.isAttacked() && !this.isAttacking()
+				&& this.getNotRestTime() < 180 && this.canOverruleResting())
+	 * 				then true
+	 * 			else
+	 * 				then false
+	 */
 	private boolean canMove() {
 		return (!this.isFalling() && !this.isAttacked() && !this.isAttacking()
 				&& this.getNotRestTime() < 180 && this.canOverruleResting());
 	}
  	
 	/**
+	 * Checks whether a boulder is active and not null
+	 * 
 	 * @return Returns whether or not a boulder is valid
 	 * 		A boulder is valid if it's active and when it's not null
 	 */
@@ -885,6 +966,8 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether a log is active and not null
+	 * 
 	 * @return Returns whether or not a log is valid
 	 * 		A log is valid if it's active and when it's not null
 	 */
@@ -893,6 +976,8 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether or not X, Y and Z point on adjacent cubes
+	 * 
 	 * @param X
 	 * 		The distance on the x-axis
 	 * @param Y
@@ -907,6 +992,8 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether or not the position is in the borders of the world of the unit
+	 * 
 	 * @param position
 	 * 		The position to be examined
 	 * @return Returns whether or not the position is in the borders of the world of the unit
@@ -919,6 +1006,17 @@ public class Unit {
 		}
 	}
 	
+	/**
+	 * Checks whether or not a position is neigbouring solid terrain
+	 * 
+	 * @param X
+	 * 		The x-coordinate
+	 * @param Y
+	 * 		The y-coordinate
+	 * @param Z
+	 * 		The z-coordinate
+	 * @return Returns true if the cube is at the bottom of the terrain or when one of it's adjacent cubes if solid
+	 */
 	private boolean isNeighbouringSolidTerrain(int X, int Y, int Z) {
 		int[] pos = {X, Y, Z};
 		return isNeighbouringSolidTerrain(pos);	
@@ -926,6 +1024,8 @@ public class Unit {
 	
 	
 	/**
+	 * Checks whether or not a position is neigbouring solid terrain
+	 * 
 	 * @param cube
 	 * 		The cube to be examined
 	 * @return Returns true if the cube is at the bottom of the terrain or when one of it's adjacent cubes if solid
@@ -1010,10 +1110,16 @@ public class Unit {
 
 	
 	/**
+	 * Checks whether a certain tuple is in the Queue
+	 * 
 	 *@param Queue
 	 *		The queue that's checked
-	 *@position
-	 *		The position of which
+	 *@param position
+	 *		The position of the tuple
+	 *@param n0
+	 *		The number of the tuple
+	 *@return Returns true if the tuple or a better tuple is in the queue, else false
+	 *		
 	 */
 	private boolean isNotInQueue(ArrayList<Object[]> Queue, int[] position, int n0) {
 		
@@ -1055,6 +1161,8 @@ public class Unit {
 	
 	
 	/**
+	 * Changes the units status to sprinting
+	 * 
 	 * @param sprinting
 	 * 		The boolean status of sprinting of the unit
 	 * @post The status of the boolean sprint of the unit equals sprinting
@@ -1076,6 +1184,8 @@ public class Unit {
 	
 	
 	/**
+	 * Make's the unit move to a certain position
+	 * 
 	 * @param target
 	 * 		The cube where the unit should move to
 	 * @post the finaltarget of the unit will be target
@@ -1104,6 +1214,7 @@ public class Unit {
 	}
 	
 	/**
+	 * Make's the unit move to a certain position
 	 * 
 	 * @param X
 	 * 		The X-coordinate of the cube where the unit should move to
@@ -1141,6 +1252,7 @@ public class Unit {
 	
 	
 	/**
+	 * Make's the unit move to an adjacent position, to be used as part of the moveTo algorithm
 	 * 
 	 * @param X
 	 * 			The distance the unit has to travel in the direction of the x-axis
@@ -1181,7 +1293,7 @@ public class Unit {
 
 	
 	/**
-	 * 
+	 * ???
 	 * @throws IllegalPositionException
 	 */
 	public void pathFindingAlgorithm() throws IllegalPositionException {
@@ -1264,6 +1376,9 @@ public class Unit {
 	
 	
 	/**
+	 * ???
+	 * Lets the unit move to it's target
+	 * 
 	 * @post The unit will be at its final target
 	 * 		new.getPosition() == this.getFinalTarget
 	 */
@@ -1297,13 +1412,17 @@ public class Unit {
 	}
 	
 	/**
-	 * @post The unit starts working, it stops moving and stops resting
+	 * Lets the unit start working
+	 * 
+	 * @post The unit starts working
 	 * 		new.getWorking == true
-	 * 		new.getSpeed == 0
-	 * 		new.getResting == false
+	 * 		new.getWorkAfterMoving == false
 	 * @throws IllegalStateException
 	 * 		Throws IllegalStateException if the unit is terminated
 	 * 		|if(new.isTerminated())
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the unit isn't allowed to work
+	 * 		|if(!new.canWork())
 	 */
 	public void work() throws IllegalStateException, IllegalArgumentException {
 		if (this.isTerminated())
@@ -1316,6 +1435,8 @@ public class Unit {
 	
 	
 	/**
+	 * Lets the unit work at a certain cube further away
+	 * 
 	 * @param x
 	 * 		The x coordinate of the cube where the unit should start moving
 	 * @param y
@@ -1324,13 +1445,15 @@ public class Unit {
 	 * 		The z coordinate of the cube where the unit should start moving
 	 * 
 	 * @post
-	 * 		The unit starts working, stops resting and starts moving towards position {x,y,z}
-	 * 		new.getWorking == true
-	 * 		new.getResting == false
-	 * 		new.getFinalTarget == {x,y,z}
+	 * 		The unit starts working and starts moving towards position {x,y,z}
+	 * 		new.getWorkAfterMoving == true
+	 * 		new.getFinalTarget = {x,y,z}
 	 * @throws IllegalStateException
 	 * 		Throws IllegalStateException if the unit is terminated
 	 * 		|if(new.isTerminated())
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the unit isn't allowed to work
+	 * 		|if(!new.canWork())
 	 */
 	public void workAt(int x, int y, int z) throws IllegalStateException, IllegalArgumentException {
 		if (this.isTerminated())
@@ -1342,6 +1465,8 @@ public class Unit {
 	}
 	
 	/**
+	 * 
+	 * 
 	 * @post
 	 * 		if (new.isCarryingBoulder() | new.isCarryingLog())
 	 *			new.isCarryingLog == false
@@ -1355,6 +1480,12 @@ public class Unit {
 	 *			new.isCarryingBoulder == true
 	 *		else if (logAvailable())
 	 *			new.isCarryingLog == true
+	 *		else if (isWood())
+	 *			new.getPosition.getTerraintype = 0
+	 *			new.getPosition.getAllObjectsOccupyingCube.contains(boulder)
+	 *		else if (isRock())
+	 *			new.getPosition.getTerraintype = 0
+	 *			new.getPosition.getAllObjectsOccupyingCube.contains(log)		
 	 */
 	protected void finishWorking() {
 		
@@ -1376,6 +1507,8 @@ public class Unit {
 	}
 	
 	/**
+	 * Improves the equipment of the unit, this consumes the boulder and/or the log it's carrying
+	 * 
 	 * @post
 	 * 		| new.isCarryingLog == false
 	 *		| new.isCarryingBoulder == false
@@ -1396,6 +1529,16 @@ public class Unit {
 		} catch (NullPointerException e) {};
 	}
 	
+	/**
+	 * Caves the cube the unit is currently standing on
+	 * 
+	 * @post The units cube has terraintype air and depending on it was wood or rock there's a log or boulder
+	 * 		new.getWorld().getTerraintype(new.getCube()) == 0
+	 * 		if this.getWorld().getTerraintype(this.getCube()) == 1
+	 * 			new.getPosition.getAllObjectsOccupyingCube.contains(log)
+	 * 		if this.getWorld().getTerraintype(this.getCube()) == 2
+	 * 			new.getPosition.getAllObjectsOccupyingCube.contains(boulder)
+	 */
 	private void collapseAndCreate() {
 		try {
 			this.getWorld().caveAndThrow(this.getCubeInt());
@@ -1404,6 +1547,7 @@ public class Unit {
 	
 	
 	/**
+	 * Initiates a fight between the attacking and defending unit
 	 * 
 	 * @param attacker
 	 * 			The attacking unit
@@ -1438,24 +1582,24 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the unit rest
 	 * 
 	 * @post The unit starts resting
-	 * 		|new.getResting == true
-	 * @post The units attackedstate, attackingstate, sprintingstate, defendingstate and workingstate are all false
-	 * 		|new.getAttacked == false;
-	 * 		|new.getAttacking == false;
-	 * 		|new.getSprinting == false;
-	 * 		|new.getDefending == false;
-	 * 		|new.getWorking == false;
-	 * @post The units speed is set 0
-	 * 		|new.getSpeed == 0
+	 * 		|new.getResting() == true
+	 * @post The unit stops working
+	 * 		|new.getWorking() == false
+	 * @post The units workAfterMoving state is false
+	 * 		|new.getWorkAfterMoving == false
 	 * 
 	 * @throws IllegalStateException
 	 * 		Throws IllegalStateException if the unit is terminated
 	 * 		|if(new.isTerminated())
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the unit can't rest
+	 * 		|if(!new.canRest())
 	 *  	
 	 */
-	public void resting() throws IllegalStateException, IllegalArgumentException, IllegalStateException {
+	public void resting() throws IllegalArgumentException, IllegalStateException {
 		
 		if (this.isTerminated())
 			throw new IllegalStateException("The unit is terminated");
@@ -1592,7 +1736,7 @@ public class Unit {
 	}
 	
 	/**
-	 * 
+	 * ????
 	 * @param trueorfalse
 	 */
 	private void setOverruleResting(boolean trueorfalse) {
@@ -1601,7 +1745,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns whether or not the unit is falling
 	 */
 	private boolean canOverruleResting() {
 		return this.firstRest;
@@ -1709,17 +1853,18 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the attacker attack
 	 * 
-	 * @param defender
-	 * 			The defending unit
-	 * @post The unit's attacking status equals true
+	 * @post The units attacking status equals true
 	 * 		| new.getAttacking() == true
-	 * @post The unit's working status equals false
+	 * @post The units working status equals false
 	 * 		| new.getWorking() == false
-	 * @post The unit's resting status equals false
+	 * @post The units resting status equals false
 	 * 		| new.getResting() == false
-	 * @post The unit's speed equals zero
-	 * 		| new.getSpeed() == 0
+	 * @post The units attacked status equals false
+	 * 		| new.getAttacked() == false
+	 * @post The units workAfterMoving state is false
+	 * 		|new.getWorkAfterMoving == false
 	 */
 	private void attack() {
 		
@@ -1732,6 +1877,18 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the defending unit defend
+	 * 
+	 * @post The units attacking status equals false
+	 * 		| new.getAttacking() == false
+	 * @post The units working status equals false
+	 * 		| new.getWorking() == false
+	 * @post The units resting status equals false
+	 * 		| new.getResting() == false
+	 * @post The units attacked status equals true
+	 * 		| new.getAttacked() == true
+	 * @post The units workAfterMoving state is false
+	 * 		|new.getWorkAfterMoving == false
 	 * 
 	 */
 	private void attacked() {
@@ -1744,7 +1901,18 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether the unit is allowed to sprint
 	 * 
+	 * @pre The unit must be sprinting
+	 * 		|this.isSprinting() == true
+	 * 
+	 * @post The units stamina is reduced with one point for every 0,1 second of sprinting, till is has reached 0
+	 * 	
+	 * @post The units sprintingtime is diminished by the time it's sprinting
+	 * 
+	 * @post If the units stamina is 0, the unit stops sprinting
+	 * 			|if (new.getStamina() <1)
+	 * 			|	new.isSprinting() == false
 	 */
 	private void controlSprinting() {
 		
@@ -1758,14 +1926,29 @@ public class Unit {
 	}
 
 	/**
-	 * NEW
-	 * De maximale afstand die een unit kan afleggen in een keer advanceTime() is 0.72.
-	 * Dit is omdat zijn maximale snelheid v = 1.5 * (strength + agillity) / (2 * weight) * 2 * 1.2
-	 * deze is dus maximaal als weight minimaal is (d.i. gelijk aan (strength + agility) / 2). Invullen 
-	 * geeft 3.6 m/s, onafhankelijk van strength of agility. Het maximaal aantal seconden is 0.2, de maximale
-	 * afstand is dus 0.72. Binnen één changePosition() blijft de unit dus in dezelfde cube of gaat één cube verder.
+	 *
 	 * 
 	 * @param time
+	 * 		The time in which the position of the unit could have changed
+	 * 
+	 * @post The orientation of the unit is updated
+	 * 		|new.getOrientation() == (Math.atan2(new.getSpeedVector().getY(), new.getSpeedVector().getX()))
+	 * @post The position of the unit is updated according to its speed, or when it has reached its target, to it's target
+	 *
+	 *		|if (Math.abs(new.getPosition().getX() - X) > Math.abs(X - new.getTarget().getX()))
+	 *		|	new.getPosition() == (new.getTarget().getX(), new.getPosition().getY(), new.getPosition().getZ())
+	 *		|if (Math.abs(new.getPosition().getY() - Y) > Math.abs(Y - new.getTarget().getY()))
+	 *		|	new.getPosition() == (new.getPosition().getX(), new.getTarget().getY(), new.getPosition().getZ())
+	 *		|if (Math.abs(new.getPosition().getZ() - Z) > Math.abs(Z - new.getTarget().getZ()))
+	 *		|	new.getPosition() == (new.getPosition().getX(), new.getPosition().getY(), new.getTarget().getZ())
+	 *		|else
+	 *		|	new.getPosition() == (new.getPosition().getX() + new.getSpeedVector().getX() * time,
+	 *		|		new.getPosition().getY() + new.getSpeedVector().getY() * time,
+	 *		|		new.getPosition().getZ() + new.getSpeedVector().getZ() * time)
+	 *
+	 *@post The units experiencepoints are increased by one if it has reached a new cube
+	 *		|if (this.getCube() != new.getCube())
+	 *		|	new.getExperiencePoints() == (this.getExperiencePoints() + 1)
 	 */
 	private void changePosition(double time) {
 		
@@ -1792,8 +1975,14 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the unit fall
 	 * 
 	 * @param time
+	 * 		The time the unit should fall
+	 * @post The z-position of the unit is diminished bij ZSpeed*time
+	 * 		|new.getPosition.getZ() == this.getPosition().getZ() + ZSpeed * time
+	 * @post The units hitpoints diminish by one for every Zlevel fallen
+	 * 		|new.getHitpoints') == (this.getHitpoints() - 10 * ZLevelsFallen)
 	 */
 	private void fall(double time) {
 		
@@ -1806,17 +1995,12 @@ public class Unit {
 	}
 	
 	/**
+	 *Adjusts the orientation of both the attacker and the defender in a fight 
 	 * 
-	 * @param defender 
-	 * 		The defending unit
-	 * @param attacker 
-	 * 		The attacking unit
 	 * 
 	 * @post Both unit's orientation changes depending on their current position, by using the function Math.atan2(x,y) 
-	 * 		| defender.getOrientation() == Math.atan2((attacker.getPosition().get(1) - defender.getPosition().get(1)),
-	 * 		| 	attacker.getPosition().get(0) - defender.getPosition().get(0))
-	 * 		| attacker.getOrientation() == Math.atan2((defender.getPosition().get(1) - attacker.getPosition().get(1)),
-	 * 		|	defender.getPosition().get(0) - attacker.getPosition().get(0))
+	 * 		| new.getOrientation() == Math.atan2((getOpponent.getPosition().getY() - new.getPosition().getY()),
+	 * 		| 	getOpponend.getPosition().getX() - new.getPosition().getX())
 	 */
 	
 	private void fightUnitOrientation() {
@@ -1827,34 +2011,31 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @param attacker
-	 * 			The attacking unit
 	 * @post The resting status of the unit equals false
 	 * 		 | new.getResting() == false
-	 * @post The speed status of the unit equals false
+	 * @post The speed of the unit is 0
 	 * 		 | new.getSpeed() == 0
 	 * @post The working status of the unit equals false
 	 * 		 | new.getWorking() == false
-	 * @post The 'attacked' status of the unit equals true
-	 * 		 | new.getAttacked() == true 
+	 * @post The 'attacked' status of the unit equals false
+	 * 		 | new.getAttacked() == false 
 	 * @post If the unit succeeds in dodging the attack, it moves to a randomly chosen adjacent position
 	 * 		 | PDodge = 0.20 * (this.getAgility() / attacker.getAgility())
 	 * 		 | if (Math.random() <= PDodge)
 	 * 		 |	then new.getPosition() == [this.getPosition().get(0) + (Math.random() - 0.5) * 2,
 	 * 		 |									this.getPosition().get(1) + (Math.random() - 0.5) * 2,
 	 * 		 |									this.getPosition().get(2) + (Math.random() - 0.5) * 2]
+	 * 		 |	new.getExperiencePoints(this.getExperiencePoints() + 20)
 	 * @post If the unit fails in dodging the attack, but succeeds in blocking the attack, it's not harmed
 	 * 		 | PBlock =  0.25 * (this.getStrength() + this.getAgility()) / (attacker.getStrength() + attacker.getAgility())
 	 * 		 | if ((Math.random() > PDodge) && (Math.random() <= PBlock))
 	 * 		 |	then new.getHitpoints() == this.getHitpoints()
+	 * 		 |	new.getExperiencePoints() == (this.getExperiencePoints() + 20)
 	 * @post If the unit fails in both dodging and blocking the attack, its hitpoints diminish by the strength of the attacker 
 	 * 		 divided by ten with a minimum of zero
 	 * 		 | if ((Math.random() > PDodge) && (Math.random() > PBlock))
 	 * 		 |	then new.getHitpoints() == Math.max(this.getHitpoints() - attacker.getStrength() / 10, 0)
-	 * @post If the unit's move to a target was interrupted because of this attack, it should resume its previous activity
-	 * 		 | if (this.getNotReachedTarget())
-	 *  	 |	then new.getSpeed() >= 0
-	 * 		 
+	 * 		 |	this.getOpponent.getExperiencepoints() == (this.getOpponent().getExperiencePoints() + 20)
 	 */
 	private void defend() {
 		
@@ -1880,7 +2061,11 @@ public class Unit {
 		
 		
 	}
-	
+	/**
+	 * The unit starts fighting potential enemys
+	 * 
+	 * @post ???
+	 */
 	private void fightPotentialEnemies() {
 		try {
 			Unit enemy = this.getWorld().getEnemy(this);
@@ -1894,6 +2079,7 @@ public class Unit {
 	
 	/**
 	 * The unit moves to a random adjacent position when it succeeds in dodging the attack by another unit
+	 * 
 	 * @post The unit's new position is a randomly chosen position in an adjacent cube
 	 * 		 | new.getPosition() = [this.getPosition().get(0) + (Math.random() - 0.5) * 2,
 	 * 		 |							this.getPosition.get(1) + (Math.random() - 0.5) * 2,
@@ -1911,6 +2097,11 @@ public class Unit {
 	}
 	
 	/**
+	 * ??
+	 * 
+	 * @post The overrulerestingstatus of the unit equals true
+	 * 		|new.getOverruleResting() == true
+	 * @post ???
 	 * 
 	 */
 	private void changeResting() {
@@ -1938,20 +2129,23 @@ public class Unit {
 	
 	
 	/**
+	 * Lets the unit behave in a random way
+	 * 
 	 * @post The unit starts to behave in a random way,  it can move to a random position,
-	 * 		 start working or start resting.
+	 * 		 start working, start resting or fight potential enemies
 	 * 		| new.getDefaultBehavior() = true
 	 * 		| P = Math.random()
-	 * 		| if (P <= 1/3)
+	 * 		| if (P <= 0.25)
 	 * 		|	then new.getTarget() ==  [Math.random() * 50, Math.random() * 50, Math.random() * 50]
-	 * 		| else if (P <= 2/3)
+	 * 		| else if (P <= 0,5)
 	 * 		|	then new.isWorking() == true
-	 * 		| else
+	 * 		| else if (P <= 0,75)
 	 * 		|	then new.isResting() == true
+	 * 		| else
+	 * 		|	then ???
 	 */
 	private void startDefaultBehavior() {
 		
-		//assert (this.getDefaultBehavior());
 		double P = Math.random();
 		if (P <= 0.25)
 			this.moveToRandomPosition(); 
@@ -1967,6 +2161,8 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the unit move to a random position
+	 * 
 	 * @post The unit starts moving to a random position
 	 * 		| new.getTarget() ==  [Math.random() * 50, Math.random() * 50, Math.random() * 50]
 	 * 		
@@ -1986,10 +2182,12 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the unit stop everything it's doing
+	 * 
 	 * @post The moving stops with everything it's doing
-	 * 		| new.isworking() == false &&
-	 * 		| new.isResting() == false &&
-	 * 		| new.getSpeed() == false &&
+	 * 		| new.isworking() == false
+	 * 		| new.isResting() == fals
+	 * 		| new.getSpeed() == 0 &&
 	 * 		| new.getTarget() == this.getPosition()
 	 */
 	private void stopDefaultBehavior() {
@@ -2012,6 +2210,7 @@ public class Unit {
 	/**
 	 * Checks whether the unit should start resting,
 	 * this is if it hasn't been resting for at least 180 seconds
+	 * 
 	 * @post If the time the unit hasn't been resting is greater than or equal to 180,
 	 * 		 this unit starts resting
 	 * 		 | if (this.getRestingTime() >= 180)
@@ -2024,8 +2223,17 @@ public class Unit {
 	
 	
 	/**
+	 * Checks whether the unit shouldfall
 	 * 
-	 * @return
+	 * @return False if the unit is at the bottom level of the world or if adjacentcubes are solid, else true
+	 * 
+	 * @post If the unit shouldfall, it stops resting, working, attacking, being attacked or workaftermoving
+	 * 		|if this.shouldFall()
+	 * 		|	new.getResting() == false
+	 * 		|	new.getWorking() == false
+	 * 		|	new.getAttacked() == false
+	 * 		|	new.getAttacking() == false
+	 * 		|	new.getWorkAftermoving() == false
 	 */
 	public boolean shouldFall() {
 		
