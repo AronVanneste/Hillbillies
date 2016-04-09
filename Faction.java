@@ -6,8 +6,10 @@ import java.util.Set;
 public class Faction {
 	
 	/**
+	 * The initialization of a faction
+	 * 
 	 * @param world
-	 * 		The world where the boulder is created
+	 * 		The world where the faction is created
 	 * @post
 	 * 		The world of the faction will be the given world
 	 * @throws IllegalWorldException
@@ -37,6 +39,8 @@ public class Faction {
 	}
 	
 	/**
+	 * Adds a unit to the faction
+	 * 
 	 * @param unit
 	 * 		The unit that has to be added to the faction
 	 * @post
@@ -71,6 +75,8 @@ public class Faction {
 	}
 	
 	/**
+	 * Removes a unit from the faction
+	 * 
 	 * @param unit
 	 * 		The unit that has to be removed from the faction
 	 * @post
@@ -81,6 +87,8 @@ public class Faction {
 	}
 	
 	/**
+	 * Checks whether a faction and a unit are in the same world
+	 * 
 	 * @param unit
 	 * 		the unit that has to be compared with the faction
 	 * @return Returns true if both the unit and the faction belong to the same world and if their world is not null
@@ -115,6 +123,8 @@ public class Faction {
 	}
 	
 	/**
+	 * Terminates faction, the links to it's world and units are cut
+	 * 
 	 * @post
 	 * 		The faction is terminated
 	 * @post
@@ -131,6 +141,8 @@ public class Faction {
 	}
 	
 	/**
+	 * Removes faction from the world
+	 * 
 	 * @post
 	 * 		The faction is removed from the factionlist of its world
 	 * @post
@@ -145,6 +157,8 @@ public class Faction {
 	}
 	
 	/**
+	 * Removes all units from the faction
+	 * 
 	 * @post
 	 * 		All the units of the faction will be terminated
 	 */

@@ -6,6 +6,7 @@ public class Boulder {
 	// If position is a double[]
 	
 	/**
+	 * The initialization of a boulder
 	 * 
 	 * @param world
 	 * 		The world where the boulder is created
@@ -49,6 +50,7 @@ public class Boulder {
 	// If position is an int[]
 	
 	/**
+	 * The initialization of a boulder
 	 * 
 	 * @param world
 	 * 		The world where the boulder is created
@@ -297,6 +299,8 @@ public class Boulder {
 	// terechtkomen in een cube die niet bestaat.
 	
 	/**
+	 * The position of the boulder is updated
+	 * 
 	 *@param time
 	 *		The time within the new position of the boulder, according to it's ZSpeed, will be calculated
 	 *@post
@@ -312,6 +316,8 @@ public class Boulder {
 	//removeOwner
 	
 	/**
+	 * The owner of the boulder will be removed and vice versa
+	 * 
 	 * @post
 	 * 		The boulder will be ownerless
 	 * 		The owner will lose that boulder
@@ -325,6 +331,8 @@ public class Boulder {
 	
 	//changeInWorld
 	/**
+	 * Applies changes in the world or in the boulders status to the boulder
+	 * 
 	 * @post
 	 * 		If the world of the boulder would collapse, the boulder will be terminated
 	 * 		If the boulder is active (and not terminated) the boulder will be added to the boulderlist of the world
@@ -342,6 +350,8 @@ public class Boulder {
 	}
 	
 	/**
+	 * Terminates the boulder, cuts the links attached to it's owner and world
+	 * 
 	 * @post
 	 * 		The boulder is terminated, it has no owner, no world
 	 */
@@ -368,6 +378,8 @@ public class Boulder {
 	}
 	
 	/**
+	 * The boulder will be removed from the world
+	 * 
 	 * @post
 	 * 		The boulder is removed from the boulderlist of it's world, if it has a world
 	 */

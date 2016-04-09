@@ -9,6 +9,7 @@ public class Log {
 	// INITIALISATION
 	// If position is a double[]
 	/**
+	 * The initialization of a log
 	 * 
 	 * @param world
 	 * 		The world where the log is created
@@ -51,6 +52,8 @@ public class Log {
 	
 	// If position is an int[]
 	/**
+	 * 
+	 * The initialization of a log
 	 * 
 	 * @param world
 	 * 		The world where the log is created
@@ -294,11 +297,13 @@ public class Log {
 	// HELPFUNCTIONS
 	// changePosition
 	// In tegenstelling tot bij Unit moet hier nooit de positie worden teruggezet. De maximale afstand die 
-	// de boulder kan afleggen is ZSpeed * time en time is maximaal 0.2, dus maximale afstand = -3 * 0.2 = -0.6.
-	// M.a.w., de boulder/log blijft in dezelfde cube of zakt er 1. Hij kan er dus nooit twee zakken in 1 stap en
+	// de log kan afleggen is ZSpeed * time en time is maximaal 0.2, dus maximale afstand = -3 * 0.2 = -0.6.
+	// M.a.w., de log/log blijft in dezelfde cube of zakt er 1. Hij kan er dus nooit twee zakken in 1 stap en
 	// terechtkomen in een cube die niet bestaat.
 	
 	/**
+	 * The position of the log is updated
+	 * 
 	 *@param time
 	 *		The time within the new position of the log, according to it's ZSpeed, will be calculated
 	 *@post
@@ -313,6 +318,8 @@ public class Log {
 	
 	//removeOwner
 	/**
+	 * The owner of the log will be removed and vice versa
+	 * 
 	 * @post
 	 * 		The log will be ownerless
 	 * 		The owner will lose that log
@@ -326,6 +333,8 @@ public class Log {
 	
 	//changeInWorld
 	/**
+	 *Applies changes in the world or in the logs status to the log
+	 *
 	 * @post
 	 * 		If the world of the log would collapse, the log will be terminated
 	 * 		If the log is active (and not terminated) the log will be added to the loglist of the world
@@ -343,6 +352,8 @@ public class Log {
 	}
 	
 	/**
+	 * Terminates the log, cuts the links attached to it's owner and world
+	 * 
 	 * @post
 	 * 		The log is terminated, it has no owner, no world
 	 */
@@ -370,6 +381,9 @@ public class Log {
 	}
 	
 	/**
+	 * 
+	 * The log will be removed from the world
+	 * 
 	 * @post
 	 * 		The log is removed from the loglist of it's world, if it has a world
 	 */

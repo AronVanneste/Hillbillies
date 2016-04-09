@@ -11,6 +11,8 @@ import hillbillies.util.ConnectedToBorder;
 public class World {
 	
 	/**
+	 * The initialization of a new world
+	 * 
 	 * @param terrainTypes
 	 * 		The type of terrain at every coordinate in the world
 	 * @param modelListener
@@ -60,6 +62,8 @@ public class World {
 	}
 	
 	/**
+	 * A cave in is applied to a given position and a raw material is thrown with a chance of 0,25
+	 * 
 	 * @param position
 	 * 		The position where the cave in should happen
 	 * @post
@@ -79,6 +83,9 @@ public class World {
 	}
 	
 	/**
+	 * 
+	 * A cave in is applied to a given position and a raw material is thrown.
+	 * 
 	 * @param position
 	 * 		The position where the cave in should happen
 	 * @post
@@ -95,6 +102,8 @@ public class World {
 	}
 	
 	/**
+	 * A raw material is thrown at a given position
+	 * 
 	 * @param position
 	 * 		The position where a raw material is thrown
 	 * @param terrainType
@@ -117,6 +126,7 @@ public class World {
 	
 	// SET TERRAIN TYPE FOR ONE CUBE
 	/**
+	 * 
 	 * @param terrainType
 	 * 		The new terrainType
 	 * @param position
@@ -164,7 +174,7 @@ public class World {
 	
 	/**
 	 * @post
-	 * 		??????
+	 * 		
 	 */
 	private void changeSolidToPassable() {
 		
@@ -183,6 +193,8 @@ public class World {
 	
 	// CHECKER
 	/**
+	 * Checks whether a given position is a valid spawn position
+	 * 
 	 * @param X
 	 * 		The X coordinate of the position 
 	 * @param Y
@@ -198,6 +210,8 @@ public class World {
 
 	
 	/**
+	 * Checks whether a given position is a valid spawn position
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's a valid spawn position
 	 * @return Returns true if the position is a valid spawn position (i.e., it's supported and it's passable)
@@ -208,6 +222,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given position is supported
+	 * 
 	 * @param position
 	 * 		The position of which is returned whether or not it's supported
 	 * @return Returns whether or not the position is supported
@@ -221,6 +237,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given position is supported
+	 * 
 	 * @param X
 	 * 		The X coordinate of the position
 	 * @param Y
@@ -237,6 +255,8 @@ public class World {
 	// isPassable
 	
 	/**
+	 * Checks whether a given position is passable
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's passable
 	 * @return Returns whether or not the position is passable (i.e., has terrainType 0 or 1)
@@ -250,6 +270,8 @@ public class World {
 	}
 
 	/**
+	 * Checks whether a given position is passable
+	 * 
 	 * @param X
 	 * 		The X coordinate of the position
 	 * @param Y
@@ -265,16 +287,20 @@ public class World {
 	
 	// isPassable
 	// isPassable
-		/**
-		 * @param terrainType
-		 * 		The terrainType
-		 * @return Returns whether or not the terrainType is a passable one
-		 */
+	/**
+	 * Checks whether a given terraintype is passable
+	 * 
+	 * @param terrainType
+	 * 		The terrainType
+	 * @return Returns whether or not the terrainType is a passable one
+	 */
 	private boolean isPassable(int terrainType) {
 		return ((terrainType == 0) || (terrainType == 1));
 	}
 	
 	/**
+	 * Checks whether a given position is a workshop
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's a workshop
 	 * @return Returns whether or not the position is a workshop (i.e., has terrainType 3)
@@ -284,6 +310,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given position is a workshop
+	 * 
 	 * @param X
 	 * 		The X coordinate of the position
 	 * @param Y
@@ -298,6 +326,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given terraintype is a workshop
+	 * 
 	 * @param terrainType
 	 * 		The terrainType
 	 * @return Returns whether or not the terrainType is a workshop
@@ -307,6 +337,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given position is wood
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's wood
 	 * @return Returns whether or not the position is wood (i.e., has terrainType 2)
@@ -316,6 +348,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given position is a workshop
+	 * 
 	 * @param X
 	 * 		The X coordinate of the position
 	 * @param Y
@@ -330,6 +364,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given terraintype is a workshop
+	 * 
 	 * @param terrainType
 	 * 		The terrainType
 	 * @return Returns whether or not the terrainType is wood
@@ -339,6 +375,8 @@ public class World {
 	}
 
 	/**
+	 * Checks whether a given position is rock
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's rock
 	 * @return Returns whether or not the position is rock (i.e., has terrainType 1)
@@ -349,6 +387,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given position is rock
+	 * 
 	 * @param X
 	 * 		The X coordinate of the position
 	 * @param Y
@@ -363,6 +403,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given terraintype is rock
+	 * 
 	 * @param terrainType
 	 * 		The terrainType
 	 * @return Returns whether or not the terrainType is rock
@@ -376,6 +418,8 @@ public class World {
 	// isValidPosition
 
 	/**
+	 * Checks whether a given position is valid
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's valid
 	 * @return Returns whether or not the position is valid (i.e., if the position is in world & the position is passable)
@@ -385,6 +429,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether a given position is valid
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's valid
 	 * @return Returns whether or not the position is valid (i.e., if the position is in world & the position is passable)
@@ -395,6 +441,8 @@ public class World {
 	
 	
 	/**
+	 * Checks whether a given position is in the world
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's in the world
 	 * @return Returns whether or not the position is the the borders of the world
@@ -405,7 +453,11 @@ public class World {
 				position[2] >= 0));
 	}
 	
+	
+	
 	/**
+	 * Checks whether a given position is in the world
+	 * 
 	 * @param position
 	 * 		The position of which is checked if it's in theworld
 	 * @return Returns whether or not the position is the the borders of the world
@@ -416,12 +468,25 @@ public class World {
 				position[2] >= 0));
 	}
 	
-	
+	/**
+	 * ??
+	 * 
+	 * @param X
+	 * 		The X coordinate of the position
+	 * @param Y
+	 * 		The Y coordinate of the position
+	 * @param Z
+	 * 		The Z coordinate of the position
+	 * 
+	 * @return ??
+	 */
 	public boolean isSolidConnectedToBorder(int x, int y, int z) {
 		return connectedToBorder.isSolidConnectedToBorder(x, y, z);
 	}
 	
 	/**
+	 * Checks whether is unit is valid
+	 * 
 	 * @param unit
 	 * 		The unit of which is checked if it's valid
 	 * @return Returns true if the unit is not null and the unit has a valid position
@@ -430,7 +495,15 @@ public class World {
 		return (unit != null && isValidPosition(unit.getPositionList()) && !unit.isTerminated());
 	}
 	
-	
+	/**
+	 * Checks whether two cubes are adjacent
+	 * 
+	 * @param cube1
+	 * 		The first cube
+	 * @param cube2
+	 * 		The second cube
+	 * @return Returns true if the two cubes are adjacent
+	 */
 	protected boolean areAdjacentCubes(int[] cube1, int[] cube2) {
 		return ((Math.abs(cube1[0] - cube2[0]) <= 1) && 
 				(Math.abs(cube1[1] - cube2[1]) <= 1) &&
@@ -438,6 +511,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether's a log available at a given position of the world
+	 * 
 	 * @param position
 	 * 		The position where is checked if there's a log available
 	 * @return Return true if there's a uncarried log at the position
@@ -451,6 +526,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether's a boulder available at a given position of the world
+	 * 
 	 * @param position
 	 * 		The position where is checked if there's a boulder available
 	 * @return Return true if there's a uncarried boulder at the position
@@ -464,6 +541,8 @@ public class World {
 	}
 	
 	/**
+	 * Returns the coordinates of the cube of the position
+	 * 
 	 * @param position
 	 * 		The position of which it's cube coordinates will be returned
 	 * @return Returns the coordinates (int's !) of the cube of the position
@@ -550,6 +629,8 @@ public class World {
 	
 	// ADD TO LIST TO CAVE
 	/**
+	 * Adds cubes to the list of cubes that have to be caved
+	 * 
 	 * @param solidToPassable
 	 * 		List of all coordinates that has to be caved
 	 * @post
@@ -569,6 +650,8 @@ public class World {
 	
 	// ADD TO AND GET BOULDER LIST
 	/**
+	 * Adds boulder to the boulderInWorld set
+	 * 
 	 * @param boulder
 	 * 		The boulder that has to be added to the boulder set
 	 * @post
@@ -612,7 +695,15 @@ public class World {
 		return null;
 	}
 	
-	
+	/**
+	 * Returns a valid enemy of a given unit
+	 * 
+	 * @param unit
+	 * 		The unit of which an valid enemy will be returned, if it has one
+	 * @return
+	 * 		Returns a valid enemy of the given unit, if it has none, it return null
+	 * 		
+	 */
 	protected Unit getEnemy(Unit unit) {
 		
 		for (Unit enemy: this.getUnits()) {
@@ -628,6 +719,8 @@ public class World {
 	// REMOVE FROM BOULDER LIST
 	
 	/**
+	 * Adds log to the logInWorld set
+	 * 
 	 * @param log
 	 * 		The log that has to be added to the log set
 	 * @post
@@ -646,6 +739,8 @@ public class World {
 	}
 	
 	/**
+	 * Tries to add faction to the activeFaction set
+	 * 
 	 * @param faction
 	 * 		The faction that has to be added to the world
 	 * @post
@@ -677,6 +772,8 @@ public class World {
 	}
 	
 	/**
+	 * Removes faction from world
+	 * 
 	 * @param faction
 	 * 		The faction that has to be removed
 	 * @post
@@ -687,6 +784,8 @@ public class World {
 	}
 	
 	/**
+	 * Checks whether both units are in the world
+	 * 
 	 * @param unit 1
 	 * 		The first unit that has to be compared
 	 * @param unit 2
@@ -699,6 +798,8 @@ public class World {
 	}
 	
 	/**
+	 * Adds unit to world
+	 * 
 	 * @param unit
 	 * 		The unit that has to be added to the unit list
 	 * @post
@@ -726,6 +827,8 @@ public class World {
 	}
 	
 	/**
+	 * Tries ta add unit to world
+	 * 
 	 * @param unit
 	 * 		The unit that has to be added to the world
 	 * @post
@@ -780,6 +883,8 @@ public class World {
 	}
 	
 	/**
+	 * A new unit is spawned in the world
+	 * 
 	 * @post
 	 * 		A new unit is added to the world, and is assigned to a faction
 	 * @throws IllegalArgumentException
@@ -796,6 +901,8 @@ public class World {
 	}
 
 	/**
+	 * A new unit is spawned in the world, with a valid faction and a valid position
+	 * 
 	 * @post
 	 * 		A new unit is added to the world, and is assigned to a faction
 	 * @throws IllegalArgumentException
@@ -851,9 +958,11 @@ public class World {
 	}
 	
 	/**
+	 * Returns all objects occupying the cube 
+	 * 
 	 * @param cube
 	 * 		The cube that has to be examined
-	 * @return Returns all objects occypying the cube 
+	 * @return Returns all objects occupying the cube 
 	 */
 	public List<Object> getAllObjectsOccupyingCube(int[] cube) {
 		
@@ -884,6 +993,8 @@ public class World {
 	}
 	
 	/**
+	 * Removes boulder from world
+	 * 
 	 * @param boulder
 	 * 		The boulder that has to be removed
 	 * @post
@@ -894,6 +1005,9 @@ public class World {
 	}
 	
 	/**
+	 * 
+	 * Removes log from world
+	 * 
 	 * @param log
 	 * 		The log that has to be removed
 	 * @post
@@ -904,6 +1018,8 @@ public class World {
 	}
 	
 	/**
+	 * Removes unit from world
+	 * 
 	 * @param unit
 	 * 		The unit that has to be removed
 	 * @post
@@ -914,6 +1030,8 @@ public class World {
 	}
 	
 	/**
+	 * Terminates world
+	 * 
 	 * @post
 	 * 		The world and all it's factions are terminated
 	 */
