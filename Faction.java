@@ -88,7 +88,6 @@ public class Faction {
 	
 	/**
 	 * Checks whether a faction and a unit are in the same world
-	 * 
 	 * @param unit
 	 * 		the unit that has to be compared with the faction
 	 * @return Returns true if both the unit and the faction belong to the same world and if their world is not null
@@ -111,6 +110,12 @@ public class Faction {
 		return world != null;
 	}
 	
+	/**
+	 * 
+	 * @param unit
+	 * 			The given unit
+	 * @return True is the unit is not null and is not terminated else false
+	 */
 	private boolean isValidUnit(Unit unit) {
 		return unit != null && !unit.isTerminated();
 	}
@@ -128,9 +133,9 @@ public class Faction {
 	 * @post
 	 * 		The faction is terminated
 	 * @post
-	 * 		The faction is removed from the factionlist of its world
+	 * 		The faction is removed from the faction list of its world
 	 * @post
-	 * 		The units of the faction are terminated??????
+	 * 		The units of the faction are terminated
 	 */
 	public void terminate() {
 		if (!this.isTerminated()) {
@@ -144,7 +149,7 @@ public class Faction {
 	 * Removes faction from the world
 	 * 
 	 * @post
-	 * 		The faction is removed from the factionlist of its world
+	 * 		The faction is removed from the faction list of its world
 	 * @post
 	 * 		The world of the faction is null
 	 */

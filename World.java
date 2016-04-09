@@ -16,7 +16,7 @@ public class World {
 	 * @param terrainTypes
 	 * 		The type of terrain at every coordinate in the world
 	 * @param modelListener
-	 * 		 ???
+	 * 		 The given modelListener of this world
 	 * @post
 	 * 		The NbX of the world is the X-length of the world
 	 * @post
@@ -62,14 +62,14 @@ public class World {
 	}
 	
 	/**
-	 * A cave in is applied to a given position and a raw material is thrown with a chance of 0,25
+	 * A cave-in is applied to the given position and a raw material is thrown with a chance of 0.25
 	 * 
 	 * @param position
-	 * 		The position where the cave in should happen
+	 * 		The position where the cave-in should take place
 	 * @post
-	 * 		The terraintype of the position changes to air
+	 * 		The terrain type of the position changes to air
 	 * @post
-	 * 		With a chance of 0,25 a raw material is thrown depending on the initial terraintype
+	 * 		With a chance of 0.25 a raw material is thrown depending on the initial terrain type
 	 */
 	private void cave(int[] position) {
 		
@@ -89,9 +89,9 @@ public class World {
 	 * @param position
 	 * 		The position where the cave in should happen
 	 * @post
-	 * 		The terraintype of the position changes to air
+	 * 		The terrain type of the position changes to air
 	 * @post
-	 * 		 A raw material is thrown depending on the initial terraintype
+	 * 		 A raw material is thrown depending on the initial terrain type
 	 */
 	protected void caveAndThrow(int[] position) {
 		int previousTerrainType = this.getTerrainType(position);
@@ -107,11 +107,11 @@ public class World {
 	 * @param position
 	 * 		The position where a raw material is thrown
 	 * @param terrainType
-	 * 		The terraintype at position
+	 * 		The terrain type at position
 	 * @post
-	 *		If the terraintype is 1 a new boulder is created at that position
+	 *		If the terrain type is 1 a new boulder is created at that position
 	 * @post
-	 * 		If the terraintype is 2 a new log is created at that position
+	 * 		If the terrain type is 2 a new log is created at that position
 	 */
 	private void throwRawMaterial(int[] position, int terrainType) {
 		
@@ -124,9 +124,7 @@ public class World {
 		
 	}
 	
-	// SET TERRAIN TYPE FOR ONE CUBE
 	/**
-	 * 
 	 * @param terrainType
 	 * 		The new terrainType
 	 * @param position
@@ -146,8 +144,8 @@ public class World {
 	
 	/**
 	 * @param position
-	 * 		The position of which the terrainType will be returned
-	 * @return Returns the terraintype at a given position
+	 * 		The position of which the terrainType should be returned
+	 * @return Returns the terrain type at a given position
 	 */
 	public int getTerrainType(int[] position) {
 		
@@ -160,12 +158,12 @@ public class World {
 
 	/**
 	 * @param X
-	 * 		The X coordinate of the position of which the terraintype will be returned
+	 * 		The X coordinate of the position of which the terrain type should be returned
 	 * @param Y
-	 * 		The Y coordinate of the position of which the terraintype will be returned
+	 * 		The Y coordinate of the position of which the terrain type should be returned
 	 * @param Z
-	 * 		The Z coordinate of the position of which the terraintype will be returned
-	 * @return Returns the terraintype at a given position
+	 * 		The Z coordinate of the position of which the terrain type should be returned
+	 * @return Returns the terrain type at a given position
 	 */
 	private int getTerrainType(int X, int Y, int Z) {
 		return this.getTerrainTypeWorld()[X][Y][Z];
@@ -174,7 +172,7 @@ public class World {
 	
 	/**
 	 * @post
-	 * 		
+	 * 		The 3-dimensional field in the connectedToBorder class will equal the 3D field this world
 	 */
 	private void changeSolidToPassable() {
 		
@@ -191,7 +189,6 @@ public class World {
 		
 	}
 	
-	// CHECKER
 	/**
 	 * Checks whether a given position is a valid spawn position
 	 * 
@@ -285,8 +282,6 @@ public class World {
 		return this.isPassable(this.getTerrainTypeWorld()[X][Y][Z]);
 	}
 	
-	// isPassable
-	// isPassable
 	/**
 	 * Checks whether a given terraintype is passable
 	 * 
@@ -321,6 +316,7 @@ public class World {
 	 * 
 	 * @return Returns whether or not the position is a workshop (i.e., has terrainType 3)
 	 */
+
 	protected boolean isWorkshop(int X, int Y, int Z) {
 		return this.isWorkshop(this.getTerrainTypeWorld()[X][Y][Z]);
 	}
@@ -381,7 +377,6 @@ public class World {
 	 * 		The position of which is checked if it's rock
 	 * @return Returns whether or not the position is rock (i.e., has terrainType 1)
 	 */
-
 	protected boolean isRock(int[] position) {
 		return this.isRock(position[0], position[1], position[2]);
 	}
@@ -415,8 +410,6 @@ public class World {
 	
 	
 	
-	// isValidPosition
-
 	/**
 	 * Checks whether a given position is valid
 	 * 
@@ -453,8 +446,6 @@ public class World {
 				position[2] >= 0));
 	}
 	
-	
-	
 	/**
 	 * Checks whether a given position is in the world
 	 * 
@@ -469,7 +460,7 @@ public class World {
 	}
 	
 	/**
-	 * ??
+	 * Check if the given position is a solid connected to the borders of the world
 	 * 
 	 * @param X
 	 * 		The X coordinate of the position
@@ -478,7 +469,8 @@ public class World {
 	 * @param Z
 	 * 		The Z coordinate of the position
 	 * 
-	 * @return ??
+	 * @return True if the given position is solid and connected to 
+	 * 		   the border of the world
 	 */
 	public boolean isSolidConnectedToBorder(int x, int y, int z) {
 		return connectedToBorder.isSolidConnectedToBorder(x, y, z);
@@ -519,7 +511,8 @@ public class World {
 	 */
 	protected boolean logAvailable(int[] position) {
 		for (Log log: this.getLogs()) {
-			if (log.getCube() == position)
+			if (log.getCube()[0] == position[0] && log.getCube()[1] == position[1]
+					&& log.getCube()[2] == position[2])
 				return true;
 		}
 		return false;
@@ -534,7 +527,8 @@ public class World {
 	 */
 	protected boolean boulderAvailable(int[] position) {
 		for (Boulder boulder: this.getBoulders()) {
-			if (boulder.getCube() == position)
+			if (boulder.getCube()[0] == position[0] && boulder.getCube()[1] == position[1]
+					&& boulder.getCube()[2] == position[2])
 				return true;
 		}
 		return false;
@@ -545,7 +539,7 @@ public class World {
 	 * 
 	 * @param position
 	 * 		The position of which it's cube coordinates will be returned
-	 * @return Returns the coordinates (int's !) of the cube of the position
+	 * @return Returns the coordinates (integers) of the cube of the position
 	 */
 	private int[] getCube(double[] position) {
 		int X = (int) Math.floor(position[0]);
@@ -556,14 +550,14 @@ public class World {
 
 	}
 	
-	// SET and GET TERRAINTYPEWORLD
 	/**
 	 * @param terrainType
 	 * 		The 3D-matrix with the terrainTypes at all positions of the world
 	 * @post
 	 * 		The terraintypes of the world shall equal terrainType
 	 * @post
-	 * 		??????
+	 * 		A 3D field with the dimension of the given terrainType is created in the 
+	 *      ConnectedToBorder class
 	 */	
 	private void setTerrainTypeWorld(int[][][] terrainType) {
 		this.terrainTypes = terrainType;
@@ -580,7 +574,6 @@ public class World {
 		return this.terrainTypes;
 	}
 	
-	// SET and GET modelListener
 	/**
 	 * @param modelListener
 	 * 		The modellistener of the world
@@ -598,28 +591,23 @@ public class World {
 		return this.modelListener;
 	}
 	
-	//SET DIMENSION
-
-	
-	
-	// SET and GET NbX, NbY, NbZ
 	
 	/**
-	 * @return Returns the nb of cubes in the X direction
+	 * @return Returns the number of cubes in the X direction
 	 */
 	public int getNbX() {
 		return this.NbX;
 	}
 	
 	/**
-	 * @return Returns the nb of cubes in the Y direction
+	 * @return Returns the number of cubes in the Y direction
 	 */
 	public int getNbY() {
 		return this.NbY;
 	}
 	
 	/**
-	 * @return Returns the nb of cubes in the Z direction
+	 * @return Returns the number of cubes in the Z direction
 	 */
 	public int getNbZ() {
 		return this.NbZ;
@@ -627,7 +615,6 @@ public class World {
 	
 	
 	
-	// ADD TO LIST TO CAVE
 	/**
 	 * Adds cubes to the list of cubes that have to be caved
 	 * 
@@ -640,7 +627,6 @@ public class World {
 		this.toCave.addAll(solidToPassable);
 	}
 	
-	// GET LIST TO CAVE
 	/**
 	* @return Returns the set with all cubes that has to be caved
 	*/
@@ -648,7 +634,6 @@ public class World {
 		return this.toCave;
 	}
 	
-	// ADD TO AND GET BOULDER LIST
 	/**
 	 * Adds boulder to the boulderInWorld set
 	 * 
@@ -676,7 +661,8 @@ public class World {
 	 */
 	public Boulder getBoulder(int[] cubeInt) {
 		for (Boulder boulder: this.getBoulders())
-			if (boulder.getCube() == cubeInt) {
+			if (boulder.getCube()[0] == cubeInt[0] && boulder.getCube()[1] == cubeInt[1] 
+					&& boulder.getCube()[2] == cubeInt[2]) {
 				return boulder;
 			}
 		return null;
@@ -689,7 +675,8 @@ public class World {
 	 */
 	public Log getLog(int[] cubeInt) {
 		for (Log log: this.getLogs())
-			if (log.getCube() == cubeInt) {
+			if (log.getCube()[0] == cubeInt[0] && log.getCube()[1] == cubeInt[1]
+					&& log.getCube()[2] == cubeInt[2]) {
 				return log;
 			}
 		return null;
@@ -699,9 +686,9 @@ public class World {
 	 * Returns a valid enemy of a given unit
 	 * 
 	 * @param unit
-	 * 		The unit of which an valid enemy will be returned, if it has one
+	 * 		The unit of which an valid enemy will be returned
 	 * @return
-	 * 		Returns a valid enemy of the given unit, if it has none, it return null
+	 * 		Returns a valid enemy of the given unit, if it has none, it'll return null
 	 * 		
 	 */
 	protected Unit getEnemy(Unit unit) {
@@ -716,7 +703,6 @@ public class World {
 	}
 	
 	
-	// REMOVE FROM BOULDER LIST
 	
 	/**
 	 * Adds log to the logInWorld set
@@ -758,7 +744,7 @@ public class World {
 	}
 	
 	/**
-	 * @return Returns the nb of active factions in the world
+	 * @return Returns the number of active factions in the world
 	 */
 	public int getNbFaction() {
 		return this.getActiveFactions().size();
@@ -827,7 +813,7 @@ public class World {
 	}
 	
 	/**
-	 * Tries ta add unit to world
+	 * Tries to add unit to world
 	 * 
 	 * @param unit
 	 * 		The unit that has to be added to the world
@@ -847,6 +833,10 @@ public class World {
 			throw new IllegalUnitException("Unit cannot be added to this world");
 		if (this.isTerminated())
 			throw new IllegalStateException("The world is terminated");
+		
+		if (unit.getFaction() == null)
+			unit.setFaction(this.getRightFaction());
+		
 		this.addToUnitList(unit);
 		
 		
@@ -902,7 +892,8 @@ public class World {
 
 	/**
 	 * A new unit is spawned in the world, with a valid faction and a valid position
-	 * 
+	 * @param defaultBehavior
+	 * 			A boolean to indicate if the unit should activate defaultBehavior
 	 * @post
 	 * 		A new unit is added to the world, and is assigned to a faction
 	 * @throws IllegalArgumentException
@@ -972,19 +963,22 @@ public class World {
 		List<Object> allObjectsOccupyingCube = new ArrayList<>();;
 		
 		for(Boulder boulder: BoulderList) {
-			if (boulder.getCube() == cube) {
+			if (boulder.getCube()[0] == cube[0] && boulder.getCube()[1] == cube[1]
+					&& boulder.getCube()[2] == cube[2]) {
 				allObjectsOccupyingCube.add(boulder);
 			}
 		}
 		
 		for(Log log: LogList) {
-			if (log.getCube() == cube) {
+			if (log.getCube()[0] == cube[0] && log.getCube()[1] == cube[1]
+					&& log.getCube()[2] == cube[2]) {
 				allObjectsOccupyingCube.add(log);
 			}
 		}
 		
 		for(Unit unit: UnitList) {
-			if (unit.getCubeInt() == cube) {
+			if (unit.getCubeInt()[0] == cube[0] && unit.getCubeInt()[1] == cube[1] &&
+					unit.getCubeInt()[2] == cube[2]) {
 				allObjectsOccupyingCube.add(unit);
 			}
 		}
@@ -1033,7 +1027,7 @@ public class World {
 	 * Terminates world
 	 * 
 	 * @post
-	 * 		The world and all it's factions are terminated
+	 * 		The world and all its factions are terminated
 	 */
 	public void terminate() {
 		if (!this.isTerminated()) {

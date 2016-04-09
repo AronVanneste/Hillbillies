@@ -1,21 +1,18 @@
 package hillbillies.model;
 
 public class Boulder {
-	
-	// INITIALISATION
-	// If position is a double[]
-	
+		
 	/**
 	 * The initialization of a boulder
 	 * 
 	 * @param world
-	 * 		The world where the boulder is created
+	 * 		The world in which the boulder is created
 	 * @param position
-	 * 		A list of doubles, the position where the boulder is created
+	 * 		An array of doubles, the position where the boulder is created
 	 * 
-	 * @post The position of the boulder will equal the given position, except when the position is not valid
+	 * @post The position of the boulder will equal the given position
 	 * 
-	 * @post The world of the boulder will equal the given world, except when the world is null
+	 * @post The world of the boulder will equal the given world
 	 * 
 	 * @post The weight of the boulder will be a random number between 10 and 40
 	 * 
@@ -25,10 +22,16 @@ public class Boulder {
 	 * 		Throws an IllegalPositionException if the given position is not valid
 	 * 
 	 * @throws IllegalWorldException
-	 * 		Throws an IllegalWorldException if the given world is null
+	 * 		Throws an IllegalWorldException if the given world is is not valid
 	 * 		
 	 */
 	public Boulder(World world, double[] position) throws IllegalPositionException, IllegalWorldException {
+		
+		try { 
+			this.setWorld(world);
+		} catch (IllegalWorldException invalidWorld) {
+			throw invalidWorld;
+		}
 		
 		try {
 			this.setPosition(position);
@@ -36,49 +39,38 @@ public class Boulder {
 			throw invalidPosition;
 		}
 	
-		try { 
-			this.setWorld(world);
-		} catch (IllegalWorldException invalidWorld) {
-			throw invalidWorld;
-		}
 		
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
 		world.addBoulder(this);
 
 	}
 	
-	// If position is an int[]
 	
 	/**
 	 * The initialization of a boulder
 	 * 
 	 * @param world
-	 * 		The world where the boulder is created
+	 * 		The world in which the boulder is created
 	 * @param position
-	 * 		A list of doubles, the position where the boulder is created
+	 * 		An array of integers, the position where the boulder is created
 	 * 
-	 * @post The position of the boulder will equal the given position, except when the position is not valid
+	 * @post The position of the boulder will equal the given position
 	 * 
-	 * @post The world of the boulder will equal the given world, except when the world is null
+	 * @post The world of the boulder will equal the given world
 	 * 
 	 * @post The weight of the boulder will be a random number between 10 and 40
 	 * 
 	 * @post The world will contain the boulder in its boulderlist
 	 * 
 	 * @throws IllegalPositionException
-	 * 		Throws an IllegalArgumentException if the given position is not valid
+	 * 		Throws an IllegalPositionException if the given position is not valid
 	 * 
 	 * @throws IllegalWorldException
-	 * 		Throws an IllegalWorldException if the given world is null
+	 * 		Throws an IllegalWorldException if the given world is is not valid
 	 * 		
 	 */
 	public Boulder(World world, int[] position) throws IllegalPositionException, IllegalWorldException {
-		try {
-			this.setPosition(position);
-		} catch (IllegalPositionException invalidPosition) {
-			throw invalidPosition;
-		}
-	
+		
 		try { 
 			this.setWorld(world);
 		} catch (IllegalWorldException invalidWorld) {
@@ -86,31 +78,33 @@ public class Boulder {
 		}
 		
 		
+		try {
+			this.setPosition(position);
+		} catch (IllegalPositionException invalidPosition) {
+			throw invalidPosition;
+		}
+	
+		
+		
 		this.weight = ((int) Math.round(Math.random() * 40 + 10));
 		world.addBoulder(this);
 	}
 
-	// CHECKERS
-	// If position is a double[]
-	
 	/**
 	 * @return Returns true if the given position is within the range of the world of the boulder
 	 */
-	
 	private boolean isValidPosition(double[] position) {
-		return this.getWorld().isValidPosition(this.getCube());
+		return this.getWorld().isValidPosition(position);
 	}
 	
-	// If position is an int[]
 	/**
 	 * @return Returns true if the given position is within the range of the world of the boulder
 	 */
 	private boolean isValidPosition(int[] position) {
-		return this.getWorld().isValidPosition(this.getCube());
+		return this.getWorld().isValidPosition(position);
 	}
 	
-	//World
-	
+
 	/**
 	 * @return Returns whether or not the world is valid (i.e. not null)
 	 */
@@ -118,8 +112,7 @@ public class Boulder {
 		return (world != null);
 	}
 	
-	//isPassable
-	
+
 	/**
 	 * @return Returns whether or not the current position of the boulder is passable
 	 */
@@ -134,16 +127,14 @@ public class Boulder {
 		return (this.getWorld().isSupported(this.getCube()));
 	}
 	
-	//isActive
 	
 	/**
-	 * @return Returns wheter or not the boulder is active (i.e. is ownerless)
+	 * @return Returns whether or not the boulder is active (i.e. is without owner and not terminated)
 	 */
 	public boolean isActive() {
-		return (this.getOwner() == null && !this.isActive());
+		return (this.getOwner() == null && !this.isTerminated());
 	}
 	
-	//shouldFall
 	
 	/**
 	 * @return Returns true if the boulder is not supported
@@ -153,7 +144,6 @@ public class Boulder {
 	}
 	
 
-	//GETCUBE
 	/**
 	 * @return Returns the coordinates of the cube of the boulder
 	 */
@@ -168,15 +158,13 @@ public class Boulder {
 		
 	}
 	
-	// SET and GET POSITION
 	/**
 	 * @param position
 	 * 		The new position of the boulder
 	 * @post
-	 * 		The position of the boulder will be the given position, if it's a valid position
+	 * 		The position of the boulder will be the given position
 	 * @throws IllegalPositionException
-	 * 		Throws an IllegalPositionException if the given position wou
-	 *  of the world of the boulder
+	 * 		Throws an IllegalPositionException if the given position is invalid
 	 * 		
 	 */
 	protected void setPosition(double[] position) throws IllegalPositionException {
@@ -189,12 +177,11 @@ public class Boulder {
 	
 	/**
 	 * @param position
-	 * 		The new position of the log
+	 * 		The new position of the boulder
 	 * @post
-	 * 		The position of the log will be the given position, if it's a valid position
-	 * @throws IllegalArgumentException
-	 * 		Throws an IllegalArgumentException if the given position wou
-	 *  of the world of the log
+	 * 		The position of the boulder will be the given position
+	 * @throws IllegalPositionException
+	 * 		Throws an IllegalPositionException if the given position is invalid
 	 * 		
 	 */
 	protected void setPosition(int[] position) throws IllegalPositionException {
@@ -216,12 +203,11 @@ public class Boulder {
 		return this.position;
 	}
 	
-	// SET AND GET WORLD
 	/**
 	 * @param world
-	 * 		The world where the boulder is located
+	 * 		The world in which the boulder is created
 	 * @post
-	 * 		The world of the boulder will be the given world, if it's not null
+	 * 		The world of the boulder will be the given world
 	 * @post
 	 * 		The boulder will be in the boulderlist of the world
 	 *@throws IllegalWorldException
@@ -233,6 +219,7 @@ public class Boulder {
 		this.world = world;
 		world.addBoulder(this);
 	}
+	
 	/**
 	 * @return Returns the world of the boulder
 	 */
@@ -240,7 +227,6 @@ public class Boulder {
 		return this.world;
 	}
 	
-	// GET WEIGHT
 	
 	/**
 	 * @return Returns the weight of the boulder
@@ -249,16 +235,11 @@ public class Boulder {
 		return this.weight;
 	}
 	
-	// SET and GET Owner
 	/**
 	 * @param owner
 	 * 		The new owner of the boulder
 	 * @post
 	 * 		The owner of the boulder will be the given owner
-	 * @post
-	 * 		The boulder could be terminated if its world is terminated
-	 * and the boulder is added to the boulder list of the world if it's active
-	 * and deleted from the list if it's unactive ????????
 	 */
 	protected void setOwner(Unit owner) throws IllegalStateException {
 		if (this.isTerminated())
@@ -266,6 +247,7 @@ public class Boulder {
 		this.owner = owner;
 		this.changeInWorld();
 	}
+	
 	/**
 	 * @return Returns the owner of the boulder
 	 */
@@ -275,7 +257,6 @@ public class Boulder {
 	
 	
 	
-	// ADVANCE TIME
 	public void advanceTime(double time) throws IllegalArgumentException, IllegalStateException {
 		
 		if (this.isTerminated())
@@ -291,20 +272,13 @@ public class Boulder {
 		
 	}
 	
-	// HELPFUNCTIONS
-	// changePosition
-	// In tegenstelling tot bij Unit moet hier nooit de positie worden teruggezet. De maximale afstand die 
-	// de boulder kan afleggen is ZSpeed * time en time is maximaal 0.2, dus maximale afstand = -3 * 0.2 = -0.6.
-	// M.a.w., de boulder/log blijft in dezelfde cube of zakt er 1. Hij kan er dus nooit twee zakken in 1 stap en
-	// terechtkomen in een cube die niet bestaat.
-	
 	/**
 	 * The position of the boulder is updated
 	 * 
 	 *@param time
-	 *		The time within the new position of the boulder, according to it's ZSpeed, will be calculated
+	 *		The given time (seconds)
 	 *@post
-	 *		The new position of the boulder will be time*ZSpeed lower than the previous one
+	 *		The new position of the boulder will be (time * ZSpeed) lower than the previous one
 	 */
 	private void changePosition(double time) {
 		
@@ -313,14 +287,14 @@ public class Boulder {
 		this.setPosition(position);
 	}
 	
-	//removeOwner
 	
 	/**
 	 * The owner of the boulder will be removed and vice versa
 	 * 
 	 * @post
-	 * 		The boulder will be ownerless
-	 * 		The owner will lose that boulder
+	 * 		The boulder will be without owner
+	 * @post 		
+	 * 		The owner (unit) will not longer carry this boulder
 	 */
 	protected void removeOwner() {
 		try {
@@ -329,14 +303,12 @@ public class Boulder {
 		} catch (NullPointerException e) {};
 	}
 	
-	//changeInWorld
 	/**
 	 * Applies changes in the world or in the boulders status to the boulder
-	 * 
 	 * @post
-	 * 		If the world of the boulder would collapse, the boulder will be terminated
-	 * 		If the boulder is active (and not terminated) the boulder will be added to the boulderlist of the world
-	 * 		If the boulder is unactive (and not terminated) the boulder will be removed from the boulderlist of the world ???????
+	 * 		If the world of the boulder is terminated, the boulder will terminate as well
+	 * 		If the boulder is active, the boulder will be added to the boulder list of the world
+	 * 		If the boulder is inactive, the boulder will be removed from the boulder list of the world
 	 */
 	private void changeInWorld() {
 		if (this.getWorld().isTerminated())
@@ -350,10 +322,10 @@ public class Boulder {
 	}
 	
 	/**
-	 * Terminates the boulder, cuts the links attached to it's owner and world
-	 * 
+	 *  Terminates the boulder, cuts the links attached to it's owner and world
+	 *  
 	 * @post
-	 * 		The boulder is terminated, it has no owner, no world
+	 * 		The boulder is terminated. It has no owner and is not longer part of a world
 	 */
 	public void terminate() {
 		if (!this.isTerminated()) {
@@ -371,17 +343,15 @@ public class Boulder {
 	}
 	
 	/**
-	 * @return Returns whether or not the unit it's owner is null
-	 */
+	 * @return Returns whether or not this boulder has an owner
+	 */ 
 	public boolean isCarriedByUnit() {
 		return this.getOwner() != null;
 	}
 	
 	/**
-	 * The boulder will be removed from the world
-	 * 
 	 * @post
-	 * 		The boulder is removed from the boulderlist of it's world, if it has a world
+	 * 		The boulder is removed from the boulder list of it's world
 	 */
 	private void removeWorld() {
 		try {
@@ -393,7 +363,6 @@ public class Boulder {
 	
 	
 
-	// VARIABLES 
 	private double[] position;
 	private final int weight;
 	private final double ZSpeed = -3.0;
