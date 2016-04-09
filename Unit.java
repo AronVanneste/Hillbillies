@@ -1,13 +1,9 @@
 package hillbillies.model;
 
 
-import java.awt.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 
@@ -596,7 +592,7 @@ public class Unit {
 	 * 
 	 * @return Returns a list containing the x-, y- and z-axis position of the unit's target
 	 */
-	private Vector getTarget() {
+	public Vector getTarget() {
 		return this.TARGET;
 	}
 	
@@ -630,7 +626,7 @@ public class Unit {
 	 * 
 	 * @return Returns the finalTarget of the unit
 	 */
-	private Vector getFinalTarget() {
+	public Vector getFinalTarget() {
 		return this.finalTARGET;
 	}
 
@@ -763,7 +759,7 @@ public class Unit {
 	 * 			| else
 	 * 			| 	then true
 	 */
-	private boolean isValidPosition(double X, double Y, double Z) {
+	public boolean isValidPosition(double X, double Y, double Z) {
 		double[] pos = {X, Y, Z};
 		return isValidPosition(pos);
 	}
@@ -816,18 +812,15 @@ public class Unit {
 	 * @param position
 	 * 		The position to be checked
 	 * @return	Returns true if position is a valid position. This is when X, Y and Z
-	 * 			are a non-negative value and do not exceed the borders of the units world
-	 * 			| if ((X < 0) | (X > new.getWorld.getNbX) | (Y < 0) |(Y > new.getWorld.getNbY) | (Z < 0) | (Z > new.getWorld.getNbZ))
-	 * 			| 	then false
-	 * 			| else
-	 * 			| 	then true	
+	 * 			are a non-negative value and do not exceed the borders of the units world.
+	 * 			If the unit is not part of a world, then the condition that X, Y and Z are not negative
+	 * 			is sufficient.	
 	 */
 	private boolean isValidPosition(double[] position) {
 		try {
 			return this.getWorld().isValidPosition(position);
 		} catch (NullPointerException e) {
-			return true;
-		}
+			return (position[0] >= 0 && position[1] >= 0 && position[2] >= 0);		}
 	}	
 	
 	/**
@@ -1127,7 +1120,9 @@ public class Unit {
 			return true;
 		for (int i = 0; i < Queue.size(); i++) {
 			Object[] something = ((Object[]) Queue.get(i));
-			if ((something[0] == position) && (((int) something[1]) <= n0))
+			int[] pos = ((int[]) something[0]);
+			if ((pos[0] == position[0] && pos[1] == position[1]
+					&& pos[2] == position[2]) && (((int) something[1]) <= n0))
 				return false;
 		}
 		return true;
@@ -1192,10 +1187,16 @@ public class Unit {
 	 * 		|new.getFinalTarget == target
 	 * @throws IllegalPositionException
 	 * 		Throws IllegalPositionException if the position if invalid
-	 * 		|if (!isValidPosition(target))
+	 * 		| (!isValidPosition(target))
 	 * @throws IllegalStateException
 	 * 		Throws IllegalStateException if the unit is terminated
-	 * 		|if(new.isTerminated())
+	 * 		| (this.isTerminated())
+	 * @throws IllegalTargetException
+	 * 		Throws IllegalTargetException if the target is invalid
+	 * 		| (!isValidTarget(target))
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the unit is not allowed to move
+	 * 		| (!this.canMove())
 	 */
 	public void moveTo(int[] target) throws IllegalPositionException, IllegalStateException, 
 		IllegalArgumentException, IllegalTargetException {
@@ -1214,7 +1215,7 @@ public class Unit {
 	}
 	
 	/**
-	 * Make's the unit move to a certain position
+	 * Makes the unit move to a certain position
 	 * 
 	 * @param X
 	 * 		The X-coordinate of the cube where the unit should move to
@@ -1230,6 +1231,12 @@ public class Unit {
 	 * @throws IllegalStateException
 	 * 		Throws IllegalStateException if the unit is terminated
 	 * 		|if(new.isTerminated())
+	 * @throws IllegalTargetException
+	 * 		Throws IllegalTargetException if the target is invalid
+	 * 		| (!isValidTarget(target))
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the unit is not allowed to move
+	 * 		| (!this.canMove())
 	 */
 	public void moveTo(int X, int Y, int Z) throws IllegalPositionException , IllegalStateException, 
 		IllegalArgumentException, IllegalTargetException {
@@ -1293,8 +1300,8 @@ public class Unit {
 
 	
 	/**
-	 * ???
 	 * @throws IllegalPositionException
+	 * 		Throws IllegalPositionException is the target is unreachable
 	 */
 	public void pathFindingAlgorithm() throws IllegalPositionException {
 		
@@ -1374,45 +1381,8 @@ public class Unit {
 	
 		
 	
-	
 	/**
-	 * ???
-	 * Lets the unit move to it's target
-	 * 
-	 * @post The unit will be at its final target
-	 * 		new.getPosition() == this.getFinalTarget
-	 */
-	private void moveToTarget() {
-		
-		double X = this.getFinalTarget().getX();
-		double Y = this.getFinalTarget().getY();
-		double Z = this.getFinalTarget().getZ();
-		
-		int x, y, z;
-		if (this.getPosition().getX() == X)
-			x = 0;
-		else if (this.getPosition().getX() < X)
-			x = 1;
-		else 
-			x = -1;
-		if (this.getPosition().getY() == Y)
-			y = 0;
-		else if (this.getPosition().getY() < Y)
-			y = 1;
-		else 
-			y = -1;
-		if (this.getPosition().getZ() == Z)
-			z = 0;
-		else if (this.getPosition().getZ() < Z)
-			z = 1;
-		else 
-			z = -1;
-			this.moveToAdjacent(x, y, z);
-		
-	}
-	
-	/**
-	 * Lets the unit start working
+	 * Indicates the unit should start working
 	 * 
 	 * @post The unit starts working
 	 * 		new.getWorking == true
@@ -1435,7 +1405,7 @@ public class Unit {
 	
 	
 	/**
-	 * Lets the unit work at a certain cube further away
+	 * Indicates the unit should work at a certain cube further away
 	 * 
 	 * @param x
 	 * 		The x coordinate of the cube where the unit should start moving
@@ -1465,8 +1435,11 @@ public class Unit {
 	}
 	
 	/**
+	 * Gives the unit bonuses after it has finished working
 	 * 
-	 * 
+	 * @post 
+	 * 		The unit's experience points are increased by 10 points
+	 * 		| new.getExperiencePoints() == this.getExperiencePoints() + 10
 	 * @post
 	 * 		if (new.isCarryingBoulder() | new.isCarryingLog())
 	 *			new.isCarryingLog == false
@@ -1553,8 +1526,6 @@ public class Unit {
 	 * 			The attacking unit
 	 * @param defender
 	 * 			The defending unit (attacked by the attacker)
-	 * @pre The attacking unit and defending unit must be located in neighboring cubes
-	 * 		| attacker.isValidAttack(defender)
 	 * @post The attacker's status of getAttacking() equals true
 	 * 		| attacker.getAttacking() == true
 	 * @post The defender's status of isAttacked() equals true
@@ -1565,13 +1536,22 @@ public class Unit {
 	 * 		| defender.getOpponent == attacker
 	 * @throws IllegalStateException
 	 * 		Throws IllegalStateException if the unit is terminated
-	 * 		|if(new.isTerminated())
+	 * 		| (new.isTerminated())
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException is the attack is not valid
+	 * 		| !(isValidAttack(attacker, defender))
 	 */
-	public void fight(Unit attacker, Unit defender) throws IllegalStateException {
+	public void fight(Unit attacker, Unit defender) throws IllegalStateException, 
+			IllegalArgumentException {
 		assert isValidAttack(attacker, defender);
 		
 		if (attacker.isTerminated() | defender.isTerminated())
 			throw new IllegalStateException("One of the units is terminated");
+
+		if (!isValidAttack(attacker, defender))
+			throw new IllegalArgumentException("Not a valid fight");
+		
+		
 		
 		
 		attacker.setOpponent(defender);
@@ -1582,7 +1562,7 @@ public class Unit {
 	}
 	
 	/**
-	 * Lets the unit rest
+	 * Indicates the unit should start resting
 	 * 
 	 * @post The unit starts resting
 	 * 		|new.getResting() == true
@@ -1969,7 +1949,7 @@ public class Unit {
 		if (Math.abs(this.getPosition().getZ() - Z) > Math.abs(Z - this.getTarget().getZ()))
 			this.setPosition(this.getPosition().getX(), this.getPosition().getY(), this.getTarget().getZ());
 		
-		if (previousCube != this.getCube())
+		if (!previousCube.equals(this.getCube()))
 			this.setExperiencePoints(this.getExperiencePoints() + 1);
 	
 	}
@@ -2064,7 +2044,9 @@ public class Unit {
 	/**
 	 * The unit starts fighting potential enemys
 	 * 
-	 * @post ???
+	 * @post if an enemy is found, the unit starts attacking
+	 * 		| if (enemy != null)
+	 * 		| 	then new.isAttacking()
 	 */
 	private void fightPotentialEnemies() {
 		try {
@@ -2141,8 +2123,6 @@ public class Unit {
 	 * 		|	then new.isWorking() == true
 	 * 		| else if (P <= 0,75)
 	 * 		|	then new.isResting() == true
-	 * 		| else
-	 * 		|	then ???
 	 */
 	private void startDefaultBehavior() {
 		
@@ -2182,7 +2162,7 @@ public class Unit {
 	}
 	
 	/**
-	 * Lets the unit stop everything it's doing
+	 * Indicates the unit should stop everything it's doing
 	 * 
 	 * @post The moving stops with everything it's doing
 	 * 		| new.isworking() == false
@@ -2280,7 +2260,7 @@ public class Unit {
 	 * @throws IllegalLogException
 	 */
 	public void carryLog(Log log) throws IllegalLogException {
-		if (isValidLog(log))
+		if (!isValidLog(log))
 			throw new IllegalLogException("Log is null");
 		
 		this.carriedLog = log;
@@ -2296,17 +2276,21 @@ public class Unit {
 		return this.carriedLog;
 	}
 	
-	public void carryBoulder() {
+	public void carryBoulder() throws NullPointerException {
 		try {
 			carryBoulder(this.getWorld().getBoulder(this.getCubeInt()));
-		} catch (NullPointerException e) {};
+		} catch (NullPointerException noWorld) {
+			throw noWorld;
+		}
 		
 	}
 	
-	public void carryLog() {
+	public void carryLog() throws NullPointerException {
 		try {
 			carryLog(this.getWorld().getLog(this.getCubeInt()));
-		} catch (NullPointerException e) {};
+		} catch (NullPointerException noWorld) {
+			throw noWorld;
+		}
 		
 	}
 	
@@ -2316,7 +2300,7 @@ public class Unit {
 	 * @throws IllegalBoulderException
 	 */
 	public void carryBoulder(Boulder boulder) throws IllegalBoulderException {
-		if (isValidBoulder(boulder))
+		if (!isValidBoulder(boulder))
 			throw new IllegalBoulderException("Boulder is null");
 			
 		this.carriedBoulder = boulder;
@@ -2378,7 +2362,7 @@ public class Unit {
 	 * @return
 	 */
 	public boolean isCarryingBoulder() {
-		return this.getCarryingLog() != null;
+		return this.getCarryingBoulder() != null;
 	}
 	
 	/**
@@ -2463,8 +2447,10 @@ public class Unit {
 			try {
 				this.getWorld().removeUnit(this);
 			} catch (NullPointerException e) {};
-			this.getFaction().removeUnit(this);
-			this.setFaction(null);
+			try {
+				this.getFaction().removeUnit(this);
+				this.setFaction(null);
+			} catch (NullPointerException ee) {};
 			this.isTerminated = true;
 		}
 	}

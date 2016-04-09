@@ -2,16 +2,22 @@
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.junit.Assert;
 
+import hillbillies.model.IllegalPositionException;
+import hillbillies.model.IllegalTargetException;
+import hillbillies.model.Log;
+import hillbillies.model.Boulder;
+import hillbillies.model.Faction;
+import hillbillies.model.IllegalNameException;
 import hillbillies.model.Unit;
 import ogp.framework.util.Util;
 
 import org.junit.Test;
 import hillbillies.model.Vector;
+import hillbillies.model.World;
 
 public class UnitTest {
 
@@ -69,48 +75,13 @@ public class UnitTest {
 
 	}
 	
-	@Test (expected = IllegalArgumentException.class)
+	@Test (expected = IllegalPositionException.class)
 	public void assertIllegalPosition() {
-		int[] pos = {59, 59, 59};
+		int[] pos = {-4, -5, 0};
 		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
 		unit1.getPosition();
 	}
 	
-	@Test (expected = IllegalArgumentException.class)
-	public void assertIllegalPosition2() {
-		int[] pos = {-1, 34, 34};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.getPosition();
-	}
-	
-	@Test (expected = IllegalArgumentException.class)
-	public void assertIllegalPosition3() {
-		int[] pos = {51, 0, 0};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.getPosition();
-	}
-	
-	@Test 
-	public void assertSetPosition() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setPosition(34, 35, 36);
-		Vector POS = new Vector(34,35,36);
-		Assert.assertTrue(unit1.getPosition().equals(POS));
-	}
-	
-	@Test (expected = IllegalArgumentException.class)
-	public void assertIllegalSetPosition() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setPosition(-34, 35, 36);
-		List<Double> POS = new ArrayList<>();
-		POS.add((double) 34); 
-		POS.add((double) 35); 
-		POS.add((double) 36);
-		Assert.assertEquals(POS, unit1.getPosition());
-	}
-
 	@Test 
 	public void assertSetToughness() {
 		int[] pos = {5, 4, 3};
@@ -172,154 +143,34 @@ public class UnitTest {
 	public void assertSetIllegalHitpoints() {
 		int[] pos = {5, 4, 3};
 		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setHitpoints(-5);
+		unit1.setHitpoints(1506540);
 		Assert.assertEquals(50, unit1.getHitpoints());
 	}
 
-
-	@Test 
-	public void assertSetOrientation() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setOrientation((double) Math.PI / 4);
-		Assert.assertEquals((double) (Math.PI / 4), unit1.getOrientation(), Util.DEFAULT_EPSILON);
-	}
 	
-	@Test 
-	public void assertSetOrientation2() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setOrientation((double) 7 * Math.PI);
-		Assert.assertEquals((double) (Math.PI), unit1.getOrientation(), Util.DEFAULT_EPSILON);
-	}
-	
-	@Test 
-	public void assertSetSpeed() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setOrientation((double) Math.PI / 4);
-		Assert.assertEquals((double) (Math.PI / 4), unit1.getOrientation(), Util.DEFAULT_EPSILON);
-	}
-	
-	@Test 
-	public void assertSetSpeed2() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setOrientation((double) 7 * Math.PI);
-		Assert.assertEquals((double) (Math.PI), unit1.getOrientation(), Util.DEFAULT_EPSILON);
-	}
-	
-	@Test 
-	public void assertIsStopped() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setAttacked(true);
-		Assert.assertTrue(unit1.isStopped());
-	}
-	
-	@Test 
-	public void assertDetermineSpeed() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setTarget(5, 4, 4);
-		double velocity = 0.5 * 1.5 * (unit1.getStrength() + unit1.getAgility()) / (2 * unit1.getWeight());
-		Assert.assertEquals(velocity, unit1.determineSpeed(), Util.DEFAULT_EPSILON);
-		
-	}
-	
-	@Test
-	public void assertDetermineSpeedSprinting() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setTarget(5, 4, 2);
-		unit1.startSprinting();
-		double velocity = 2 * 1.2 * 1.5 * (unit1.getStrength() + unit1.getAgility()) / (2 * unit1.getWeight());
-		Assert.assertEquals(velocity, unit1.determineSpeed(), Util.DEFAULT_EPSILON);
-		
-	}
-	
-	@Test
-	public void assertDetermineSpeed2() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setTarget(5, 4, 2);
-		double velocity = 1.2 * 1.5 * (unit1.getStrength() + unit1.getAgility()) / (2 * unit1.getWeight());
-		Assert.assertEquals(velocity, unit1.determineSpeed(), Util.DEFAULT_EPSILON);
-		
-	}
-	
-	@Test
-	public void assertSpeedVector() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setTarget(5, 4, 4);
-		unit1.setSpeed(unit1.determineSpeed());
-		Vector speedVector = new Vector(0.0, 0.0, 0.75);
-		Assert.assertTrue(unit1.getSpeedVector().equals(speedVector));
-		
-	}
-	
-	@Test
-	public void assertMoveToRandomAdjacentPosition() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.moveToRandomAdjacentPosition();
-		Assert.assertTrue(unit1.isValidPosition(unit1.getPosition().getX(), 
-				unit1.getPosition().getY(), unit1.getPosition().getZ()));
-		
-	}
-	
-	@Test
-	public void assertCheckResting() {
-		int[] pos = {5, 4, 3};
-		Unit unit1 = new Unit("Unit", pos, 50, 50, 50, 50, false);
-		unit1.setRestingTime(181);
-		unit1.checkResting();
-		Assert.assertTrue(unit1.isResting());
-	}
-	
-	
-	@Test (expected = IllegalArgumentException.class)
+	@Test (expected = IllegalNameException.class)
 	public void assertIllegalNameCapital() {
 		int[] pos = {1,2,3};
 		Unit unit = new Unit("aron", pos, 50, 50, 50, 50, false);
+		unit.getName();
 	}
 
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test (expected = IllegalNameException.class)
 	public void assertIllegalNameNumber() {
 		int[] pos = {1,2,3};
 		Unit unit = new Unit("Aron69", pos, 50, 50, 50, 50, false);
+		unit.getName();
 	}
 
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test (expected = IllegalNameException.class)
 	public void assertIllegalNameNotEnough() {
 		int[] pos = {1,2,3};
 		Unit unit = new Unit("A", pos, 50, 50, 50, 50, false);
+		unit.getName();
 
 	}
-
-
-	@Test
-	public void assertGetCube() {
-		
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		unit.setPosition(1, 2, 3);
-		Vector cube = new Vector(1, 2, 3);
-		Assert.assertTrue(unit.getCube().equals(cube));
-		}
-
-
-	@Test(expected = IllegalArgumentException.class)
-	public void assertSetIllegalTarget() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		unit.setTarget(40, 43, 51);
-
-	}
-
 
 	@Test
 	public void assertGetMaxHitpoints() {
@@ -330,55 +181,6 @@ public class UnitTest {
 		Assert.assertEquals(maxHitpoints,unit.getMaxHitpoints());
 	}
 
-
-	@Test
-	public void assertUpdateOrientation() {
-		
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		unit.setSpeed(10);
-		unit.setTarget(4,5,6);
-		unit.updateOrientation();
-		double distance = Math.sqrt(9+9+9);
-		double orientation = Math.atan2(10*3/distance,10*3/distance);
-		Assert.assertEquals((double) unit.getOrientation(), orientation, Util.DEFAULT_EPSILON);
-
-	}
-
-
-	@Test
-	public void assertIsValidAttack() {
-		
-		int[] pos1 = {1,2,3};
-		Unit unit1 = new Unit("Aron", pos1, 50, 50, 50, 50, false);
-		int[] pos2 = {2,2,3};
-		Unit unit2 = new Unit("Aron", pos2, 50, 50, 50, 50, false);
-		int[] pos3 = {3,2,3};
-		Unit unit3 = new Unit("Aron", pos3, 50, 50, 50, 50, false);
-		Assert.assertEquals(true, unit1.isValidAttack(unit2));
-		Assert.assertEquals(true, unit3.isValidAttack(unit2));
-		Assert.assertEquals(false, unit1.isValidAttack(unit3));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		unit.setTarget(0, 0, 0);
-		Vector TARGET = new Vector(0,0,0);
-		Assert.assertTrue(unit.getTarget().equals(TARGET));
-
-	}
-	
-	@Test
-	public void assertIsValidPositionInt() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		unit.setTarget(0, 0, 0);
-		Assert.assertTrue(unit.isValidPosition(0, 0, 0));;;
-
-	}
 	
 	@Test 
 	public void assertVectorClassEquals() {
@@ -404,139 +206,7 @@ public class UnitTest {
 
 	}
 	
-	@Test
-	public void assertIsValidPosition3() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
 	
-	@Test
-	public void assertIsValidPosition4() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition5() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition6() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition7() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition8() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition9() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition10() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition11() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition12() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition13() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition14() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test
-	public void assertIsValidPosition15() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		Assert.assertTrue(unit.isValidPosition(Math.random()*50, Math.random()*50, Math.random()*50));
-
-	}
-	
-	@Test (expected = IllegalArgumentException.class)
-	public void assertIsValidPosition16() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		unit.setPosition(-1, 50, 56);
-
-	}
-	
-	@Test 
-	public void assertIsValidPosition17() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		int X = 1;
-		int Y = 49;
-		int Z = 49;
-		Assert.assertTrue(unit.isValidPosition(X, Y, Z));
-
-	}
-	
-	@Test 
-	public void assertIsValidPosition18() {
-		int[] pos = {1,2,3};
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		float X = 1;
-		float Y = 49;
-		float Z = 49;
-		Assert.assertTrue(unit.isValidPosition(X, Y, Z));
-
-	}
 	
 	@Test
 	public void assertMoveToAdjacent1() {
@@ -563,6 +233,7 @@ public class UnitTest {
 		Assert.assertTrue(test.equals(unit.getTarget()));
 
 	}
+	
 	@Test
 	public void assertMoveToAdjacent3() {
 		int[] pos = {1,2,3};
@@ -577,19 +248,314 @@ public class UnitTest {
 	}
 	
 	@Test
-	public void assertMoveTo() {
-		int[] pos = {1,2,3};
-		int x = 0;
-		int y = 0;
-		int z = 0;
-		Unit unit = new Unit("Aron", pos, 50, 50, 50, 50, false);
-		unit.moveTo(x, y, z);
-		Vector test = new Vector(0,0,0);
-		while (!unit.getPosition().equals(unit.getTarget()))
-			unit.advanceTime(0.2);
-		Assert.assertTrue(test.equals(unit.getTarget()));
+	public void assertUnitAddedToFaction() {
+		int[][][] field = {{{1,0,3},{0,2,2},{3,1,1}},
+						   {{1,0,3},{0,2,2},{3,1,1}},
+						   {{1,0,3},{0,2,2},{3,1,1}}};
+		World world = new World(field, null);
+		int[] pos = {0,0,1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		world.addUnit(unit);
+		Assert.assertNotNull(unit.getFaction());
+		
 
 	}
+	
+	@Test
+	public void assertUnitSpawned() {
+		int[][][] field = {{{1,0,3},{0,2,2},{3,1,1}},
+						   {{1,0,3},{0,2,2},{3,1,1}},
+						   {{1,0,3},{0,2,2},{3,1,1}}};
+		World world = new World(field, null);
+		world.spawnUnit();
+		Assert.assertSame(world.getUnits().size(), 1);
+	}
+	
+	@Test
+	public void assertUnitMoveTo() {
+		
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] target = {0, 0, 0};
+		unit.moveTo(target);
+		Vector targetV = new Vector(0,0,0);
+		Assert.assertTrue(targetV.equals(unit.getFinalTarget()));
+
+
+	}
+	
+	@Test (expected = IllegalStateException.class)
+	public void assertUnitMoveToException1() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] target = {0, 0, 0};
+		unit.terminate();
+		unit.moveTo(target);
+
+	}
+	
+	@Test (expected = IllegalTargetException.class)
+	public void assertUnitMoveToException2() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] target = {-41, 0, 0};
+		unit.moveTo(target);
+
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void assertUnitMoveToException3() {
+		
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] target = {2, 0, 0};
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		world.addUnit(unit);
+		unit.shouldFall();
+		unit.moveTo(target);
+
+	}
+	
+	@Test
+	public void assertUnitWork() {
+		
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		unit.work();
+		Assert.assertTrue(unit.isWorking());
+
+	}
+	
+	@Test (expected = IllegalStateException.class)
+	public void assertUnitWorkException() {
+		
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		unit.terminate();
+		unit.work();
+
+	}
+
+	@Test (expected = IllegalArgumentException.class)
+	public void assertUnitWorkException2() {
+		
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		unit.shouldFall();
+		unit.work();
+
+	}
+	
+	@Test
+	public void assertUnitSprinting() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		unit.setSprinting(true);
+		Assert.assertFalse(unit.isSprinting());
+
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void assertUnitFightException() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] pos2 = {1, 0, 1};
+		Unit unit2 = new Unit("Unit", pos2, 50, 50, 50, 50, false);
+		unit.fight(unit, unit2);
+	}
+	
+	@Test (expected = IllegalStateException.class)
+	public void assertUnitFightException2() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] pos2 = {1, 0, 1};
+		Unit unit2 = new Unit("Unit", pos2, 50, 50, 50, 50, false);
+		unit.terminate();
+		unit.fight(unit, unit2);
+	}
+	
+	@Test 
+	public void assertUnitFight() {
+		int[] pos = {0, 0, 0};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] pos2 = {1, 0, 0};
+		Unit unit2 = new Unit("Unit", pos2, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		world.addUnit(unit);
+		world.addUnit(unit2);
+		unit.fight(unit, unit2);
+		Assert.assertTrue(unit.isAttacking());
+
+	}
+	
+	@Test 
+	public void assertUnitFight2() {
+		int[] pos = {0, 0, 0};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[] pos2 = {1, 0, 0};
+		Unit unit2 = new Unit("Unit", pos2, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		world.addUnit(unit);
+		world.addUnit(unit2);
+		unit.fight(unit, unit2);
+		Assert.assertTrue(unit2.isAttacked());
+
+	}
+	
+	@Test 
+	public void assertUnitResting() {
+		int[] pos = {0, 0, 0};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		unit.resting();
+		Assert.assertTrue(unit.isResting());
+
+	}
+	
+	@Test (expected = IllegalStateException.class)
+	public void assertUnitRestingException() {
+		int[] pos = {0, 0, 0};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		unit.terminate();
+		unit.resting();
+
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void assertUnitRestingException2() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		unit.shouldFall();
+		unit.resting();
+
+	}
+	
+	@Test
+	public void assertUnitCarryLog() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		Log log = new Log(world, pos);
+		unit.carryLog(log);
+		Assert.assertTrue(unit.isCarryingLog());
+
+	}
+	
+	@Test (expected = NullPointerException.class)
+	public void assertUnitCarryLog2() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		Log log = new Log(world, pos);
+		unit.carryLog();
+		//Assert.assertTrue(unit.isCarryingLog());
+
+	}
+	
+	@Test 
+	public void assertUnitCarryLog3() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		world.addUnit(unit);
+		Log log = new Log(world, pos);
+		unit.carryLog();
+		Assert.assertTrue(unit.isCarryingLog());
+
+	}
+	
+	@Test 
+	public void assertUnitCarryLog4() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		int weight = unit.getWeight();
+		World world = new World(field, null);
+		world.addUnit(unit);
+		Log log = new Log(world, pos);
+		unit.carryLog();
+		Assert.assertTrue(unit.getWeight() ==  weight + log.getWeight());
+
+	}
+
+	@Test
+	public void assertUnitCarryBoulder() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		Boulder boulder = new Boulder(world, pos);
+		unit.carryBoulder(boulder);
+		Assert.assertTrue(unit.isCarryingBoulder());
+
+	}
+	
+	@Test (expected = NullPointerException.class)
+	public void assertUnitCarryBoulder2() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		Boulder boulder = new Boulder(world, pos);
+		unit.carryBoulder();
+		//Assert.assertTrue(unit.isCarryingLog());
+
+	}
+	
+	@Test 
+	public void assertUnitCarryBoulder3() {
+		int[] pos = {0, 0, 1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		world.addUnit(unit);
+		Boulder boulder = new Boulder(world, pos);
+		unit.carryBoulder();
+		Assert.assertTrue(unit.isCarryingBoulder());
+
+	}
+
+	
+	@Test
+	public void assertUnitFalling() {
+		int[][][] field = {{{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}},
+				   {{0,0,0},{0,0,0},{0,0,0}}};
+		World world = new World(field, null);
+		int[] pos = {0,0,1};
+		Unit unit = new Unit("Unit", pos, 50, 50, 50, 50, false);
+		world.addUnit(unit);
+		unit.shouldFall();
+		Assert.assertTrue(unit.isFalling());
+
+
+	}
+	
 
 	
 	
