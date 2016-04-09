@@ -679,7 +679,7 @@ public class Unit {
 		double velocity = 1.5 * (this.getStrength() + this.getAgility()) / (2 * this.getWeight());
 		double ZNow = this.getCube().getZ();
 		
-		if (this.isSprinting())
+		if (this.shouldSprinting())
 			velocity *= 2;
 		if (ZNow - ZTarget == -1)
 			return 0.5 * velocity;
@@ -1322,10 +1322,12 @@ public class Unit {
 			}
 			if (isInQueue(Queue, this.getCubeInt())) {
 				int[] next = takeNext(Queue);
-				moveToAdjacent(this.getCubeInt()[0] - next[0], 
-						this.getCubeInt()[1] - next[1], 
-						this.getCubeInt()[2] - next[2]);
+				moveToAdjacent(next[0] - this.getCubeInt()[0], 
+						next[1] - this.getCubeInt()[1], 
+						next[2] - this.getCubeInt()[2]);
 			} else	{
+				if (this.shouldWorkAfterMoving())
+					this.workAfterMoving(false);
 				throw new IllegalPositionException("Destination is unreachable");
 			}
 		}
@@ -1632,6 +1634,13 @@ public class Unit {
 	 */
 	public boolean isSprinting() {
 		return (this.sprint && this.getSpeed() != 0 && !this.isFalling());
+	}
+	
+	/**
+	 * @return Returns whether or not the unit should start sprinting
+	 */
+	private boolean shouldSprinting() {
+		return this.sprint;
 	}
 
 	/**
