@@ -9,15 +9,31 @@ import java.util.Set;
 
 import hillbillies.model.Vector;
 
+
+
 /**
- * 
  * @author Steven, Aron
- *
+ * 		   2nd bachelor, computer science
+ * 
+ * @invar  The name of each unit must be a valid name for any unit.
+ *       | isValidName(getName())
+ * @invar  The position of each unit must be a valid position for any unit.
+ *       | isValidPosition(getPosition())
+ * @invar  The number of hitpoints of each unit must be a valid number of hitpoints for any unit.
+ * 		 | isValidHitpoints(getHitpoints())
+ * @invar  The number of stamina points of each unit must be a valid number of stamina points for any unit.
+ * 		 | isValidStamina(getStamina())
+ * @invar  The orientation of each unit must be a valid orientation for any unit.
+ *       | isValidOrientation(getOrientation())
+ * @invar  The target of each unit must be a valid target for any unit.
+ *       | isValidTarget(getTarget())
  */
+
+
 
 public class Unit {
 	
-	@invar
+	
 	
 	
 	/**
