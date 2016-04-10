@@ -1744,8 +1744,11 @@ public class Unit {
 	}
 	
 	/**
-	 * ????
+	 * Indicates if the resting status can be overruled
 	 * @param trueorfalse
+	 * 		  A given boolean 
+	 * @post The overrule resting status equals the given boolean
+	 * 		| this.canOverruleResting() == trueorfalse
 	 */
 	private void setOverruleResting(boolean trueorfalse) {
 		this.firstRest = trueorfalse;
@@ -1753,7 +1756,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return Returns whether or not the unit is falling
+	 * @return Returns whether or not resting can be overruled
 	 */
 	private boolean canOverruleResting() {
 		return this.firstRest;
@@ -2107,11 +2110,10 @@ public class Unit {
 	}
 	
 	/**
-	 * ??
+	 * Updates the units hitpoints and stamina depending on the time the unit's been resting
 	 * 
 	 * @post The overrulerestingstatus of the unit equals true
-	 * 		|new.getOverruleResting() == true
-	 * @post ???
+	 * 		| new.getOverruleResting() == true
 	 * 
 	 */
 	private void changeResting() {
