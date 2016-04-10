@@ -17,6 +17,9 @@ import hillbillies.model.Vector;
 
 public class Unit {
 	
+	@invar
+	
+	
 	/**
 	 * Creates a new Unit
 	 * 
@@ -2264,10 +2267,17 @@ public class Unit {
 	 */
 	
 	/**
+	 * Lets the unit carry a given log
 	 * 
 	 * @param log
+	 * 		The log that has to be carried
+	 * @post The unit is carrying the log, the log has as owner the unit and the units weight has increased with the weight of the log
+	 * 		|log.getOwner() == new
+	 * 		|new.getWeight() == (this.getWeight() + log.getWeight())
+	 * 		|new.getCarryingLog() == log
 	 * @throws IllegalLogException
-	 */
+	 * 		Throws IllegalLogException if the log is null
+	 */	
 	public void carryLog(Log log) throws IllegalLogException {
 		if (!isValidLog(log))
 			throw new IllegalLogException("Log is null");
@@ -2279,11 +2289,20 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the log the unit's carrying
 	 */
 	public Log getCarryingLog() {
 		return this.carriedLog;
 	}
+	
+	/**
+	 * Lets the unit pick up the boulder at it's current cube
+	 * 
+	 * @post The unit is carrying the boulder at it's current cube
+	 * 		|new.getCarriedBoulder() == this.getWorld().getBoulder(this.getCubeInt())
+	 * @throws NullPointerException
+	 * 		Throws nullpointerExceptoion if the unit has no world (its world is null)
+	 */
 	
 	public void carryBoulder() throws NullPointerException {
 		try {
@@ -2294,6 +2313,15 @@ public class Unit {
 		
 	}
 	
+	
+	/**
+	 * Lets the unit pick up the log at it's current cube
+	 * 
+	 * @post The unit is carrying the log at it's current cube
+	 * 		|new.getCarriedlog() == this.getWorld().getlog(this.getCubeInt())
+	 * @throws NullPointerException
+	 * 		Throws nullpointerExceptoion if the unit has no world (its world is null)
+	 */
 	public void carryLog() throws NullPointerException {
 		try {
 			carryLog(this.getWorld().getLog(this.getCubeInt()));
@@ -2304,9 +2332,16 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the unit carry the given boulder
 	 * 
 	 * @param boulder
+	 * 		The boulder the unit has to carry
+	 * @post The unit is carrying the boulder, the boulder has as owner the unit and the units weight has increased with the weight of the boulder
+	 * 		|boulder.getOwner() == new
+	 * 		|new.getWeight() == (this.getWeight() + boulder.getWeight())
+	 * 		|new.getCarryingboulder() == boulder 
 	 * @throws IllegalBoulderException
+	 * 		Throws illegalBoulderException when the boulder is null
 	 */
 	public void carryBoulder(Boulder boulder) throws IllegalBoulderException {
 		if (!isValidBoulder(boulder))
@@ -2320,14 +2355,18 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the boulder the unit is carrying
 	 */
 	public Boulder getCarryingBoulder() {
 		return this.carriedBoulder;
 	}
 
  	/**
- 	 * 
+ 	 * Lets the unit drop the log and boulder it's currently carrying
+ 	 * 	
+ 	 * @post The unit has no log or boulder anymore
+ 	 * 		|new.isCarryingLog() == false
+ 	 * 		|new.isCarryingBoulder() == false
  	 */
 	public void dropEverything() {
 		this.dropLog();
@@ -2335,7 +2374,13 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the unit drop the log  it's carrying
 	 * 
+	 * @post The unit has no log anymore, the log has no owner anymore, the log it's position is the position of the unit and the units weight is decreased
+ 	 * 		|new.isCarryingLog() == false
+ 	 * 		|this.getCarryingLog().getOwner() == null
+ 	 * 		|new.getWeight() == this.getWeight() - this.getCarryingLog().getWeight()
+ 	 * 		|this.getCarryingLog().getPosition() == this.getPositionList()
 	 */
 	public void dropLog() {
 		
@@ -2347,7 +2392,13 @@ public class Unit {
 	}
 	
 	/**
+	 * Lets the unit drop the boulder  it's carrying
 	 * 
+	 * @post The unit has no boulder anymore, the boulder has no owner anymore, the boulder it's position is the position of the unit and the units weight is decreased
+ 	 * 		|new.isCarryingboulder() == false
+ 	 * 		|this.getCarryingboulder().getOwner() == null
+ 	 * 		|new.getWeight() == this.getWeight() - this.getCarryingboulder().getWeight()
+ 	 * 		|this.getCarryingboulder().getPosition() == this.getPositionList()
 	 */
 	public void dropBoulder() {
 		
@@ -2360,7 +2411,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns whether or not the unit is carrying a log
 	 */
 	public boolean isCarryingLog() {
 		return this.getCarryingLog() != null;
@@ -2368,14 +2419,19 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns whether or not the unit is carrying a boulder
 	 */
 	public boolean isCarryingBoulder() {
 		return this.getCarryingBoulder() != null;
 	}
 	
 	/**
+	 * Removes the boulder from the unit
 	 * 
+	 * @post The boulder is dropped and the units weight is decreased
+	 * 		|new.getCarriedboulder() == null
+ 	 * 		|new.getWeight() == this.getWeight() - this.getCarryingboulder().getWeight()
+	 * 		
 	 */
 	protected void removeBoulder() {
 		this.setWeight(this.getWeight() - this.getCarryingBoulder().getWeight());
@@ -2383,19 +2439,28 @@ public class Unit {
 	}
 	
 	/**
+	 * Removes the log from the unit
 	 * 
+	 * @post The log is dropped and the units weight is decreased
+	 * 		|new.getCarriedlog() == null
+ 	 * 		|new.getWeight() == this.getWeight() - this.getCarryinglog().getWeight()
+	 * 		
 	 */
 	protected void removeLog() {
 		this.setWeight(this.getWeight() - this.getCarryingLog().getWeight());
 		carriedLog = null;
 	}
 	
-	
+	/**
+	 * @return Returns whether or not there's a log available at the current position of the unit
+	 */
 	private boolean logAvailable() {
 		return logAvailable(this.getCubeInt());
 	}
 	
-	
+	/**
+	 * @return Returns whether or not there's a log available at the given cube
+	 */
 	private boolean logAvailable(int[] position) {
 		try {
 			return this.getWorld().logAvailable(position);
@@ -2404,11 +2469,16 @@ public class Unit {
 		}
 	}
 	
+	/**
+	 * @return Returns whether or not there's a boulder available at the current position of the unit
+	 */
 	private boolean boulderAvailable() {
 		return boulderAvailable(this.getCubeInt());
 	}
 	
-	
+	/**
+	 * @return Returns whether or not there's a boulder available at the given cube
+	 */
 	private boolean boulderAvailable(int[] position) {
 		try {
 			return this.getWorld().boulderAvailable(position);
@@ -2417,14 +2487,21 @@ public class Unit {
 		}
 	}
 	
+	/**
+	 * @return Returns whether or not there are a log and boulder available at the cube of the unit
+	 */
 	private boolean logAndBoulderAreAvailable() {
 		return logAndBoulderAreAvailable(this.getCubeInt());
 	}
-	
+	/**
+	 * @return Returns whether or not there are a log and boulder available at the given cube
+	 */
 	private boolean logAndBoulderAreAvailable(int[] position) {
 		return (boulderAvailable(position) && logAvailable(position));
 	}
-	
+	/**
+	 * @return Returns the boulder of at the cube of the unit
+	 */
 	private Boulder getBoulder() {
 		try {
 			return this.getWorld().getBoulder(this.getCubeInt());
@@ -2433,6 +2510,9 @@ public class Unit {
 		}
 	}
 	
+	/**
+	 * @return Returns the log of at the cube of the unit
+	 */
 	private Log getLog() {
 		try {
 			return this.getWorld().getLog(this.getCubeInt());
@@ -2448,7 +2528,18 @@ public class Unit {
 	 */
 	
 	/**
+	 * Terminates the unit
 	 * 
+	 * @post The units status is terminated
+	 * 		|new.isTerminated() == true
+ 	 * @post The unit has no log or boulder anymore
+ 	 * 		|new.isCarryingLog() == false
+ 	 * 		|new.isCarryingBoulder() == false
+ 	 * @post The unit is removed from the world
+ 	 * 		|this.getWorld.containsUnit(this) == false
+ 	 * @post The unit is removed from its faction and its faction becomes null
+ 	 * 		|this.getFaction.containsUnit(this) == false
+ 	 * 		|new.getFaction() == null
 	 */
 	public void terminate() {
 		if (!this.isTerminated()) {
@@ -2465,7 +2556,16 @@ public class Unit {
 	}
 	
 	/**
+	 * Checks whether or not the unit has to be terminated
 	 * 
+	 * @post If it's hitpoints or 0 or below zero, the unit is terminated
+	 *		|if(this.getHitpoints() <= 0)
+	 * 		|	new.isTerminated() == true
+ 	 * 		|	new.isCarryingLog() == false
+ 	 * 		|	new.isCarryingBoulder() == false
+ 	 * 		|	this.getWorld.containsUnit(this) == false
+ 	 * 		|	this.getFaction.containsUnit(this) == false
+ 	 * 		|	new.getFaction() == null
 	 */
 	private void checkTerminate() {
 		if (this.getHitpoints() <= 0)
@@ -2474,7 +2574,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns whether or not the unit is terminated
 	 */
 	public boolean isTerminated() {
 		return this.isTerminated;
@@ -2489,14 +2589,7 @@ public class Unit {
 	 */
 	
 	/**
-	 * The unit starts working and stops after 500 divided by its strength seconds
-	 * unless its working activity is interrupted by an attack or because its need to rest
-	 * @post The working status of the unit equals false after the work is done
-	 * 		 | new.getWorking() == false
-	 * @post The unit's speed is equal to zero
-	 * 		 | new.getSpeed() == 0
-	 * @post The unit's resting status is false
-	 * 		 | new.isResting() == false
+	 * @return Returns the time in seconds the unit has to work to finish its job
 	 */
 	private double getTimeToWork() {
 		return (double) (500 / this.getStrength());
@@ -2512,12 +2605,13 @@ public class Unit {
 	/**
 	 * 
 	 * @param restingTime
-	 * 			Time in seconds
-	 * @pre	 The given restingTime is a non-negative double and does not equal zero
-	 * 		 | restingTime > 0
+	 * 			Time in second
 	 * @post The time in seconds that has passed since the last time the unit was resting equals 
 	 * 		 the given time
-	 * 		 | new.getRestingTime() == restingTime
+	 * 		 | new.getRestingTime() == Math.max(restingTime, 0)
+	 * @post If it has been to long since the unit rested, the unit starts to rest
+	 * 		 | if (this.getRestingTime() >= 180)
+	 * 		 |	then new.isResting() == true
 	 */
 	private void setRestingTime(double restingTime) {
 		this.restingTime = Math.max(restingTime, 0);
@@ -2537,12 +2631,11 @@ public class Unit {
 	
 	
 	/**
-	 * @pre	 The given activityTime is greater than zero 
-	 * 		 | activityTime > 0
 	 * @param activityTime
 	 * 			The time in seconds 
-	 * @post The time in seconds a unit has been sprinting equals the given time
-	 * 		 | new.getSprintingTime() == activityTime
+	 * @post If the unit is sprinting, the time in seconds a unit has been sprinting equals the given time
+	 * 		 |if (this.isSprinting())
+	 * 		 | new.getSprintingTime() == Math.max(activityTime,0)
 	 */
 	private void setSprintingTime(double activityTime) {
 		if (this.isSprinting())
@@ -2552,6 +2645,9 @@ public class Unit {
 	/**
 	 * 
 	 * @param time
+	 * 		|The time the unit has been fighting
+	 * @post The time the unit has been fighting equals time
+	 * 		|new.getFightTime()) == time
 	 */
 	private void setFightTime(double time) {
 		this.fightTime = Math.max(time, 0);
@@ -2559,7 +2655,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the time the unit has fought
 	 */
 	private double getFightTime() {
 		return this.fightTime;
@@ -2568,6 +2664,9 @@ public class Unit {
 	/**
 	 * 
 	 * @param time
+	 * 		The time the unit has worked
+	 * @post The time the unit has been working equals time
+	 * 		|new.getWorkingTime()) == Math.max(time, 0)
 	 */
 	private void setWorkingTime(double time) {
 		this.workingTime = Math.max(time, 0);
@@ -2575,7 +2674,7 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the time the unit has worked
 	 */
 	private double getWorkingTime() {
 		return this.workingTime;
@@ -2584,6 +2683,9 @@ public class Unit {
 	/**
 	 * 
 	 * @param time
+	 * 		The time the unit has not rested
+	 * @post The time the unit hasn't been resting equals time
+	 * 		|new.getNotRestTime()) == Math.max(time, 0)
 	 */
 	private void setNotRestTime(double time) {
 		this.notRestTime = Math.max(time, 0);
@@ -2591,16 +2693,27 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the time the unit hasn't been resting
 	 */
 	private double getNotRestTime() {
 		return this.notRestTime;
 	}
 	
+	/**
+	 * 
+	 * @param value
+	 * 		Indicates if the unit should work after moving or not
+	 * @post The workAfterMoving value equals the given value
+	 * 		|new.workAfterMoving()) == value
+	 */
 	private void workAfterMoving(boolean value) {
 		this.workAfterMoving = value;
 	}
 	
+	/**
+	 * 
+	 * @return Returns whether or not the unit should work after it has moved
+	 */
 	private boolean shouldWorkAfterMoving() {
 		return this.workAfterMoving;
 	}
@@ -2608,6 +2721,9 @@ public class Unit {
 	/**
 	 * 
 	 * @param opponent
+	 * 		The units opponent
+	 * @post The units opponent is opponend
+	 * 		|new.getOpponent() == opponent
 	 */
 	private void setOpponent(Unit opponent) {
 		this.opponent = opponent;
@@ -2615,13 +2731,15 @@ public class Unit {
 	
 	/**
 	 * 
-	 * @return
+	 * @return Returns the opponent of the unit
 	 */
 	private Unit getOpponent() {
 		return this.opponent;
 	}
 	
-
+	/**
+	 * @return Returns a set with all the directly adjacent cubes of the given unit
+	 */
 	public Set<int[]> getDirectlyAdjacentCubes() {
 		
 		int X = this.getCubeInt()[0];
@@ -2640,10 +2758,15 @@ public class Unit {
 		return cubes;
 	}
 	
+	/**
+	 * @return Returns a list with all the  adjacent cubes of the given unit
+	 */
 	public ArrayList<int[]> getAdjacentCubes() {
 		return this.getAdjacentCubes(this.getCubeInt());
 	}
-	
+	/**
+	 * @return Returns a list with all the  adjacent cubes of the given cube
+	 */
 	public ArrayList<int[]> getAdjacentCubes(int[] position) {
 		ArrayList<int[]> adjacentCubes = new ArrayList<>();
 		
