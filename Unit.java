@@ -31,7 +31,7 @@ import hillbillies.model.Vector;
 
 
 
-public class Unit {
+public class Unit implements TerminateInterface {
 	
 	
 	
@@ -1425,6 +1425,28 @@ public class Unit {
 	}
 	
 	
+	
+	/**
+	 * Indicates the unit should work at a certain cube further away
+	 * 
+	 * @param position
+	 * 		Position where the unit should work
+	 * @post
+	 * 		The unit starts working and starts moving towards position
+	 * 		new.getWorkAfterMoving == true
+	 * 		new.getFinalTarget = position
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the unit is terminated
+	 * 		|if(new.isTerminated())
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the unit isn't allowed to work
+	 * 		|if(!new.canWork())
+	 */
+	public void workAt(int[] position) {
+		workAt(position[0], position[1], position[2]);
+	}
+	
+	
 	/**
 	 * Indicates the unit should work at a certain cube further away
 	 * 
@@ -1581,6 +1603,25 @@ public class Unit {
 		defender.attacked();
 		
 	}
+	
+	public void follow(Unit passiveUnit) {
+		if (canMove()) {
+			this.unitToFollow = passiveUnit;
+			this.setResting(false);
+			this.setWorking(false);
+		}
+	}
+	
+	public void stopFollowing() {
+		this.unitToFollow = null;
+	}
+	
+	private Unit getUnitToFollow() {
+		// TODO Auto-generated method stub
+		return unitToFollow;
+	}
+
+
 	
 	/**
 	 * Indicates the unit should start resting
@@ -1743,6 +1784,10 @@ public class Unit {
 		return this.falling;
 	}
 	
+	public boolean isFollowing() {
+		return this.getUnitToFollow() != null;
+	}
+	
 	/**
 	 * Indicates if the resting status can be overruled
 	 * @param trueorfalse
@@ -1818,6 +1863,12 @@ public class Unit {
 			return;
 		}
 		
+		if (this.isFollowing()) {
+			this.moveTo((int) this.getUnitToFollow().getPosition().getX(), 
+					(int) this.getUnitToFollow().getPosition().getY(), 
+					(int) this.getUnitToFollow().getPosition().getZ());
+		}
+		
 		if (!this.getPosition().equals(this.getFinalTarget())) {
 			if (!this.getPosition().equals(this.getTarget())) {
 				this.setSpeed(this.determineSpeed());
@@ -1845,6 +1896,8 @@ public class Unit {
 			}
 		}
 		
+	
+		
 		
 		if (this.isWorking()) {
 			if (this.getWorkingTime() >= this.getTimeToWork()) {
@@ -1863,6 +1916,11 @@ public class Unit {
 			this.stopDefaultBehavior();	
 	}
 	
+
+
+
+
+
 	/**
 	 * Lets the attacker attack
 	 * 
@@ -2444,6 +2502,16 @@ public class Unit {
 	}
 	
 	/**
+	 * 
+	 */
+	protected void removeRaw() {
+		if (this.isCarryingBoulder())
+			removeBoulder();
+		else if (this.isCarryingLog())
+			removeLog();
+	}
+	
+	/**
 	 * Removes the boulder from the unit
 	 * 
 	 * @post The boulder is dropped and the units weight is decreased
@@ -2837,6 +2905,7 @@ public class Unit {
 	private final double ZSpeed = -3.0;
 	private boolean falling;
 	private boolean workAfterMoving;
+	private Unit unitToFollow;
 
 
 

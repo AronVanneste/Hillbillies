@@ -1,0 +1,114 @@
+package hillbillies.model;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+public class Scheduler {
+	
+	public Scheduler() {
+		
+	}
+	
+	public void addTask(T task) {
+		this.getTasks().add(task);
+	}
+	
+	public List<T> getTasks() {
+		return this.taskList;
+	}
+	
+	public void removeTask(T task) {
+		this.getTasks().remove(task);
+		task.terminate();
+	}
+	
+	public void replaceTask(T newTask, T oldTask) {
+		removeTask(oldTask);
+		addTask(newTask);
+	}
+	
+	public boolean areAllPartOfScheduler(Collection<T> tasks) {
+		
+		for (T task: tasks) {
+			if (!this.getTasks().contains(task))
+				return false;
+		}
+		return true;
+	}
+	public T getHighestPriorityTask() {
+		int highestPriority = Integer.MIN_VALUE;
+		T highestPriorityTask = null;
+		List<T> tasks = this.getTasks();
+		
+		for (T task: tasks) {
+			if (task.getPriority() > highestPriority && task.isNotExecuting()){
+				highestPriority = task.getPriority();
+				highestPriorityTask = task;
+			}
+				
+		}
+		return highestPriorityTask;
+		
+		
+	}
+	
+	
+	
+	public Iterator<T> getAllTasksIterator() {
+		return new Iterator<T>() {
+
+			@Override
+			public boolean hasNext() {
+				for (T t: getTasks()) {
+					if (!passedT.contains(t)) {
+						return true;
+					}
+				}
+				return false;
+					
+			}
+
+			@Override
+			public T next() throws NoSuchElementException {
+				if (!hasNext())
+					throw new NoSuchElementException();
+				for (T t: getTasks()) {
+					if ((t.getPriority() >= largestPriority) && !passedT.contains(t)) {
+						currentElement = t;
+						largestPriority = t.getPriority();
+					}
+				}
+				passedT.add(currentElement);
+				return currentElement;
+			}
+			private T currentElement = null;
+			private int largestPriority = Integer.MIN_VALUE;
+			private List<T> passedT = new ArrayList<>();
+
+		};
+	}
+
+	/**
+	 * Algorithms to return all tasks satisfying some condition
+	 */
+	
+	public List<T> getAllTasksSatisfyingCondition(Predicate<T> condition) {
+		
+		List<T> taskList = new ArrayList<>();
+		this.getTasks().stream().filter(condition).forEach(taskList::add);
+		return taskList;
+			
+	}
+	
+	
+	
+	private List<T> taskList = new ArrayList<>();
+	
+		
+}

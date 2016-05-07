@@ -1,14 +1,16 @@
 package hillbillies.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 
-public class World {
+public class World implements TerminateInterface {
 	
 	/**
 	 * The initialization of a new world
@@ -73,8 +75,8 @@ public class World {
 	 */
 	private void cave(int[] position) {
 		
-		int previousTerrainType = this.getTerrainType(position);
-		this.setTerrainType(0, position);
+		TerrainType previousTerrainType = this.getTerrainType(position);
+		this.setTerrainType(TerrainType.AIR, position);
 		
 		double P = Math.random();
 		if (P <= 0.25)
@@ -94,8 +96,8 @@ public class World {
 	 * 		 A raw material is thrown depending on the initial terrain type
 	 */
 	protected void caveAndThrow(int[] position) {
-		int previousTerrainType = this.getTerrainType(position);
-		this.setTerrainType(0, position);
+		TerrainType previousTerrainType = this.getTerrainType(position);
+		this.setTerrainType(TerrainType.AIR, position);
 		
 		this.throwRawMaterial(position, previousTerrainType);
 
@@ -113,11 +115,11 @@ public class World {
 	 * @post
 	 * 		If the terrain type is 2 a new log is created at that position
 	 */
-	private void throwRawMaterial(int[] position, int terrainType) {
+	private void throwRawMaterial(int[] position, TerrainType terrainType) {
 		
-		if (terrainType == 1)
+		if (terrainType == TerrainType.ROCK)
 			new Boulder(this, position);
-		else if (terrainType == 2)
+		else if (terrainType == TerrainType.TREE)
 			new Log(this, position);
 
 		
@@ -131,13 +133,13 @@ public class World {
 	 * 		The position where the terrainType is set
 	 * 
 	 */
-	public void setTerrainType(int terrainType, int[] position) {
+	public void setTerrainType(TerrainType terrainType, int[] position) {
 		
 		int X = position[0];
 		int Y = position[1];
 		int Z = position[2];
 		int[][][] terrain = this.getTerrainTypeWorld();
-		terrain[X][Y][Z] = terrainType;
+		terrain[X][Y][Z] = terrainType.getInt();
 		this.setTerrainTypeWorld(terrain);
 
 	}
@@ -147,7 +149,7 @@ public class World {
 	 * 		The position of which the terrainType should be returned
 	 * @return Returns the terrain type at a given position
 	 */
-	public int getTerrainType(int[] position) {
+	public TerrainType getTerrainType(int[] position) {
 		
 		int X = position[0];
 		int Y = position[1];
@@ -165,10 +167,43 @@ public class World {
 	 * 		The Z coordinate of the position of which the terrain type should be returned
 	 * @return Returns the terrain type at a given position
 	 */
-	private int getTerrainType(int X, int Y, int Z) {
-		return this.getTerrainTypeWorld()[X][Y][Z];
+	private TerrainType getTerrainType(int X, int Y, int Z) {
+		int type = this.getTerrainTypeWorld()[X][Y][Z];
+		
+		if (type == TerrainType.AIR.getInt())
+			return TerrainType.AIR;
+		else if (type == TerrainType.ROCK.getInt())
+			return TerrainType.ROCK;
+		else if (type == TerrainType.TREE.getInt())
+			return TerrainType.TREE;
+		else 
+			return TerrainType.WORKSHOP;
 		
 	}
+	
+	public int[] getNextPosition(int[] position) {
+		int X = position[0];
+		int Y = position[1];
+		int Z = position[2];
+		
+		int[] pos1 = {X+1,Y,Z};
+		int[] pos2 = {X-1,Y,Z};
+		int[] pos3 = {X,Y+1,Z};
+		int[] pos4 = {X,Y-1,Z};
+		int[] pos5 = {X,Y,Z+1};
+		int[] pos6 = {X,Y,Z-1};
+		
+		Set<int[]> cubes = new HashSet<int[]>(Arrays.asList(pos1, pos2, pos3, pos4, pos5, pos6));
+		
+		for (int[]pos:cubes){
+			if(isValidPosition(pos))
+				return pos;
+		}
+		return null;
+	}
+	
+
+
 	
 	/**
 	 * @post
@@ -290,7 +325,7 @@ public class World {
 	 * @return Returns whether or not the terrainType is a passable one
 	 */
 	private boolean isPassable(int terrainType) {
-		return ((terrainType == 0) || (terrainType == 1));
+		return ((terrainType == TerrainType.AIR.getInt()) || (terrainType == TerrainType.WORKSHOP.getInt()));
 	}
 	
 	/**
@@ -329,7 +364,7 @@ public class World {
 	 * @return Returns whether or not the terrainType is a workshop
 	 */
 	private boolean isWorkshop(int terrainType) {
-		return (terrainType == 3);
+		return (terrainType == TerrainType.WORKSHOP.getInt());
 	}
 	
 	/**
@@ -367,7 +402,7 @@ public class World {
 	 * @return Returns whether or not the terrainType is wood
 	 */
 	private boolean isWood(int terrainType) {
-		return (terrainType == 2);
+		return (terrainType == TerrainType.TREE.getInt());
 	}
 
 	/**
@@ -405,7 +440,7 @@ public class World {
 	 * @return Returns whether or not the terrainType is rock
 	 */
 	private boolean isRock(int terrainType) {
-		return (terrainType == 2);
+		return (terrainType == TerrainType.ROCK.getInt());
 	}
 	
 	
@@ -627,11 +662,129 @@ public class World {
 		this.toCave.addAll(solidToPassable);
 	}
 	
+	public Unit getClosestUnit(Predicate<Unit> condition, Unit performer) {
+		List<Unit> unitList = new ArrayList<>();
+		this.getUnits().stream().filter(condition).forEach(unitList::add);
+		
+		double minDistance = Double.MAX_VALUE;
+		Unit closestUnit = null;
+		
+		for (Unit unit: unitList) {
+			double distance = getDistanceBetweenUnits(unit, performer);
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestUnit = unit;
+			}
+				
+		}
+		
+		return closestUnit;
+	}
+	
+	public Boulder getClosestBoulder(Unit unit) {
+		
+		double minDistance = Double.MAX_VALUE;
+		Boulder closestBoulder = null;
+		
+		for (Boulder boulder: this.getBoulders()) {
+			double distance = getDistanceBetweenRawAndUnit(unit, boulder);
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestBoulder = boulder;
+			}
+		}
+		
+		return closestBoulder;
+	}
+	
+	public Log getClosestLog(Unit unit) {
+		
+		double minDistance = Double.MAX_VALUE;
+		Log closestLog = null;
+		
+		for (Log log: this.getLogs()) {
+			double distance = getDistanceBetweenRawAndUnit(unit, log);
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestLog = log;
+			}
+		}
+		
+		return closestLog;
+	}
+	
+	public int[] getClosestTerrainType(TerrainType terrain, Unit unit) {
+		
+		int[] position = null;
+		double minDistance = Double.MAX_VALUE;
+		
+		for (int x = 0; x < getNbX(); x++) {
+			for (int y = 0; y < getNbY(); y++) {
+				for (int z = 0; z < getNbZ(); z++) {
+					if (this.getTerrainTypeWorld()[x][y][z] == terrain.getInt()) {
+						int[] currentPos = {x, y, z};
+						double distance = getDistanceBetweenPosAndUnit(unit, currentPos);
+						if (distance < minDistance) {
+							minDistance = distance;
+							position = currentPos;
+						}
+					}
+				}
+			}
+		}
+		
+		return position;
+	}
+	
+	public double getDistanceBetweenPosAndUnit(Unit unit, int[] pos) {
+		
+		double X = Math.pow(unit.getPosition().getX() - (double) pos[0], 2);
+		double Y = Math.pow(unit.getPosition().getY() - (double) pos[1], 2);
+		double Z = Math.pow(unit.getPosition().getZ() - (double) pos[2], 2);
+		
+		return Math.sqrt(X + Y + Z);
+
+	}
+	
+	
+	
+	public double getDistanceBetweenRawAndUnit(Unit unit, Raw raw) {
+		
+		double X = Math.pow(unit.getPosition().getX() - raw.getPosition()[0], 2);
+		double Y = Math.pow(unit.getPosition().getY() - raw.getPosition()[1], 2);
+		double Z = Math.pow(unit.getPosition().getZ() - raw.getPosition()[2], 2);
+		
+		return Math.sqrt(X + Y + Z);
+
+	}
+	
+	public double getDistanceBetweenUnits(Unit unit1, Unit unit2) {
+		
+		double X = Math.pow(unit1.getPosition().getX() - unit2.getPosition().getX(), 2);
+		double Y = Math.pow(unit1.getPosition().getY() - unit2.getPosition().getY(), 2);
+		double Z = Math.pow(unit1.getPosition().getZ() - unit2.getPosition().getZ(), 2);
+		
+		return Math.sqrt(X + Y + Z);
+
+	}
+	
+	
+	
 	/**
 	* @return Returns the set with all cubes that has to be caved
 	*/
 	public Set<int[]> getListToCave() {
 		return this.toCave;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addRaw(Raw raw) {
+		if (raw instanceof Boulder)
+			this.addBoulder((Boulder) raw);
+		else if (raw instanceof Log) 
+			this.addLog((Log) raw);
 	}
 	
 	/**
@@ -984,6 +1137,16 @@ public class World {
 		}
 		
 		return allObjectsOccupyingCube;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removeRaw(Raw raw) {
+		if (raw instanceof Boulder) 
+			removeBoulder((Boulder) raw);
+		else if (raw instanceof Log)
+			removeLog((Log) raw);
 	}
 	
 	/**
