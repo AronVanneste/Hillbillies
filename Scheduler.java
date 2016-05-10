@@ -23,6 +23,7 @@ public class Scheduler {
 		return this.taskList;
 	}
 	
+	
 	public void removeTask(T task) {
 		this.getTasks().remove(task);
 		task.terminate();
@@ -41,22 +42,30 @@ public class Scheduler {
 		}
 		return true;
 	}
-	public T getHighestPriorityTask() {
-		int highestPriority = Integer.MIN_VALUE;
-		T highestPriorityTask = null;
-		List<T> tasks = this.getTasks();
+	
+	public T getHighestPriorityTaskNotYetAssigned() {
 		
-		for (T task: tasks) {
-			if (task.getPriority() > highestPriority && !task.isAssigned()){
-				highestPriority = task.getPriority();
-				highestPriorityTask = task;
-			}
-				
+		Iterator<T> iter = this.getAllTasksIterator();
+		while (iter.hasNext()) {
+			T task = iter.next(); 
+			if (!task.isAssigned())
+				return task;
 		}
-		return highestPriorityTask;
 		
-		
+		throw new NoSuchElementException();
 	}
+	
+	public void assignTaskToUnit(Unit unit) throws NoSuchElementException {
+		
+		try {
+			T task = getHighestPriorityTaskNotYetAssigned();
+			assignTaskToUnit(unit, task);
+		} catch (NoSuchElementException exc) {
+			throw exc;
+		}
+	}
+	
+	
 	
 	public void assignTaskToUnit(Unit unit, T task) throws IllegalArgumentException, 
 		IllegalUnitException {
@@ -87,10 +96,12 @@ public class Scheduler {
 
 			@Override
 			public T next() throws NoSuchElementException {
+				currentElement = null;
+				largestPriority = Integer.MIN_VALUE;
 				if (!hasNext())
 					throw new NoSuchElementException();
 				for (T t: getTasks()) {
-					if ((t.getPriority() >= largestPriority) && !passedT.contains(t)) {
+					if ((t.getPriority() > largestPriority) && !passedT.contains(t)) {
 						currentElement = t;
 						largestPriority = t.getPriority();
 					}

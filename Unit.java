@@ -753,6 +753,17 @@ public class Unit implements TerminateInterface {
 		
 		return this.enableDefaultBehaviour;
 	}
+	
+	/**
+	 * 
+	 */
+	public T getTask() {
+		return this.task;
+	}
+	
+	public void setTask(T task) {
+		this.task = task;
+	}
 
 	
 	/**
@@ -2229,6 +2240,14 @@ public class Unit implements TerminateInterface {
 	}
 	
 	/**
+	 * 
+	 */
+	public void pickTask() {
+		
+	}
+	
+	
+	/**
 	 * Lets the unit move to a random position
 	 * 
 	 * @post The unit starts moving to a random position
@@ -2906,6 +2925,7 @@ public class Unit implements TerminateInterface {
 	private boolean falling;
 	private boolean workAfterMoving;
 	private Unit unitToFollow;
+	private T task;
 
 
 

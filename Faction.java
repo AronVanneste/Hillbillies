@@ -15,10 +15,14 @@ public class Faction {
 	 * @throws IllegalWorldException
 	 * 		Throws IllegalWorldException if the world is null
 	 */
-	public Faction(World world) throws IllegalWorldException {
+	public Faction(World world, Scheduler scheduler) throws IllegalWorldException, 
+			IllegalSchedulerException {
 		if (!isValidWorld(world))
 			throw new IllegalWorldException("World is null");
+		if (!isValidScheduler(scheduler))
+			throw new IllegalSchedulerException("Scheduler is invalid");
 		this.setWorld(world);
+		this.setScheduler(scheduler);
 	}
 	
 	/**
@@ -36,6 +40,17 @@ public class Faction {
 	 */
 	public World getWorld() {
 		return this.world;
+	}
+	
+	/**
+	 * 
+	 */
+	private void setScheduler(Scheduler scheduler) {
+		this.scheduler = scheduler;
+	}
+	
+	public Scheduler getScheduler() {
+		return this.scheduler;
 	}
 	
 	/**
@@ -64,6 +79,20 @@ public class Faction {
 		if (this.isTerminated())
 			throw new IllegalStateException("Faction is terminated");
 		this.unitInFaction.add(unit);
+		
+	}
+	
+	/**
+	 * 
+	 */
+	public void giveTaskToUnit(Unit unit) throws IllegalUnitException, IllegalArgumentException {
+		if (!isValidUnit(unit))
+			throw new IllegalArgumentException("Unit is null");
+		if (!this.getUnits().contains(unit))
+			throw new IllegalUnitException("Unit is not part of this faction");
+		this.getScheduler().assignTaskToUnit(unit);
+		
+		
 		
 	}
 	
@@ -106,8 +135,15 @@ public class Faction {
 	/**
 	 * @return Returns whether or not the world is valid (i.e. not null)
 	 */
-	private boolean isValidWorld(World world) {
+	public boolean isValidWorld(World world) {
 		return world != null;
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isValidScheduler(Scheduler scheduler) {
+		return scheduler != null;
 	}
 	
 	/**
@@ -175,7 +211,7 @@ public class Faction {
 	}
 	
 	/**
-	 * @return Returns whether or not the fcation is terminated
+	 * @return Returns whether or not the faction is terminated
 	 */
 	public boolean isTerminated() {
 		return this.isTerminated;
@@ -187,6 +223,7 @@ public class Faction {
 	private Set<Unit> unitInFaction = new HashSet<>();
 	private int maxUnitsInFaction = 50;
 	private boolean isTerminated;
+	private Scheduler scheduler;
 
 
 }

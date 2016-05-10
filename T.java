@@ -5,8 +5,8 @@ import java.util.Iterator;
 public class T implements PerformInterface {
 	
 	public T(String name, int priority, S activity, int[] cube) throws IllegalStatementException {
-		if (!isValidStatement(activity))
-			throw new IllegalStatementException("Not a valid statement");
+		//if (!isValidStatement(activity))
+		//	throw new IllegalStatementException("Not a valid statement");
 		this.setName(name);
 		this.setPriority(priority);
 		this.setActivity(activity);

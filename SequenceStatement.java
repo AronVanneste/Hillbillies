@@ -41,6 +41,8 @@ public class SequenceStatement extends S {
 
 			@Override
 			public S next() throws NoSuchElementException {
+				currentS = null;
+				currentPos = new SourceLocation(Integer.MAX_VALUE, Integer.MAX_VALUE);
 				if (!hasNext())
 					throw new NoSuchElementException();
 				for (S s: getStatements()) {
