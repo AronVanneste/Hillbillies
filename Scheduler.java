@@ -47,7 +47,7 @@ public class Scheduler {
 		List<T> tasks = this.getTasks();
 		
 		for (T task: tasks) {
-			if (task.getPriority() > highestPriority && task.isNotExecuting()){
+			if (task.getPriority() > highestPriority && !task.isAssigned()){
 				highestPriority = task.getPriority();
 				highestPriorityTask = task;
 			}
@@ -56,6 +56,17 @@ public class Scheduler {
 		return highestPriorityTask;
 		
 		
+	}
+	
+	public void assignTaskToUnit(Unit unit, T task) throws IllegalArgumentException, 
+		IllegalUnitException {
+		
+		if (!this.getTasks().contains(task))
+			throw new IllegalArgumentException("Task is not part of this scheduler");
+		if (task.isAssigned())
+			throw new IllegalUnitException("Task is already assigned to a unit");
+		task.setUnit(unit);
+		unit.setTask(task);
 	}
 	
 	
@@ -97,6 +108,19 @@ public class Scheduler {
 	/**
 	 * Algorithms to return all tasks satisfying some condition
 	 */
+	
+	public List<T> getAllTaskPriorityLargerThan(int K) {
+		return getAllTasksSatisfyingCondition((T t) -> t.getPriority() > K);
+	}
+	
+	public List<T> getAllTaskPrioritySmallerThan(int K) {
+		return getAllTasksSatisfyingCondition((T t) -> t.getPriority() < K);
+	}
+	
+	public List<T> getAllTaskCurrentlyNotExecuting() {
+		return getAllTasksSatisfyingCondition((T t) -> !t.isAssigned());
+	}
+	
 	
 	public List<T> getAllTasksSatisfyingCondition(Predicate<T> condition) {
 		

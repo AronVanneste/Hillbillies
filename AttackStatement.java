@@ -1,9 +1,11 @@
 package hillbillies.model;
 
+import hillbillies.part3.programs.SourceLocation;
+
 public class AttackStatement extends UnitStatement {
 
-	public AttackStatement(Unit unit) {
-		super(unit);
+	public AttackStatement(Unit unit, SourceLocation source) {
+		super(unit, source);
 	}
 
 	@Override

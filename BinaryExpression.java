@@ -13,6 +13,13 @@ public abstract class BinaryExpression extends BooleanExpression {
 		this.right = (BooleanExpression) right;
 	}
 	
+	public BinaryExpression(BooleanExpression left, BooleanExpression right, 
+			SourceLocation sourceLocation) {
+		super(sourceLocation);
+		this.left = (BooleanExpression) left;
+		this.right = (BooleanExpression) right;
+	}
+	
 	public BooleanExpression getLeftExpression() {
 		return this.left;
 	}

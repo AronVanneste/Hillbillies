@@ -1,9 +1,11 @@
 package hillbillies.model;
 
+import hillbillies.part3.programs.SourceLocation;
+
 public class FollowStatement extends UnitStatement {
 
-	public FollowStatement(Unit unit) {
-		super(unit);
+	public FollowStatement(Unit unit, SourceLocation source) {
+		super(unit, source);
 	}
 
 	@Override

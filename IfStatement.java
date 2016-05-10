@@ -1,8 +1,12 @@
 package hillbillies.model;
 
+import hillbillies.part3.programs.SourceLocation;
+
 public class IfStatement extends EvaluateStatement {
 
-	public IfStatement(E<?> condition, S ifBody, S elseBody) throws IllegalArgumentException {
+	public IfStatement(E<?> condition, S ifBody, S elseBody, SourceLocation source) 
+			throws IllegalArgumentException {
+		super(source);
 		if (!(condition instanceof BooleanExpression))
 			throw new IllegalArgumentException();
 		this.condition = (BooleanExpression) condition;

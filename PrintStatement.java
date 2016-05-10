@@ -1,8 +1,11 @@
 package hillbillies.model;
 
+import hillbillies.part3.programs.SourceLocation;
+
 public class PrintStatement extends S {
 	
-	public PrintStatement(E<?> expression) {
+	public PrintStatement(E<?> expression, SourceLocation source) {
+		super(source);
 		this.expression = expression;
 	}
 

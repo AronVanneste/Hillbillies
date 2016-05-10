@@ -1,0 +1,17 @@
+-> Dynamic Binding
+     -> Wat verwachten ze juist?
+-> Value Class
+-> Liskov: Raw -> (Boulder of Log)
+     -> Is dat Liskov?
+-> Type Safety voor 17 or more:
+     -> Bedoelen ze dat het programma een exception moet gooien
+	wanneer de verkeerde expressions E<> worden meegegeven;
+	vb. f(E<?> expression) terwijl de constructor van f E<Boolean>
+	verwacht
+     -> Of geen exception gooien in bovenstaande geval maar gewoon
+	niet toelaten (de compiler mag dat niet toelaten) dat zo
+	een object wordt aangemaakt
+     -> Of verwachten ze nog iets anders?
+ 
+-> VariableExpression:
+     -> Wat?

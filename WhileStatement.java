@@ -1,8 +1,12 @@
 package hillbillies.model;
 
+import hillbillies.part3.programs.SourceLocation;
+
 public class WhileStatement extends EvaluateStatement {
 
-	public WhileStatement(E<?> condition, S body) throws IllegalArgumentException {
+	public WhileStatement(E<?> condition, S body, SourceLocation source) 
+			throws IllegalArgumentException {
+		super(source);
 		if (!(condition instanceof BooleanExpression))
 			throw new IllegalArgumentException();
 		this.condition = (BooleanExpression) condition;
