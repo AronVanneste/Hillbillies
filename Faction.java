@@ -1,6 +1,7 @@
 package hillbillies.model;
 
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class Faction {
@@ -85,12 +86,17 @@ public class Faction {
 	/**
 	 * 
 	 */
-	public void giveTaskToUnit(Unit unit) throws IllegalUnitException, IllegalArgumentException {
+	public void giveTaskToUnit(Unit unit) throws IllegalUnitException, IllegalArgumentException, 
+			NoSuchElementException {
 		if (!isValidUnit(unit))
 			throw new IllegalArgumentException("Unit is null");
 		if (!this.getUnits().contains(unit))
 			throw new IllegalUnitException("Unit is not part of this faction");
-		this.getScheduler().assignTaskToUnit(unit);
+		try {
+			this.getScheduler().assignTaskToUnit(unit);
+		} catch (NoSuchElementException exc) {
+			throw exc;
+		}
 		
 		
 		

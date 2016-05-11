@@ -4,7 +4,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class NotExpression extends UnaryExpression {
 
-	public NotExpression(E<?> expression, SourceLocation source) {
+	public NotExpression(BooleanExpression expression, SourceLocation source) {
 		super(expression, source);
 	}
 

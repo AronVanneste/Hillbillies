@@ -125,7 +125,7 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 	@Override
 	public E<?> createNot(E<?> expression, SourceLocation sourceLocation) {
 		// TODO Auto-generated method stub
-		return new NotExpression(expression, sourceLocation);
+		return new NotExpression((BooleanExpression) expression, sourceLocation);
 		
 	}
 

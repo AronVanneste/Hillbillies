@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 
-public class World implements TerminateInterface {
+public class World implements ITerminate {
 	
 	/**
 	 * The initialization of a new world

@@ -1,6 +1,6 @@
 package hillbillies.model;
 
-public abstract class Raw implements TerminateInterface {
+public abstract class Raw implements ITerminate {
  
 		
 		/**

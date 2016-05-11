@@ -2,7 +2,7 @@ package hillbillies.model;
 
 import java.util.Iterator;
 
-public class T implements PerformInterface {
+public class T implements IPerform {
 	
 	public T(String name, int priority, S activity, int[] cube) throws IllegalStatementException {
 		//if (!isValidStatement(activity))

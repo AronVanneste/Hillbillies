@@ -4,6 +4,7 @@ package hillbillies.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 
@@ -31,7 +32,7 @@ import hillbillies.model.Vector;
 
 
 
-public class Unit implements TerminateInterface {
+public class Unit implements ITerminate {
 	
 	
 	
@@ -2225,15 +2226,23 @@ public class Unit implements TerminateInterface {
 	 */
 	private void startDefaultBehavior() {
 		
-		double P = Math.random();
-		if (P <= 0.25)
-			this.moveToRandomPosition(); 
-		else if (P <= 0.50)
-			this.work();
-		else if (P <= 0.75)
-			this.resting();
-		else
-			this.fightPotentialEnemies();
+		try {
+			this.pickTask();
+		} catch (NoSuchElementException e) {
+			double P = Math.random();
+			if (P <= 0.25)
+				this.moveToRandomPosition(); 
+			else if (P <= 0.50)
+				this.work();
+			else if (P <= 0.75)
+				this.resting();
+			else
+				this.fightPotentialEnemies();
+			
+		}
+		
+		
+		
 		
 		
 				
@@ -2242,8 +2251,12 @@ public class Unit implements TerminateInterface {
 	/**
 	 * 
 	 */
-	public void pickTask() {
-		
+	public void pickTask() throws NoSuchElementException {
+		try {
+			this.getFaction().giveTaskToUnit(this);
+		} catch (NoSuchElementException exc) {
+			throw exc;
+		}
 	}
 	
 	

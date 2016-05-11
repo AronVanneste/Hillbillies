@@ -3,12 +3,8 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class AndExpression extends BinaryExpression {
-
-	public AndExpression(E<?> left, E<?> right, SourceLocation source) {
-		super(left, right, source);
-	}
 	
-	public AndExpression(BooleanExpression left, BooleanExpression right, SourceLocation source) {
+	public AndExpression(E<Boolean> left, E<Boolean> right, SourceLocation source) {
 		super(left, right, source);
 	}
 

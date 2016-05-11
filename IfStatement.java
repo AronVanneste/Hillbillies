@@ -2,7 +2,7 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class IfStatement extends EvaluateStatement {
+public class IfStatement extends EvaluateStatement implements IPerform {
 
 	public IfStatement(E<?> condition, S ifBody, S elseBody, SourceLocation source) 
 			throws IllegalArgumentException {
@@ -35,8 +35,29 @@ public class IfStatement extends EvaluateStatement {
 		return this.elseBody;
 	}
 	
+	@Override
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+		
+	}
+
+
+	@Override
+	public Unit getUnit() {
+		return this.unit;
+	}
+
+
+	@Override
+	public boolean isAssigned() {
+		// TODO Auto-generated method stub
+		return this.getUnit() != null;
+	}
+
+	
 	private final BooleanExpression condition;
 	private final S ifBody;
 	private final S elseBody;
-
+	private Unit unit;
+	
 }

@@ -2,7 +2,7 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class UnitStatement extends ActionStatement implements RelationInterface {
+public abstract class UnitStatement extends ActionStatement implements IRelation {
 	
 	public UnitStatement(Unit unit, SourceLocation source) throws IllegalUnitException {
 		super(source);

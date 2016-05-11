@@ -17,9 +17,9 @@ public class Expermint {
 		while (iter.hasNext()) {
 			T t = iter.next();
 			System.out.println(t.getName());
-			System.out.println(t.getPriority());
-			
+			System.out.println(t.getPriority());	
 		}
+		
 		
 		
 		
