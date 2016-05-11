@@ -28,103 +28,86 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public S createWhile(E<?> condition, S body, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new WhileStatement(condition, body, sourceLocation);
 	}
 
 	@Override
 	public S createIf(E<?> condition, S ifBody, S elseBody, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IfStatement(condition, ifBody, elseBody, sourceLocation);
 	}
 
 	@Override
 	public S createBreak(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new BreakStatement(sourceLocation);
 	}
 
 	@Override
 	public S createPrint(E<?> value, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PrintStatement(value, sourceLocation);
 	}
 
 	@Override
 	public S createSequence(List<S> statements, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SequenceStatement(statements, sourceLocation);
 	}
 
 	@Override
 	public S createMoveTo(E<?> position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new MoveToStatement(position, sourceLocation);
 	}
 
 	@Override
 	public S createWork(E<?> position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new WorkStatement(position, sourceLocation);
 	}
 
 	@Override
 	public S createFollow(E<?> unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FollowStatement(unit, sourceLocation);
 	}
 
 	@Override
 	public S createAttack(E<?> unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AttackStatement(unit,sourceLocation);
 	}
 
 	@Override
 	public E<?> createReadVariable(String variableName, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
 	public E<?> createIsSolid(E<?> position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CheckSolidExpression(position, sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsPassable(E<?> position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CheckPassableExpression(position,sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsFriend(E<?> unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CheckFriendExpression(unit, sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsEnemy(E<?> unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CheckEnemyExpression(unit, sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsAlive(E<?> unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CheckAliveExpression(unit, sourceLocation);
 	}
 
 	@Override
 	public E<?> createCarriesItem(E<?> unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CarriesItemExpression(unit, sourceLocation);
 	}
 
 	@Override
 	public E<?> createNot(E<?> expression, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
 		return new NotExpression((BooleanExpression) expression, sourceLocation);
 		
 	}
@@ -137,92 +120,77 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public E<?> createOr(E<?> left, E<?> right, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new OrExpression(left, right, sourceLocation);
 	}
 
 	@Override
 	public E<?> createHerePosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PositionExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createLogPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LogExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createBoulderPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new BoulderExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createWorkshopPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new WorkschopExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createSelectedPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SelectedExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createNextToPosition(E<?> position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NextToExpression(position, sourceLocation);
 	}
 
 	@Override
 	public E<?> createPositionOf(E<?> unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
 	public E<?> createLiteralPosition(int x, int y, int z, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LiteralExpression(x,y,z, sourceLocation);
 	}
 
 	@Override
 	public E<?> createThis(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ThisExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createFriend(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FriendExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createEnemy(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new EnemyExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createAny(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AnyExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createTrue(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrueExpression(sourceLocation);
 	}
 
 	@Override
 	public E<?> createFalse(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FalseExpression(sourceLocation);
 	}
 
 }
