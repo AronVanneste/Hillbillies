@@ -11,10 +11,18 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public List<T> createTasks(String name, int priority, S activity, List<int[]> selectedCubes) {
-		// TODO Auto-generated method stub
 		List<T> tasks = new ArrayList<>();
-		for (int[] pos: selectedCubes) {
-			tasks.add(new T(name, priority, activity, pos));
+		if(!(activity instanceof SequenceStatement)){
+			tasks.add(new T(name, priority, activity, selectedCubes.get(0)));
+			return tasks;
+		}
+		else  {
+			int i = 0;
+			for (S s: ((SequenceStatement) activity).getStatements()) {
+				tasks.add(new T(name, priority, activity, selectedCubes.get(i)));
+				i+=1;
+
+			}
 		}
 		return tasks;
 	
@@ -22,18 +30,17 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public S createAssignment(String variableName, E<?> value, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AssignStatement(variableName, value, sourceLocation);
 	}
 
 	@Override
 	public S createWhile(E<?> condition, S body, SourceLocation sourceLocation) {
-		return new WhileStatement(condition, body, sourceLocation);
+		return new WhileStatement((BooleanExpression) condition, body, sourceLocation);
 	}
 
 	@Override
 	public S createIf(E<?> condition, S ifBody, S elseBody, SourceLocation sourceLocation) {
-		return new IfStatement(condition, ifBody, elseBody, sourceLocation);
+		return new IfStatement((BooleanExpression) condition, ifBody, elseBody, sourceLocation);
 	}
 
 	@Override
@@ -53,7 +60,7 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public S createMoveTo(E<?> position, SourceLocation sourceLocation) {
-		return new MoveToStatement(position, sourceLocation);
+		return new MoveToStatement((PositionExpression) position, sourceLocation);
 	}
 
 	@Override
@@ -63,47 +70,47 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public S createFollow(E<?> unit, SourceLocation sourceLocation) {
-		return new FollowStatement(unit, sourceLocation);
+		return new FollowStatement((UnitExpression) unit, sourceLocation);
 	}
 
 	@Override
 	public S createAttack(E<?> unit, SourceLocation sourceLocation) {
-		return new AttackStatement(unit,sourceLocation);
+		return new AttackStatement((UnitExpression) unit,sourceLocation);
 	}
 
 	@Override
 	public E<?> createReadVariable(String variableName, SourceLocation sourceLocation) {
-		
+		return new ReadVariableExpression(variableName, sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsSolid(E<?> position, SourceLocation sourceLocation) {
-		return new CheckSolidExpression(position, sourceLocation);
+		return new CheckSolidExpression((PositionExpression) position, sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsPassable(E<?> position, SourceLocation sourceLocation) {
-		return new CheckPassableExpression(position,sourceLocation);
+		return new CheckPassableExpression((PositionExpression) position,sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsFriend(E<?> unit, SourceLocation sourceLocation) {
-		return new CheckFriendExpression(unit, sourceLocation);
+		return new CheckFriendExpression((UnitExpression) unit, sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsEnemy(E<?> unit, SourceLocation sourceLocation) {
-		return new CheckEnemyExpression(unit, sourceLocation);
+		return new CheckEnemyExpression((UnitExpression) unit, sourceLocation);
 	}
 
 	@Override
 	public E<?> createIsAlive(E<?> unit, SourceLocation sourceLocation) {
-		return new CheckAliveExpression(unit, sourceLocation);
+		return new CheckAliveExpression((UnitExpression) unit, sourceLocation);
 	}
 
 	@Override
 	public E<?> createCarriesItem(E<?> unit, SourceLocation sourceLocation) {
-		return new CarriesItemExpression(unit, sourceLocation);
+		return new CarriesItemExpression((UnitExpression) unit, sourceLocation);
 	}
 
 	@Override
@@ -114,18 +121,17 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public E<?> createAnd(E<?> left, E<?> right, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
 		return new AndExpression((BooleanExpression) left, (BooleanExpression) right, sourceLocation);
 	}
 
 	@Override
 	public E<?> createOr(E<?> left, E<?> right, SourceLocation sourceLocation) {
-		return new OrExpression(left, right, sourceLocation);
+		return new OrExpression((BooleanExpression) left, (BooleanExpression) right, sourceLocation);
 	}
 
 	@Override
 	public E<?> createHerePosition(SourceLocation sourceLocation) {
-		return new PositionExpression(sourceLocation);
+		return new HereExpression(sourceLocation);
 	}
 
 	@Override
@@ -140,7 +146,7 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public E<?> createWorkshopPosition(SourceLocation sourceLocation) {
-		return new WorkschopExpression(sourceLocation);
+		return new WorkshopExpression(sourceLocation);
 	}
 
 	@Override
@@ -150,11 +156,12 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public E<?> createNextToPosition(E<?> position, SourceLocation sourceLocation) {
-		return new NextToExpression(position, sourceLocation);
+		return new NextToExpression((PositionExpression) position, sourceLocation);
 	}
 
 	@Override
 	public E<?> createPositionOf(E<?> unit, SourceLocation sourceLocation) {
+		return new UnitPositionExpression((UnitExpression) unit, sourceLocation);
 		
 	}
 
