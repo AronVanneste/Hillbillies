@@ -4,20 +4,22 @@ import hillbillies.part3.programs.SourceLocation;
 
 public abstract class UnitStatement extends ActionStatement implements IRelation {
 	
-	public UnitStatement(Unit unit, SourceLocation source) throws IllegalUnitException {
+	public UnitStatement(UnitExpression unit, SourceLocation source) throws IllegalUnitException {
 		super(source);
+		if (!isValidUnit(unit))
+			throw new IllegalUnitException();
 		this.passiveUnit = unit;
 		
 	}
 	
-	public Unit getPassiveUnit() {
+	public UnitExpression getPassiveUnit() {
 		return this.passiveUnit;
 	}
 	
-	public boolean isValidUnit(Unit unit) {
+	public boolean isValidUnit(UnitExpression unit) {
 		return unit != null;
 	}
 	
-	private final Unit passiveUnit;
+	private final UnitExpression passiveUnit;
 
 }

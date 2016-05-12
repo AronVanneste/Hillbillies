@@ -4,17 +4,19 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class AttackStatement extends UnitStatement {
 
-	public AttackStatement(Unit unit, SourceLocation source) {
+	public AttackStatement(UnitExpression unit, SourceLocation source) {
 		super(unit, source);
 	}
 
 	@Override
 	public void execute() {
 		if (this.isAssigned())
-			this.getUnit().fight(this.getUnit(), this.getPassiveUnit());
+			this.getUnit().fight(this.getUnit(), this.getPassiveUnit().evaluate());
 		else
 			return;
 		
 	}
 
 }
+
+

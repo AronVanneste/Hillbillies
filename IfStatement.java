@@ -2,25 +2,34 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class IfStatement extends EvaluateStatement implements IPerform {
+public class IfStatement extends EvaluateStatement {
 
-	public IfStatement(E<?> condition, S ifBody, S elseBody, SourceLocation source) 
-			throws IllegalArgumentException {
+	public IfStatement(BooleanExpression condition, S ifBody, S elseBody, SourceLocation source) {
 		super(source);
-		if (!(condition instanceof BooleanExpression))
-			throw new IllegalArgumentException();
-		this.condition = (BooleanExpression) condition;
+		this.condition = condition;
 		this.ifBody = ifBody;
 		this.elseBody = elseBody;
 	}
 	
 	
 	@Override
-	public void execute() {
-		if (this.getCondition().evaluate())
-			this.getIfBody().execute();
-		else
-			this.getElseBody().execute();
+	public void execute() throws BreakException {
+		if (this.getCondition().evaluate()) {
+			this.getIfBody().setUnit(this.getUnit());
+			try {
+				this.getIfBody().execute();
+			} catch (BreakException brk) {
+				throw brk;
+			}
+		}
+		else {
+			this.getElseBody().setUnit(this.getUnit());
+			try {
+				this.getElseBody().execute();
+			} catch (BreakException brk2) {
+				throw brk2;
+			}
+		}
 	}
 	
 	public BooleanExpression getCondition() {
@@ -38,7 +47,8 @@ public class IfStatement extends EvaluateStatement implements IPerform {
 	@Override
 	public void setUnit(Unit unit) {
 		this.unit = unit;
-		
+		this.getIfBody().setUnit(unit);
+		this.getElseBody().setUnit(unit);
 	}
 
 
@@ -50,9 +60,13 @@ public class IfStatement extends EvaluateStatement implements IPerform {
 
 	@Override
 	public boolean isAssigned() {
-		// TODO Auto-generated method stub
 		return this.getUnit() != null;
 	}
+		
+	
+
+
+	
 
 	
 	private final BooleanExpression condition;

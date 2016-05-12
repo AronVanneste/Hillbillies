@@ -19,7 +19,7 @@ public class AssignStatement extends S {
 		return this.name;
 	}
 	
-	private E<?> getExpression() {
+	public E<?> getExpression() {
 		return this.expression;
 	}
 	

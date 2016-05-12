@@ -9,9 +9,11 @@ public class BreakStatement extends EvaluateStatement {
 		super(source);
 	}
 
-	public void execute() {
+	public void execute() throws BreakException {
+		throw new BreakException();
 
 		
 	}
+
 
 }

@@ -4,7 +4,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class MoveToStatement extends MoveStatement {
 	
-	public MoveToStatement(E<?> position, SourceLocation source) {
+	public MoveToStatement(PositionExpression position, SourceLocation source) {
 		super(position, source);
 	}
 

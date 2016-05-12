@@ -2,22 +2,25 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class WhileStatement extends EvaluateStatement implements IPerform {
+public class WhileStatement extends EvaluateStatement {
 
-	public WhileStatement(E<?> condition, S body, SourceLocation source) 
+	public WhileStatement(BooleanExpression condition, S body, SourceLocation source) 
 			throws IllegalArgumentException {
 		super(source);
-		if (!(condition instanceof BooleanExpression))
-			throw new IllegalArgumentException();
-		this.condition = (BooleanExpression) condition;
+		this.condition = condition;
 		this.body = body;
 	}
 	
 	
 	@Override
 	public void execute() {
-		while (this.getCondition().evaluate())
-			this.getBody().execute();
+		while (this.getCondition().evaluate()) {
+			try {
+				this.getBody().execute();
+			} catch (BreakException e) {
+				break;
+			}
+		}
 	}
 	
 	public BooleanExpression getCondition() {
@@ -31,7 +34,7 @@ public class WhileStatement extends EvaluateStatement implements IPerform {
 	@Override
 	public void setUnit(Unit unit) {
 		this.unit = unit;
-		
+		this.getBody().setUnit(unit);
 	}
 
 
@@ -43,9 +46,12 @@ public class WhileStatement extends EvaluateStatement implements IPerform {
 
 	@Override
 	public boolean isAssigned() {
-		// TODO Auto-generated method stub
 		return this.getUnit() != null;
 	}
+
+	
+
+		
 	
 	private final BooleanExpression condition;
 	private final S body;

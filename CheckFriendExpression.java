@@ -4,7 +4,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class CheckFriendExpression extends RelationExpression {
 	
-	public CheckFriendExpression(Unit friend, SourceLocation source) {
+	public CheckFriendExpression(UnitExpression friend, SourceLocation source) {
 		super(friend, source);
 		
 	}
@@ -12,7 +12,7 @@ public class CheckFriendExpression extends RelationExpression {
 	@Override
 	public Boolean evaluate() {
 		if (this.isAssigned()) {
-			if (this.getUnit().getFaction() == this.getPassiveUnit().getFaction()
+			if (this.getUnit().getFaction() == this.getPassiveUnit().evaluate().getFaction()
 					&& this.getUnit().getFaction() != null)
 				return true;
 		}

@@ -4,16 +4,16 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class CheckEnemyExpression extends RelationExpression {
 	
-	public CheckEnemyExpression(Unit unit, SourceLocation source) {
+	public CheckEnemyExpression(UnitExpression unit, SourceLocation source) {
 		super(unit, source);
 	}
 
 	@Override
 	public Boolean evaluate() {
 		if (this.isAssigned()) {
-			if (this.getUnit().getFaction() != this.getPassiveUnit().getFaction()
+			if (this.getUnit().getFaction() != this.getPassiveUnit().evaluate().getFaction()
 					&& this.getUnit().getFaction() != null
-					&& this.getPassiveUnit().getFaction() != null)
+					&& this.getPassiveUnit().evaluate().getFaction() != null)
 				return true;
 		}
 		

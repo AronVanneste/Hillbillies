@@ -765,6 +765,10 @@ public class Unit implements ITerminate {
 	public void setTask(T task) {
 		this.task = task;
 	}
+	
+	public boolean hasTask() {
+		return this.getTask() != null;
+	}
 
 	
 	/**
@@ -2227,17 +2231,22 @@ public class Unit implements ITerminate {
 	private void startDefaultBehavior() {
 		
 		try {
-			this.pickTask();
-		} catch (NoSuchElementException e) {
-			double P = Math.random();
-			if (P <= 0.25)
-				this.moveToRandomPosition(); 
-			else if (P <= 0.50)
-				this.work();
-			else if (P <= 0.75)
-				this.resting();
-			else
-				this.fightPotentialEnemies();
+			if (this.hasTask())
+				this.executeTask();
+		} catch (NoStatementsLeftException e) {
+			try { 
+				this.pickTask();
+			} catch (NoSuchElementException n) {
+				double P = Math.random();
+				if (P <= 0.25)
+					this.moveToRandomPosition(); 
+				else if (P <= 0.50)
+					this.work();
+				else if (P <= 0.75)
+					this.resting();
+				else
+					this.fightPotentialEnemies();
+		} 
 			
 		}
 		
@@ -2257,6 +2266,20 @@ public class Unit implements ITerminate {
 		} catch (NoSuchElementException exc) {
 			throw exc;
 		}
+	}
+	
+	public void executeTask() throws NoStatementsLeftException {
+		
+		T task = this.getTask();
+		try {
+			S sts = task.getNextStatement();
+			sts.setUnit(this);
+			sts.execute();
+		} catch (NoStatementsLeftException exc) {
+			task.terminate();
+			throw exc;
+		}
+		
 	}
 	
 	
@@ -2939,6 +2962,8 @@ public class Unit implements ITerminate {
 	private boolean workAfterMoving;
 	private Unit unitToFollow;
 	private T task;
+	private boolean taskInterrupted;
+	
 
 
 

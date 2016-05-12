@@ -16,13 +16,10 @@ public class SequenceStatement extends S {
 
 	@Override
 	public void execute() {
-		for (S s: this.getStatement())
+		for (S s: this.getStatements())
 			s.execute();
 	}
 	
-	public List<S> getStatement() {
-		return this.statements;
-	}
 	
 	public Iterator<S> iterator() {
 		return new Iterator<S>() {

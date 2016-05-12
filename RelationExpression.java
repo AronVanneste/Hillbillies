@@ -5,15 +5,15 @@ import hillbillies.part3.programs.SourceLocation;
 public abstract class RelationExpression extends BooleanExpression implements IPerform, 
 		IRelation {
 
-	public RelationExpression(Unit unit, SourceLocation sourceLocation) {
+	public RelationExpression(UnitExpression unit, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		this.unitToPerformTaskOn = unit;
 	}
 	
-	public Unit getPassiveUnit() {
+	public UnitExpression getPassiveUnit() {
 		return this.unitToPerformTaskOn;
 	}
 	
 	
-	private final Unit unitToPerformTaskOn;
+	private final UnitExpression unitToPerformTaskOn;
 }

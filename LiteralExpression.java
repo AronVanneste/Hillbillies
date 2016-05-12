@@ -31,22 +31,7 @@ public class LiteralExpression extends PositionExpression {
 		return this.z;
 	}
 	
-	@Override
-	public void setUnit(Unit unit) {
-		this.performer = unit;
-	}
-
-	@Override
-	public Unit getUnit() {
-		return this.performer;
-	}
-
-	@Override
-	public boolean isAssigned() {
-		return (this.performer != null);
-	}
 	
-	private Unit performer;
 	
 	private final int x;
 	private final int y; 

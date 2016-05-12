@@ -10,20 +10,31 @@ public abstract class E<K> {
 	
 	public abstract K evaluate();
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return this.name;
-	}
 	
 	public SourceLocation getSourceLocation() {
 		return this.sourceLocation;
 	}
 	
-	private String name;
+	public boolean wasReadVariableExpression() {
+		return this.read;
+	}
+	
+	public void enableReadVariableExpression() {
+		this.read = true;
+	}
+	
+	public String getVariableName() {
+		return variableName;
+	}
+
+	public void setVariableName(String variableName) {
+		if (this.wasReadVariableExpression())
+			this.variableName = variableName;
+	}
+
 	private final SourceLocation sourceLocation;
+	private boolean read;
+	private String variableName;
 	
 
 

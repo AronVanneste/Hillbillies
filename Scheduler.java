@@ -20,6 +20,12 @@ public class Scheduler {
 	}
 	
 	public List<T> getTasks() {
+		
+		for (T t: this.taskList) {
+			if (t.isTerminated())
+				this.taskList.remove(t);
+		}
+		
 		return this.taskList;
 	}
 	

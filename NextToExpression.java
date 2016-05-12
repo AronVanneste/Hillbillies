@@ -5,15 +5,16 @@ import hillbillies.part3.programs.SourceLocation;
 public class NextToExpression extends PositionExpression {
 	
 
-	public NextToExpression(SourceLocation sourceLocation) {
+	public NextToExpression(PositionExpression position, SourceLocation sourceLocation) {
 		super(sourceLocation);
+		this.position = position;
 	}
 
 	@Override
 	public int[] evaluate() throws IllegalArgumentException, IllegalUnitException {
 		if (this.isAssigned()) {
 			try {
-				return this.getUnit().getWorld().getNextPosition(this.getUnit().getCubeInt());
+				return this.getUnit().getWorld().getNextPosition(this.getPosition().evaluate());
 			} catch (NullPointerException e) {
 				throw new IllegalUnitException("Unit does not belong to a world");
 			}
@@ -23,21 +24,12 @@ public class NextToExpression extends PositionExpression {
 		
 	}
 	
-	@Override
-	public void setUnit(Unit unit) {
-		this.performer = unit;
-	}
-
-	@Override
-	public Unit getUnit() {
-		return this.performer;
-	}
-
-	@Override
-	public boolean isAssigned() {
-		return (this.performer != null);
+	
+	
+	public PositionExpression getPosition() {
+		return this.position;
 	}
 	
-	private Unit performer;
+	private final PositionExpression position;
 
 }

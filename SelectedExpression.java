@@ -20,22 +20,7 @@ public class SelectedExpression extends PositionExpression {
 		this.selectedPosition = pos;
 	}
 	
-	@Override
-	public void setUnit(Unit unit) {
-		this.performer = unit;
-	}
-
-	@Override
-	public Unit getUnit() {
-		return this.performer;
-	}
-
-	@Override
-	public boolean isAssigned() {
-		return (this.performer != null);
-	}
 	
-	private Unit performer;
 	
 	private int[] selectedPosition;
 
