@@ -7,7 +7,15 @@ public class EnemyExpression extends UnitExpression {
 	public EnemyExpression(SourceLocation source) {
 		super(source);
 	}
-
+	/**
+	 * Evaluates the EnemyExpression
+	 * 
+	 * @return Returns the closest enemy
+	 * 
+	 * @throws Throws IllegalUnitException if the unit does not belong to a world
+	 * 
+	 * @throws IllegalArgumentException if the expression has no unit assigned
+	 */
 	@Override
 	public Unit evaluate() throws IllegalArgumentException, IllegalUnitException {
 		if (this.isAssigned()) {
