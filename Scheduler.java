@@ -17,7 +17,11 @@ public class Scheduler {
 	public Scheduler() {
 		
 	}
-	
+	/**
+	 * Adds a task to the scheduler
+	 * 
+	 * @post The task is added to the scheduler and the scheduler is added to the task
+	 */
 	public void addTask(T task) {
 		this.taskList.add(task);
 		task.addScheduler(this);
@@ -28,17 +32,24 @@ public class Scheduler {
 		return this.taskList;
 	}
 	
-	
+	/**
+	 * Removes a given task form the scheduler and terminates it
+	 */
 	public void removeTask(T task) {
 		this.getTasks().remove(task);
 		task.terminate();
 	}
-	
+	/**
+	 *Replaces an old task by a new task
+	 */
 	public void replaceTask(T newTask, T oldTask) {
 		removeTask(oldTask);
 		addTask(newTask);
 	}
 	
+	/**
+	 * @return Returns whether or not all tasks in a collection are part of the scheduler
+	 */
 	public boolean areAllPartOfScheduler(Collection<T> tasks) {
 		
 		for (T task: tasks) {
@@ -48,6 +59,9 @@ public class Scheduler {
 		return true;
 	}
 	
+	/**
+	 *@return Returns the task in the scheduler that has the highest priority and is not yet assigned
+	 */
 	public T getHighestPriorityTaskNotYetAssigned() {
 		
 		Iterator<T> iter = this.getAllTasksIterator();
@@ -60,6 +74,9 @@ public class Scheduler {
 		throw new NoSuchElementException();
 	}
 	
+	/**
+	 * Assigns the task with the highest priotity and that's not yet assigned to the given unit
+	 */
 	public void assignTaskToUnit(Unit unit) throws NoSuchElementException {
 		
 		try {
@@ -71,7 +88,9 @@ public class Scheduler {
 	}
 	
 	
-	
+	/**
+	 * Assigns the task and that's not yet assigned to the given unit
+	 */
 	public void assignTaskToUnit(Unit unit, T task) throws IllegalArgumentException, 
 		IllegalUnitException {
 		
@@ -84,7 +103,10 @@ public class Scheduler {
 	}
 	
 	
-	
+	/**
+	 * 
+	 * @return Returns an iterator with all tasks
+	 */
 	public Iterator<T> getAllTasksIterator() {
 		return new Iterator<T>() {
 
