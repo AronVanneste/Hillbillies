@@ -7,7 +7,11 @@ public class FriendExpression extends UnitExpression {
 	public FriendExpression(SourceLocation source) {
 		super(source);
 	}
-
+	/**
+	 * Evaluates the FriendExpression
+	 * 
+	 * @return Returns the unit that's in the same faction closest to the unit assigned to the expression
+	 */
 	@Override
 	public Unit evaluate() throws IllegalArgumentException {
 		if (this.isAssigned()) {
