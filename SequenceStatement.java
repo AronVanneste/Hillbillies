@@ -13,7 +13,11 @@ public class SequenceStatement extends S {
 		super(source);
 		this.statements.addAll(statements);
 	}
-
+	/**
+	 * Executes the SequenceStatement
+	 * 
+	 * @post All the statements in the sequence are executed
+	 */
 	@Override
 	public void execute() {
 		for (S s: this.getStatements())
