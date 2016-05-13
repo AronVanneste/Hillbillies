@@ -9,7 +9,13 @@ public class ReadVariableExpression extends E<E<?>> {
 		this.name = name;
 	}
 	
-	
+	/**
+	 *Evaluates the ReadVariableExpression
+	 *
+	 * @return Returns the expression with the name assigned to the ReadVariableExpression
+	 * 
+	 * @post The expression is read
+	 */
 	@Override
 	public E<?> evaluate() throws IllegalArgumentException {
 		if (isAssignedToTask()) {
