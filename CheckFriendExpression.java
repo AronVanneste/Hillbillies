@@ -8,7 +8,11 @@ public class CheckFriendExpression extends RelationExpression {
 		super(friend, source);
 		
 	}
-
+	/**
+	 * Checks if two units are in the same faction
+	 * 
+	 * @return Returns true if the units assigned to the expression are friends
+	 */
 	@Override
 	public Boolean evaluate() {
 		if (this.isAssigned()) {
