@@ -48,7 +48,7 @@ public class Faction {
 	 * @param world
 	 * 		The world of the faction
 	 * @post
-	 * 		The world if the faction will be the given world
+	 * 		The world of the faction will be the given world
 	 */
 	private void setWorld(World world) {
 		this.world = world;
@@ -62,12 +62,17 @@ public class Faction {
 	}
 	
 	/**
-	 * 
+	 * @param scheduler
+	 * 	The scheduler of the faction
+	 * @post
+	 * 	The scheduler of the faction will be the given scheduler
 	 */
 	private void setScheduler(Scheduler scheduler) {
 		this.scheduler = scheduler;
 	}
-	
+	/**
+	 * @return Returns the scheduler of the faction
+	 */
 	public Scheduler getScheduler() {
 		return this.scheduler;
 	}
@@ -102,7 +107,19 @@ public class Faction {
 	}
 	
 	/**
+	 * Gives a tasks to a given unit
 	 * 
+	 * @param unit
+	 * 	The unit that has to perform a task
+	 * 
+	 * @post
+	 * 	The unit has the task assigned and will start executing it
+	 * 
+	 * @throws Throws IllegalUnitException if the unit is not part of the faction
+	 * 
+	 * @throws IllegalArgumentException if the given unit is null
+	 * 
+	 * @throws NoSuchElementException if there's no valid task for the unit
 	 */
 	public void giveTaskToUnit(Unit unit) throws IllegalUnitException, IllegalArgumentException, 
 			NoSuchElementException {
@@ -164,7 +181,7 @@ public class Faction {
 	}
 	
 	/**
-	 * 
+	 * @return Returns false is the scheduler is null
 	 */
 	public boolean isValidScheduler(Scheduler scheduler) {
 		return scheduler != null;
