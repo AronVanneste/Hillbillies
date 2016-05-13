@@ -22,7 +22,11 @@ public class HereExpression extends PositionExpression implements IPerform {
 	public boolean isAssigned() {
 		return this.getUnit() != null;
 	}
-
+	/**
+	 * Evaluates the HereExpression
+	 * 
+	 * @return Returns the coordinates (int[]) of the unit assigned to th expression
+	 */
 	@Override
 	public int[] evaluate() {
 		return this.getUnit().getCubeInt();
