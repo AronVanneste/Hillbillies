@@ -7,7 +7,15 @@ public class AnyExpression extends UnitExpression {
 	public AnyExpression(SourceLocation source) {
 		super(source);
 	}
-
+	/**
+	 * Evaluates the AnyExpression
+	 * 
+	 * @return Returns the closest unit to the unit assigned to AnyExpression
+	 * 
+	 * @throws Throws IllegalUnitExpression if the unit is not assigned to a world
+	 * 
+	 * @throws Throws IllegalArgumentExpression if the AnyExpression has no unit
+	 */ 
 	@Override
 	public Unit evaluate() throws IllegalUnitException, IllegalArgumentException {
 		if (this.isAssigned()) {
@@ -31,7 +39,10 @@ public class AnyExpression extends UnitExpression {
 	public Unit getUnit() {
 		return this.performer;
 	}
-
+	/**
+	 * 
+	 * @return Returns whether or not a unit is assigned to the expression
+	 */ 
 	@Override
 	public boolean isAssigned() {
 		return (this.performer != null);
