@@ -7,7 +7,11 @@ public class CheckEnemyExpression extends RelationExpression {
 	public CheckEnemyExpression(UnitExpression unit, SourceLocation source) {
 		super(unit, source);
 	}
-
+	/**
+	 * Checks whether or not as unit is an enemy of the unit assigned to the expression
+	 * 
+	 * @return Returns whether or not the units are enemys
+	 */
 	@Override
 	public Boolean evaluate() {
 		if (this.isAssigned()) {
