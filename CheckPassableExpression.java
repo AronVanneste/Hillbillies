@@ -7,7 +7,11 @@ public class CheckPassableExpression extends TerrainExpression {
 	public CheckPassableExpression(PositionExpression pos, SourceLocation sourceLocation) {
 		super(pos, sourceLocation);
 	}
-
+	/**
+	 * Returns whether or not the position of the expression is passable
+	 * 
+	 * @return Returns whether or not the position of the expression is passable
+	 */
 	@Override
 	public Boolean evaluate() throws IllegalArgumentException, IllegalUnitException {
 		if (this.isAssigned()) {
