@@ -7,9 +7,16 @@ public class BoulderExpression extends PositionExpression {
 
 	public BoulderExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		// TODO Auto-generated constructor stub
 	}
-
+	/**
+	 * Evaluates the given BoulderExpression
+	 * 
+	 * @return Returns the closest boulder to the unit
+	 * 
+	 * @throws Throws IllegalArgumentException if the expression has no assigned unit
+	 * 
+	 * @throws Throws IllegalUnitException if the assigned unit does not belong to a world
+	 */
 	@Override
 	public int[] evaluate() throws IllegalArgumentException, IllegalUnitException {
 		if (this.isAssigned()) {
