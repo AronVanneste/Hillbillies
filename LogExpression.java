@@ -8,7 +8,15 @@ public class LogExpression extends PositionExpression {
 	public LogExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
 	}
-
+	/**
+	 * Evaluates the logExpression
+	 * 
+	 * @return Returns the position of the closest log to the unit assigned to the Expression
+	 * 
+	 * @throws IllegalUnitException if the unit does not belong to a world
+	 * 
+	 * @throws IllegalArgumentException if the expression is not assigned to a unit
+	 */
 	@Override
 	public int[] evaluate() throws IllegalUnitException, IllegalArgumentException {
 		if (this.isAssigned()) {
