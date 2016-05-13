@@ -8,7 +8,11 @@ public class PrintStatement extends S {
 		super(source);
 		this.expression = expression;
 	}
-
+	/**
+	 * Evaluates the print statement
+	 * 
+	 * @post Prints the evaluation of the expression that assigned to the PrintExpression
+	 */
 	@Override
 	public void execute() {
 		System.out.println(this.getExpression().evaluate());
