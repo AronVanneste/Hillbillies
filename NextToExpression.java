@@ -9,7 +9,15 @@ public class NextToExpression extends PositionExpression {
 		super(sourceLocation);
 		this.position = position;
 	}
-
+	/**
+	 * Evaluates the NextToExpression
+	 * 
+	 *@return Returns a position next to the position of the unit assigned to the expression that's passable
+	 * 
+	 * @throws IllegalArgumentException if the expression has no unit assigned
+	 * 
+	 * @throws IllegalUnitException if the unit does not belong to a world
+	 */
 	@Override
 	public int[] evaluate() throws IllegalArgumentException, IllegalUnitException {
 		if (this.isAssigned()) {
