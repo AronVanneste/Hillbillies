@@ -766,6 +766,10 @@ public class Unit implements ITerminate {
 		this.task = task;
 	}
 	
+	public void removeTask() {
+		this.task = null;
+	}
+	
 	public boolean hasTask() {
 		return this.getTask() != null;
 	}
@@ -1633,7 +1637,6 @@ public class Unit implements ITerminate {
 	}
 	
 	private Unit getUnitToFollow() {
-		// TODO Auto-generated method stub
 		return unitToFollow;
 	}
 
@@ -1823,6 +1826,15 @@ public class Unit implements ITerminate {
 		return this.firstRest;
 	}
 	
+	
+	private void setTaskInterrupted(boolean bool) {
+		this.taskInterrupted = bool;
+	}
+	
+	private boolean isTaskInterrupted() {
+		return this.taskInterrupted;
+	}
+	
 
 	
 	/**
@@ -1838,6 +1850,8 @@ public class Unit implements ITerminate {
 			throw new IllegalArgumentException("Given seconds should be a double value between 0 and 0.2");
 		if (this.isTerminated())
 			throw new IllegalStateException("The unit is terminated");
+					
+		
 		
 		// Falling:
 		if (this.shouldFall()) {
@@ -1896,7 +1910,9 @@ public class Unit implements ITerminate {
 					this.changePosition(seconds);
 				} catch (IllegalPositionException e) {
 					this.setFinalTarget(this.getPosition().getX(), this.getPosition().getY(),
-							this.getPosition().getZ());;
+							this.getPosition().getZ());
+					if (this.hasTask()) {
+						this.taskWasInterrupted();
 				}
 			}
 			if (this.isSprinting()) {
@@ -1983,6 +1999,8 @@ public class Unit implements ITerminate {
 		this.setResting(false);
 		this.setAttacked(true);
 		this.workAfterMoving(false);
+		if (this.hasTask())
+			this.taskWasInterrupted();
 	}
 	
 	/**
@@ -2283,6 +2301,14 @@ public class Unit implements ITerminate {
 	}
 	
 	
+	private void taskWasInterruped() {
+		if (!hasTask())
+			return;
+		this.getTask().removeUnit();
+		this.removeTask();
+	}
+	
+	
 	/**
 	 * Lets the unit move to a random position
 	 * 
@@ -2340,8 +2366,11 @@ public class Unit implements ITerminate {
 	 * 		 |	then new.isResting() == true
 	 */
 	private void checkResting() {
-		if (this.getNotRestTime() >= 180)
+		if (this.getNotRestTime() >= 180) {
 			this.resting();
+			if (this.hasTask())
+				this.taskWasInterrupted();
+		}
 	}
 	
 	
@@ -2383,6 +2412,8 @@ public class Unit implements ITerminate {
 		this.setAttacked(false);
 		this.setAttacking(false);
 		this.workAfterMoving(false);
+		if (this.hasTask())
+			this.taskWasInterruped();
 		
 		return true;
 		

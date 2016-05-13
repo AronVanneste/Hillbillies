@@ -11,21 +11,20 @@ import java.util.stream.Stream;
 
 public class Scheduler {
 	
+
+
+
 	public Scheduler() {
 		
 	}
 	
 	public void addTask(T task) {
-		this.getTasks().add(task);
+		this.taskList.add(task);
+		task.addScheduler(this);
 	}
 	
 	public List<T> getTasks() {
-		
-		for (T t: this.taskList) {
-			if (t.isTerminated())
-				this.taskList.remove(t);
-		}
-		
+				
 		return this.taskList;
 	}
 	

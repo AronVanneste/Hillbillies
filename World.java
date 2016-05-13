@@ -167,7 +167,7 @@ public class World implements ITerminate {
 	 * 		The Z coordinate of the position of which the terrain type should be returned
 	 * @return Returns the terrain type at a given position
 	 */
-	private TerrainType getTerrainType(int X, int Y, int Z) {
+	public TerrainType getTerrainType(int X, int Y, int Z) {
 		int type = this.getTerrainTypeWorld()[X][Y][Z];
 		
 		if (type == TerrainType.AIR.getInt())
@@ -179,6 +179,10 @@ public class World implements ITerminate {
 		else 
 			return TerrainType.WORKSHOP;
 		
+	}
+	
+	public int getTypeTerrain(int X, int Y, int Z) {
+		return getTerrainType(X, Y, Z).getInt();
 	}
 	
 	public int[] getNextPosition(int[] position) {

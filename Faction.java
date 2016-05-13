@@ -27,6 +27,24 @@ public class Faction {
 	}
 	
 	/**
+	 * The initialization of a faction
+	 * 
+	 * @param world
+	 * 		The world where the faction is created
+	 * @post
+	 * 		The world of the faction will be the given world
+	 * @throws IllegalWorldException
+	 * 		Throws IllegalWorldException if the world is null
+	 */
+	public Faction(World world) throws IllegalWorldException {
+		if (!isValidWorld(world))
+			throw new IllegalWorldException("World is null");
+		this.setWorld(world);
+		this.setScheduler(new Scheduler());
+	}
+
+	
+	/**
 	 * @param world
 	 * 		The world of the faction
 	 * @post

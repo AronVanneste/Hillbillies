@@ -1,8 +1,10 @@
 package hillbillies.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import hillbillies.part3.programs.SourceLocation;
 
@@ -21,6 +23,10 @@ public class T implements IPerform, ITerminate {
 	public void terminate() {
 		this.getUnit().setTask(null);
 		this.setUnit(null);
+		for (Scheduler s: this.getSchedulers()) {
+			s.removeTask(this);
+			this.removeScheduler(s);
+		}
 	}
 	
 	public Map<String, AssignStatement> getVariables() {
@@ -61,7 +67,7 @@ public class T implements IPerform, ITerminate {
 		this.name = name;
 	}
 	
-	protected String getName() {
+	public String getName() {
 		return this.name;
 	}
 	
@@ -69,7 +75,7 @@ public class T implements IPerform, ITerminate {
 		this.priority = priority;
 	}
 	
-	protected int getPriority() {
+	public int getPriority() {
 		return this.priority;
 	}
 	
@@ -270,6 +276,18 @@ public class T implements IPerform, ITerminate {
 	public boolean getTaskRead() {
 		return this.taskRead;
 	}
+	
+	public Set<Scheduler> getSchedulers() {
+		return this.schedulers;
+	}
+	
+	public void addScheduler(Scheduler sch) {
+		this.schedulers.add(sch);
+	}
+	
+	public void removeScheduler(Scheduler s) {
+		this.schedulers.remove(s);
+	}
 
 	
 	
@@ -282,6 +300,7 @@ public class T implements IPerform, ITerminate {
 	private Map<String, SourceLocation> readVariables = new HashMap<>();
 	private Iterator<S> iter;
 	private boolean taskRead;
+	private Set<Scheduler> schedulers = new HashSet<>();;
 	
 	
 }
