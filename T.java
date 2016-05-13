@@ -9,7 +9,32 @@ import java.util.Set;
 import hillbillies.part3.programs.SourceLocation;
 
 public class T implements IPerform, ITerminate {
-	
+	/**
+	 * The initialization of a task
+	 * 
+	 * @param name
+	 * 		The name of the task
+	 * @param priority
+	 * 		The priority of the task
+	 * @param activity
+	 * 		The (sequence of) activities the task consists of
+	 * @param cube
+	 * 		The position where the task should be executed
+	 * @post
+	 * 		The name of the task will be the given name
+	 * 		|new.getName() = name
+	 * @post
+	 * 		The priority of the task will be the given prioritycube
+	 * 		|new.getPriority() = priority
+	 * @post
+	 * 		The activities of the task will be the given activities
+	 * 		|new.getActivity() = activity
+	 * @post
+	 * 		The cube of the task will be the given cube
+	 * 		|new.getCube() = cube
+	 * @throws IllegalStatementException
+	 * 		Throws IllegalStatementException is the activity is not well formed
+	 */
 	public T(String name, int priority, S activity, int[] cube) throws IllegalStatementException {
 		if (!isWellFormed(activity))
 			throw new IllegalStatementException("Not a valid statement");
@@ -19,7 +44,17 @@ public class T implements IPerform, ITerminate {
 		this.setCubes(cube);
 	}
 	
-	
+	/**
+	 * Terminates the task
+	 * 
+	 * @post The unit's task is null
+	 * 	|this.getUnit().getTask() = null
+	 * @post The unit is  null
+	 * 	|new.getUnit() = null
+	 * @post The task is removed from all schedulers and vice versa
+	 * 	|this.getScheduler().contains(task) == false
+	 * 	|new.getScheduler() = null;
+	 */
 	public void terminate() {
 		this.getUnit().setTask(null);
 		this.setUnit(null);
@@ -29,11 +64,24 @@ public class T implements IPerform, ITerminate {
 		}
 	}
 	
+	/**
+	 * Returns all the variables used in the task
+	 * 
+	 * @return Returns all the variables used in the task
+	 */
 	public Map<String, AssignStatement> getVariables() {
 		return this.variables;
 	}
-	
-	public void executeTask() {
+	/**
+	 * Executes the task
+	 * 
+	 * @post The activities of the task are executed and have a unit assigned
+	 * 	|new.getActivity().getUnit() = this.getUnit();
+	 * 
+	 * @throws IllegalArgumentsException if the task is not assigned
+	 *
+	 */
+	public void executeTask() throws IllegalArgumentException{
 		if (!isAssigned())
 			throw new IllegalArgumentException("Task not assigned");
 		if (!(this.getActivity() instanceof SequenceStatement)) {
@@ -41,7 +89,13 @@ public class T implements IPerform, ITerminate {
 			this.getActivity().execute();
 		}
 	}
-	
+	/**
+	 * Returns the next statement
+	 * 
+	 * @return Returns the statement that's not yet eecuted
+	 * 
+	 * @throws NoStatementsLeftException if there's no statements left
+	 */
 	public S getNextStatement() throws NoStatementsLeftException {
 		if (this.getActivity() instanceof SequenceStatement) {
 			if (this.getIterator().hasNext())
