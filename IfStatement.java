@@ -11,7 +11,11 @@ public class IfStatement extends EvaluateStatement {
 		this.elseBody = elseBody;
 	}
 	
-	
+	/**
+	 * Evaluates the IfStatement
+	 * 
+	 * @post If the condition is true, the ifBody will be executed, else the elseBody
+	 */
 	@Override
 	public void execute() throws BreakException {
 		if (this.getCondition().evaluate()) {
