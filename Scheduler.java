@@ -25,7 +25,10 @@ public class Scheduler {
 		this.taskList.add(task);
 		task.addScheduler(this);
 	}
-	
+	/**
+	 * 
+	 * @return Returns a list with all tasks in the scheduler
+	 */
 	public List<T> getTasks() {
 				
 		return this.taskList;
@@ -33,6 +36,9 @@ public class Scheduler {
 	
 	/**
 	 * Removes a given task form the scheduler and terminates it
+	 * 
+	 * @param task
+	 * 		The task that has to be removed
 	 */
 	public void removeTask(T task) {
 		this.getTasks().remove(task);
@@ -40,6 +46,11 @@ public class Scheduler {
 	}
 	/**
 	 *Replaces an old task by a new task
+	 *
+	 * @param newTask
+	 * 		The new Task
+	 * @param oldTask
+	 * 		The task that's removed
 	 */
 	public void replaceTask(T newTask, T oldTask) {
 		removeTask(oldTask);
@@ -75,6 +86,11 @@ public class Scheduler {
 	
 	/**
 	 * Assigns the task with the highest priotity and that's not yet assigned to the given unit
+	 * 
+	 * @param unit
+	 * 		The unit to which a task should be assigned
+	 * @throws NoSuchElementException
+	 * 		Throws NoSuchElementException if there's no task in the scheduler
 	 */
 	public void assignTaskToUnit(Unit unit) throws NoSuchElementException {
 		
@@ -88,7 +104,16 @@ public class Scheduler {
 	
 	
 	/**
-	 * Assigns the task and that's not yet assigned to the given unit
+	 * Assigns the task that's not yet assigned to the given unit
+	 * 
+	 * @param unit
+	 * 		The unit to which a task is assigned
+	 * @param task
+	 * 		The task that has to be assigned
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the task is not part of the Scheduler
+	 * @throws IllegalUnitException
+	 * 		Throws IllegalUnitException  if the task is already assigned to a unit
 	 */
 	public void assignTaskToUnit(Unit unit, T task) throws IllegalArgumentException, 
 		IllegalUnitException {

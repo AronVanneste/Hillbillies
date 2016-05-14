@@ -9,6 +9,8 @@ public abstract class PositionExpression extends E<int[]> implements IPerform {
 	 * 
 	 * @param sourceLocation
 	 *   	The column and line of the PositionExpression in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public PositionExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);

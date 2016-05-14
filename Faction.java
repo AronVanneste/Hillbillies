@@ -15,6 +15,8 @@ public class Faction {
 	 * 		The world of the faction will be the given world
 	 * @throws IllegalWorldException
 	 * 		Throws IllegalWorldException if the world is null
+	 * @throws IllegalSchedulerException
+	 * 		Throws IllegalSchedulerException if the scheduler is not valid
 	 */
 	public Faction(World world, Scheduler scheduler) throws IllegalWorldException, 
 			IllegalSchedulerException {
@@ -90,6 +92,8 @@ public class Faction {
 	 * 		Throws IllegalFactionException if the faction is full
 	 * @throws IllegalUnitException
 	 * 		Throws IllegalUnitException if the unit already belongs to a faction
+	 * @throws IllegalStateException
+	 * 		Throws IllegalStateException if the Faction is terminated
 	 */
 	public void addUnit(Unit unit) throws IllegalWorldException, IllegalFactionException, 
 		IllegalUnitException, IllegalStateException {

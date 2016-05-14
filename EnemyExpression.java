@@ -8,6 +8,8 @@ public class EnemyExpression extends UnitExpression {
 	 * 
 	 * @param source
 	 * 		The column and line of the EnemyExpression in its Task
+	 *@throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public EnemyExpression(SourceLocation source) throws IllegalSourceException {
 		super(source);

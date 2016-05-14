@@ -3,7 +3,13 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public abstract class UnitExpression extends E<Unit> implements IPerform {
-
+	/**
+	 * Initializes a UnitExpression
+	 * @param sourceLocation
+	 * 		The column and line of the UnitExpression in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceExpression if its sourcelocation is not valid
+	 */
 	public UnitExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);
 	}

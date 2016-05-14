@@ -15,6 +15,12 @@ public class IfStatement extends EvaluateStatement implements IExpressionCheck, 
 	 * 		The body to be executed when the condition evaluates to false
 	 * @param source
 	 *  		The line and column of the IfStatement in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
+	 * @throws IllegalExpressionException
+	 * 		Throws IllegalSourceException if the Expression is not valid
+	 * @throws IllegalStatementException
+	 * 		Throws IllegalStatementException if the statement is not valid
 	 */
 	public IfStatement(BooleanExpression condition, S ifBody, S elseBody, SourceLocation source) 
 			throws IllegalSourceException, IllegalStatementException, IllegalExpressionException {
@@ -32,6 +38,9 @@ public class IfStatement extends EvaluateStatement implements IExpressionCheck, 
 	 * Evaluates the IfStatement
 	 * 
 	 * @post If the condition is true, the ifBody will be executed, else the elseBody
+	 * 
+	 * @throws BreakException
+	 * 		Throws BreakException if there's a BreakStatement in the if or else-body
 	 */
 	@Override
 	public void execute() throws BreakException {

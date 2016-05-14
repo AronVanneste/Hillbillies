@@ -8,6 +8,8 @@ public class AnyExpression extends UnitExpression {
 	 * 
 	 * @param source
 	 * 		The column and line of the AnyExpression in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public AnyExpression(SourceLocation source) throws IllegalSourceException {
 		super(source);

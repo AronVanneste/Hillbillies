@@ -10,6 +10,8 @@ public class BoulderExpression extends PositionExpression {
 	 * 
 	 * @param sourceLocation
 	 * 		The column and line of the BoulderExpression in its Task
+	 *@throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public BoulderExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);

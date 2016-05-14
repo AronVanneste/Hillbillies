@@ -8,6 +8,8 @@ public abstract class E<K> implements ISourceCheck {
 	 * 
 	 * @param sourceLocation
 	 *    		The column and line of the expression in its Task
+	 *@throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public E(SourceLocation sourceLocation) throws IllegalSourceException {
 		if (!isValidSourceLocation(sourceLocation))

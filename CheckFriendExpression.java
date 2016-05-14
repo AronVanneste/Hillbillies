@@ -10,6 +10,10 @@ public class CheckFriendExpression extends RelationExpression {
 	 * 		The unit that has to be checked
 	 * @param source
 	 *  		The column and line of the CheckFriendExpression in its Task
+	 *@throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
+	 * @throws IllegalExpressionException
+	 * 		Throws IllegalSourceException if the Expression is not valid
 	 */
 	public CheckFriendExpression(UnitExpression friend, SourceLocation source) throws
 			IllegalSourceException, IllegalExpressionException {

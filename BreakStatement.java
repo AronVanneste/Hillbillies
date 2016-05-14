@@ -9,6 +9,8 @@ public class BreakStatement extends EvaluateStatement {
 	 * 
 	 * @param source
 	 * 		The column and line of the BreakStatement in its Task
+	 *@throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public BreakStatement(SourceLocation source) throws IllegalSourceException {
 		super(source);

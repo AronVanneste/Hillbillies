@@ -181,10 +181,28 @@ public class World implements ITerminate {
 		
 	}
 	
+	/**
+	 * Returns the terrainType at a certain position
+	 * 
+	 * @param X
+	 * 		The X-coordinate of the position
+	 * @param Y
+	 *  	The Y-coordinate of the position
+	 * @param Z
+	 *  	The Z-coordinate of the position
+	 * @return Returns the terrainType at a certain position
+	 */
 	public int getTypeTerrain(int X, int Y, int Z) {
 		return getTerrainType(X, Y, Z).getInt();
 	}
 	
+	/**
+	 * Returns a valid position next to a given position
+	 * 
+	 * @param position
+	 * 		The position of which a cube next to it is searched
+	 * @return Returns a valid position next to a given position
+	 */
 	public int[] getNextPosition(int[] position) {
 		int X = position[0];
 		int Y = position[1];
@@ -685,6 +703,12 @@ public class World implements ITerminate {
 		return closestUnit;
 	}
 	
+	/**
+	 * 
+	 * @param unit
+	 * 		The unit in the world for which the closest boulder is returned
+	 * @return Returns the closest boulder to the given unit
+	 */
 	public Boulder getClosestBoulder(Unit unit) {
 		
 		double minDistance = Double.MAX_VALUE;
@@ -701,6 +725,12 @@ public class World implements ITerminate {
 		return closestBoulder;
 	}
 	
+	/**
+	 * 
+	 * @param unit
+	 * 		The unit in the world for which the closest log is returned
+	 * @return Returns the closest log to the given unit
+	 */
 	public Log getClosestLog(Unit unit) {
 		
 		double minDistance = Double.MAX_VALUE;
@@ -717,6 +747,14 @@ public class World implements ITerminate {
 		return closestLog;
 	}
 	
+	/**
+	 * Returns the closest cube to the given unit with a certain terraintype
+	 * @param terrain
+	 * 		The terrainType
+	 * @param unit
+	 * 		The unit
+	 * @return  Returns the closest cube to the given unit with a certain terraintype
+	 */
 	public int[] getClosestTerrainType(TerrainType terrain, Unit unit) {
 		
 		int[] position = null;
@@ -739,7 +777,15 @@ public class World implements ITerminate {
 		
 		return position;
 	}
-	
+	/**
+	 * Returns the distance between a Cube and unit
+	 * 
+	 * @param unit
+	 * 		The unit
+	 * @param pos
+	 * 		The cube
+	 * @return Returns the distance between a Cube and unit
+	 */
 	public double getDistanceBetweenPosAndUnit(Unit unit, int[] pos) {
 		
 		double X = Math.pow(unit.getPosition().getX() - (double) pos[0], 2);
@@ -750,7 +796,16 @@ public class World implements ITerminate {
 
 	}
 	
-	
+	/**
+	 * Returns the distance between a Raw and unit
+	 * 
+	 * @param unit
+	 * 		The unit
+	 * @param Raw
+	 * 		The raw material
+	 * @return Returns the distance between a Raw and unit
+	 */
+	public
 	
 	public double getDistanceBetweenRawAndUnit(Unit unit, Raw raw) {
 		
@@ -761,7 +816,15 @@ public class World implements ITerminate {
 		return Math.sqrt(X + Y + Z);
 
 	}
-	
+	/**
+	 * Returns the distance between two units
+	 * 
+	 * @param unit1
+	 * 		The first unit
+	 * @param unit2
+	 * 		The second unit
+	 * @return Returns the distance between two units
+	 */
 	public double getDistanceBetweenUnits(Unit unit1, Unit unit2) {
 		
 		double X = Math.pow(unit1.getPosition().getX() - unit2.getPosition().getX(), 2);
@@ -782,7 +845,9 @@ public class World implements ITerminate {
 	}
 	
 	/**
-	 * 
+	 * Adds a raw to the world
+	 * @param raw
+	 * 		The raw to be added
 	 */
 	protected void addRaw(Raw raw) {
 		if (raw instanceof Boulder)
@@ -1144,7 +1209,9 @@ public class World implements ITerminate {
 	}
 	
 	/**
-	 * 
+	 * Removes a raw from the world
+	 * @param raw
+	 * 		The raw to be removed
 	 */
 	protected void removeRaw(Raw raw) {
 		if (raw instanceof Boulder) 

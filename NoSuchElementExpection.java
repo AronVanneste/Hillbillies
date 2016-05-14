@@ -1,6 +1,6 @@
 package hillbillies.model;
 
-public class NoSuchElementExpection extends RuntimeException {
+public class NoSuchElementExcection extends RuntimeException {
 
 	/**
 	 * 

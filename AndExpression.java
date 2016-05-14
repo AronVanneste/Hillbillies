@@ -13,6 +13,10 @@ public class AndExpression extends BinaryExpression {
 	 * 		The right BooleanExpression
 	 * @param source
 	 * 		The column and line of the AndExpression in the task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
+	 * @throws IllegalExpressionException
+	 * 		Throws IllegalExpressionException if the expression is not valid
 	 */
 	public AndExpression(BooleanExpression left, BooleanExpression right, SourceLocation source) 
 			throws IllegalSourceException, IllegalExpressionException {

@@ -15,6 +15,8 @@ public class LiteralExpression extends PositionExpression {
 	 * 		The z-coordinate
 	 * @param source
 	 *  		The line and column of the LiteralExpression in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public LiteralExpression(int x, int y, int z, SourceLocation source) throws IllegalSourceException {
 		super(source);

@@ -8,7 +8,18 @@ import java.util.NoSuchElementException;
 import hillbillies.part3.programs.SourceLocation;
 
 public class SequenceStatement extends S implements IStatementCheck {
-	
+	/**
+	 * Initializes a SequenceStatement
+	 * 
+	 * @param statements
+	 * 		The list of statement in the SequenceStatement
+	 * @param source
+	 * 		The column and row of the SequenceStatement in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
+	 * @throws IllegalExpressionException
+	 * 		Throws IllegalSourceException if the Expression is not valid
+	 */
 	public SequenceStatement(List<S> statements, SourceLocation source) throws
 			IllegalSourceException, IllegalStatementException {
 		super(source);
@@ -31,11 +42,17 @@ public class SequenceStatement extends S implements IStatementCheck {
 			s.execute();
 	}
 	
-	
+	/**
+	 * 
+	 * @return Returns an iterator
+	 */
 	public Iterator<S> iterator() {
 		return new Iterator<S>() {
 
-
+			/**
+			 * 
+			 * @return Returns true is the iterator has a next Statement
+			 */
 			@Override
 			public boolean hasNext() {
 				for (S s: getStatements()) {
@@ -46,7 +63,13 @@ public class SequenceStatement extends S implements IStatementCheck {
 				return false;
 					
 			}
-
+			/**
+			 * 
+			 * @return Returns the next Statement in the iterator
+			 * 
+			 * @throws NoSuchElementException
+			 * 		Throws NoSuchElementException if the iterator has no next element
+			 */
 			@Override
 			public S next() throws NoSuchElementException {
 				currentS = null;
@@ -76,6 +99,10 @@ public class SequenceStatement extends S implements IStatementCheck {
 		};
 	}
 	
+	/**
+	 * 
+	 * @return Returns a list with all the Statements in the SequenceStatement
+	 */
 	public List<S> getStatements() {
 		return this.statements;
 	}

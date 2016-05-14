@@ -8,6 +8,8 @@ public class FriendExpression extends UnitExpression {
 	 * 
 	 * @param source
 	 *  		The column and line of the EnemyExpression in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public FriendExpression(SourceLocation source) throws IllegalSourceException {
 		super(source);
@@ -16,6 +18,9 @@ public class FriendExpression extends UnitExpression {
 	 * Evaluates the FriendExpression
 	 * 
 	 * @return Returns the unit that's in the same faction closest to the unit assigned to the expression
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		Throws IllegalArgumentException if the expression has no unit assigned
 	 */
 	@Override
 	public Unit evaluate() throws IllegalArgumentException {

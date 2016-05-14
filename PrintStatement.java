@@ -11,6 +11,10 @@ public class PrintStatement extends S implements IExpressionCheck {
 	 * 		The expression that has to be printed
 	 * @param source
 	 *   	The column and line of the PrintExpression in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
+	 * @throws IllegalExpressionException
+	 * 		Throws IllegalSourceException if the Expression is not valid
 	 */
 	public PrintStatement(E<?> expression, SourceLocation source) throws IllegalSourceException, 
 			IllegalExpressionException {
@@ -21,7 +25,7 @@ public class PrintStatement extends S implements IExpressionCheck {
 	}
 
 	/**
-	 * Evaluates the print statement
+	 * Executes the print statement
 	 * 
 	 * @post Prints the evaluation of the expression that assigned to the PrintExpression
 	 */

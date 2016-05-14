@@ -4,7 +4,9 @@ import be.kuleuven.cs.som.annotate.Value;
 
 @Value
 public class Vector {	
-	
+	/**
+	 * This is a Value Class
+	 */
 	
 	/**
 	 * 
@@ -58,44 +60,118 @@ public class Vector {
 		return this.Z;
 	}
 	
+	/**
+	 * 
+	 * @param vector
+	 * 		The vector of which is checked if it equals this
+	 * @return Returns true if the two vectors are the same
+	 */
 	public boolean equals(Vector vector) {
-		if ((this.getX() == vector.getX()) && (this.getY() == vector.getY())
-				&& (this.getZ() == vector.getZ()))
+		double EPSILON = Math.pow(10,-10);
+		if ((this.getX() - vector.getX() < EPSILON) && (this.getY() - vector.getY()< EPSILON)
+				&& (this.getZ() - vector.getZ()) < EPSILON)
 			return true;
 		else
 			return false;
 	}
-	
+	/**
+	 * Sums two vectors
+	 * @param vector
+	 * 		The vector to be added to this
+	 * @return Returns the sum of vector and this
+	 */
 	public Vector sum(Vector vector) {
 		return new Vector(this.getX() + vector.getX(), this.getY() + vector.getY(),
 					this.getZ() + vector.getZ());
 	}
 	
+
+	/**
+	 * Adds values to the x, y and z coordinate
+	 * 
+	 * @param x
+	 * 		The x-value to be added
+	 * @param y
+	 * 	 	The y-value to be added
+	 * @param z
+	 * 		The z-value to be added
+	 * @return Returns the this-vector added with the x,y,z values
+	 */
 	public Vector sum(int x, int y, int z) {
 		return new Vector(this.getX() + x, this.getY() + y,
 				this.getZ() + z);
 	}
 	
+	/**
+	 * Adds values to the x, y and z coordinate
+	 * 
+	 * @param x
+	 * 		The x-value to be added
+	 * @param y
+	 * 	 	The y-value to be added
+	 * @param z
+	 * 		The z-value to be added
+	 * @return Returns the this-vector added with the x,y,z values
+	 */
 	public Vector sum(double x, double y, double z) {
 		return new Vector(this.getX() + x, this.getY() + y,
 				this.getZ() + z);
 	}
-	
+	/**
+	 * Subtracts values to the x, y and z coordinate
+	 * 
+	 * @param x
+	 * 		The x-value to be subtracted
+	 * @param y
+	 * 	 	The y-value to be subtracted
+	 * @param z
+	 * 		The z-value to be subtracted
+	 * @return Returns the this-vector subtracted with the x,y,z values
+	 */
 	public Vector subtract(Vector v) {
 		return new Vector(this.getX() - v.getX(), this.getY() - v.getY(), 
 				this.getZ() - v.getZ());
 	}
 	
+	/**
+	 * Subtracts values to the x, y and z coordinate
+	 * 
+	 * @param x
+	 * 		The x-value to be subtracted
+	 * @param y
+	 * 	 	The y-value to be subtracted
+	 * @param z
+	 * 		The z-value to be subtracted
+	 * @return Returns the this-vector subtracted with the x,y,z values
+	 */
 	public Vector subtract(int x, int y, int z) {
 		return new Vector(this.getX() - x, this.getY() - y,
 				this.getZ() - z);
 	}
 	
+	/**
+	 * Subtracts values to the x, y and z coordinate
+	 * 
+	 * @param x
+	 * 		The x-value to be subtracted
+	 * @param y
+	 * 	 	The y-value to be subtracted
+	 * @param z
+	 * 		The z-value to be subtracted
+	 * @return Returns the this-vector subtracted with the x,y,z values
+	 */
 	public Vector subtract(double x, double y, double z) {
 		return new Vector(this.getX() - x, this.getY() - y,
 				this.getZ() - z);
 	}
 	
+	/**
+	 * Returns the distance between two vectors
+	 * 
+	 * @param v
+	 * 		The seconds vector to be compared
+	 * @return Returns the distance between this and v
+	 */
 	public double distance(Vector v) {
 		double P = Math.pow(this.getX() - v.getX(), 2) + Math.pow(this.getY() - v.getY(), 2)
 			+ Math.pow(this.getZ() - v.getZ(), 2);

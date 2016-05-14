@@ -10,6 +10,8 @@ public abstract class S implements IPerform, ISourceCheck {
 	 *   	The column and line of the Statement in its Task
 	 * @post
 	 * 		|new.getSource() = source 
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public S(SourceLocation source) throws IllegalSourceException {
 		if (!isValidSourceLocation(source))

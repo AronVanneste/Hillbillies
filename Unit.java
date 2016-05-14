@@ -753,19 +753,34 @@ public class Unit implements ITerminate, IPartOfWorld {
 	
 	/**
 	 * 
+	 * @return Returns the Task assigned to the unit
 	 */
 	public T getTask() {
 		return this.task;
 	}
-	
+	/**
+	 * 
+	 * @param task
+	 * 		The task assigned to the unit
+	 * @post
+	 * 		|new.getTask() = task
+	 */
 	public void setTask(T task) {
 		this.task = task;
 	}
-	
+	/**
+	 * Removes task from unit
+	 * 
+	 * @post
+	 * 		|new.getTask() = null
+	 */
 	public void removeTask() {
 		this.task = null;
 	}
-	
+	/**
+	 * 
+	 * @return Returns whether or not a Unit has a task assigned
+	 */
 	public boolean hasTask() {
 		return this.getTask() != null;
 	}
@@ -859,6 +874,16 @@ public class Unit implements ITerminate, IPartOfWorld {
 			return (position[0] >= 0 && position[1] >= 0 && position[2] >= 0);		}
 	}	
 	
+	/**
+	 *  Checks whether a position is valid for the unit, according to it's world dimensions
+	 * 
+	 * @param position
+	 * 		The position to be checked
+	 * @return	Returns true if position is a valid position. This is when X, Y and Z
+	 * 			are a non-negative value and do not exceed the borders of the units world.
+	 * 			If the unit is not part of a world, then the condition that X, Y and Z are not negative
+	 * 			is sufficient.	
+	 */
 	@Override
 	public boolean isValidPosition(int[] position) {
 		double[] pos = {(double) position[0], (double) position[1], (double) position[2]};
@@ -1627,7 +1652,15 @@ public class Unit implements ITerminate, IPartOfWorld {
 		defender.attacked();
 		
 	}
-	
+	/**
+	 * Lets the unit follow an other unit
+	 * @param passiveUnit
+	 * 		The unit to follow
+	 * @post
+	 * 		|new.isResting() = false
+	 * 		|new.isWorking() = false
+	 * 		|new.getUnitToFollow() = passiveunit
+	 */
 	public void follow(Unit passiveUnit) {
 		if (canMove()) {
 			this.unitToFollow = passiveUnit;
@@ -1636,10 +1669,20 @@ public class Unit implements ITerminate, IPartOfWorld {
 		}
 	}
 	
+	/**
+	 * Lets the unit stop following a unit
+	 * @post
+	 * 		|new.getUnitToFollow() = null
+	 * 
+	 */
 	public void stopFollowing() {
 		this.unitToFollow = null;
 	}
 	
+	/**
+	 * 
+	 * @return Returns the unit the unit is following
+	 */
 	private Unit getUnitToFollow() {
 		return unitToFollow;
 	}
@@ -2279,7 +2322,12 @@ public class Unit implements ITerminate, IPartOfWorld {
 	}
 	
 	/**
+	 * Picks the free task with the highest priority and assigns it to the unit
 	 * 
+	 * @post
+	 * 		|new.hasTask()
+	 * @throws NoSuchElementException
+	 * 		|Throws NoSuchElementException if there no suitable task for the unit
 	 */
 	public void pickTask() throws NoSuchElementException {
 		try {
@@ -2289,6 +2337,12 @@ public class Unit implements ITerminate, IPartOfWorld {
 		}
 	}
 	
+	/**
+	 * Lets the unit execute its task
+	 * 
+	 * @throws NoStatementsLeftException
+	 * 		Throws NoStatementsLeftException if there are no statements left to be executed
+	 */
 	public void executeTask() throws NoStatementsLeftException {
 		
 		T task = this.getTask();
@@ -2304,7 +2358,13 @@ public class Unit implements ITerminate, IPartOfWorld {
 	}
 	
 	
-	
+	/**
+	 * Indicates a task could not be completed and the unit starts behaving default
+	 * 
+	 * @post
+	 * 		|this.getTask().getUnit() == null
+	 * 		|new.getTask() == null;
+	 */
 	private void taskWasInterrupted() {
 		if (!hasTask())
 			return;
@@ -2594,7 +2654,9 @@ public class Unit implements ITerminate, IPartOfWorld {
 	}
 	
 	/**
-	 * 
+	 * Lets the unit drop a boulder or log it is carrying
+	 * @post
+	 * 		|new.isCarryingRaw() = false
 	 */
 	protected void removeRaw() {
 		if (this.isCarryingBoulder())
@@ -2877,22 +2939,46 @@ public class Unit implements ITerminate, IPartOfWorld {
 		return this.notRestTime;
 	}
 	
+	/**
+	 * 
+	 * @param time
+	 * 		The time since it has last executed a statement
+	 * @post
+	 * 		|new.getLastStatementTime() = time
+	 */
 	private void setLastStatementTime(double time) {
 		this.timeLastStatement = time;
 	}
 	
+	/**
+	 * 
+	 * @return Returns the time since it has last executed a statement
+	 */
 	private double getLastStatementTime() {
 		return this.timeLastStatement;
 	}
 	
+	/**
+	 * 
+	 * @return Returns whether or not it longer than a millisecond ago that it has executed a statement
+	 */
 	private boolean checkLastStatementTime() {
 		return (this.getLastStatementTime() >= 0.001);
 	}
 	
+	/**
+	 * Sets the lastStatementTime to zero
+	 * 
+	 * @post
+	 * 		|new.getLastStatementTime() = 0
+	 */
 	private void resetLastStatementTime() {
 		this.setLastStatementTime(0);
 	}
 	
+	/**
+	 * Check whether it has taken long enough since it has executed a statement
+	 */
 	private void updateLastStatementTime() {
 		if (this.checkLastStatementTime())
 			this.resetLastStatementTime();

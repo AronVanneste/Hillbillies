@@ -13,6 +13,12 @@ public class AssignStatement extends S implements IExpressionCheck {
 	 * 		The expression
 	 * @param source
 	 * 		The column and line of the AssignStatement in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
+	 * @throws IllegalNameException
+	 * 		Throws IllegalSourceException if the name is not valid
+	 * @throws IllegalExpressionException
+	 * 		Throws IllegalSourceException if the expression is not valid
 	 */
 	public AssignStatement(String name, E<?> e, SourceLocation source) throws IllegalNameException, 
 			IllegalExpressionException, IllegalSourceException {
@@ -50,7 +56,12 @@ public class AssignStatement extends S implements IExpressionCheck {
 	public E<?> getExpression() {
 		return this.expression;
 	}
-	
+	/**
+	 * 
+	 * @param name
+	 * 		The name assigned to the expression
+	 * @return Return whether or not the given name is valid
+	 */
 	public boolean isValidName(String name) {
 		return (name != null);
 	}

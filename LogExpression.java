@@ -9,6 +9,8 @@ public class LogExpression extends PositionExpression {
 	 * 
 	 * @param sourceLocation
 	 * 		The column and line of the LogExpression in its Task
+	 * @throws IllegalSourceException
+	 * 		Throws IllegalSourceException if the sourceLocation is not valid
 	 */
 	public LogExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);
