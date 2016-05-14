@@ -16,7 +16,7 @@ public abstract class E<K> {
 	/**
 	 * Evaluates the Expression
 	 * 
-	 * @return Returns K, this can be a BooleanExpression, UnitExpression, etc.
+	 * @return Returns an object of class K, this can be of any type.
 	 */
 	public abstract K evaluate();
 	

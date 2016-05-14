@@ -2,12 +2,14 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class UnitStatement extends ActionStatement implements IRelation {
+public abstract class UnitStatement extends ActionStatement implements IRelation, 
+			IExpressionCheck {
 	
-	public UnitStatement(UnitExpression unit, SourceLocation source) throws IllegalUnitException {
+	public UnitStatement(UnitExpression unit, SourceLocation source) throws IllegalExpressionException, 
+			IllegalSourceException {
 		super(source);
-		if (!isValidUnit(unit))
-			throw new IllegalUnitException();
+		if (!isValidExpression(unit))
+			throw new IllegalExpressionException();
 		this.passiveUnit = unit;
 		
 	}
@@ -16,9 +18,6 @@ public abstract class UnitStatement extends ActionStatement implements IRelation
 		return this.passiveUnit;
 	}
 	
-	public boolean isValidUnit(UnitExpression unit) {
-		return unit != null;
-	}
 	
 	private final UnitExpression passiveUnit;
 

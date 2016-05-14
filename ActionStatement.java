@@ -10,7 +10,7 @@ public abstract class ActionStatement extends S implements IPerform {
 	 * @param source
 	 * 		The line and column of the ActionStatement in the task
 	 */
-	public ActionStatement(SourceLocation source) {
+	public ActionStatement(SourceLocation source) throws IllegalSourceException {
 		super(source);
 	}
 

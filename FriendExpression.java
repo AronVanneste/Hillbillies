@@ -31,33 +31,5 @@ public class FriendExpression extends UnitExpression {
 		throw new IllegalArgumentException("Expression not assigned to Unit");
 		
 	}
-	/**
-	 * 
-	 * @param unit
-	 * 		The unit of which its closest friend is returned
-	 */
-	@Override
-	public void setUnit(Unit unit) {
-		this.performer = unit;
-	}
-	/**
-	 * 
-	 * @return Returns the unit of which its closest friend is returned
-	 */
-	@Override
-	public Unit getUnit() {
-		return this.performer;
-	}
-	/**
-	 * 
-	 * @return Returns whether or not the FriendExpression has a unit assigned
-	 */
-	@Override
-	public boolean isAssigned() {
-		return (this.performer != null);
-	}
 	
-	private Unit performer;
-
 }
-

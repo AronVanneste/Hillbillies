@@ -3,6 +3,7 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public abstract class BooleanExpression extends E<Boolean> {
+
 	/**
 	 * Initialization of a BooleanExpression
 	 * 

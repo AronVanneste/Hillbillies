@@ -3,6 +3,7 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class FollowStatement extends UnitStatement {
+
 	/**
 	 * Initializes a FollowStatement
 	 * 
@@ -11,9 +12,12 @@ public class FollowStatement extends UnitStatement {
 	 * @param source
 	 *  		The column and line of the FollowStatement in its Task
 	 */
-	public FollowStatement(UnitExpression unit, SourceLocation source) {
+	public FollowStatement(UnitExpression unit, SourceLocation source) throws
+			IllegalSourceException, IllegalExpressionException {
 		super(unit, source);
 	}
+
+	
 	/**
 	 * Executes the followStatement
 	 * 

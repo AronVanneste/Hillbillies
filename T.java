@@ -36,8 +36,9 @@ public class T implements IPerform, ITerminate {
 	 * 		Throws IllegalStatementException is the activity is not well formed
 	 */
 	public T(String name, int priority, S activity, int[] cube) throws IllegalStatementException {
-		if (!isWellFormed(activity))
+		if (!isWellFormed(activity) | !isValidStatement(activity))
 			throw new IllegalStatementException("Not a valid statement");
+		if (!isValidPosition(cube))
 		this.setName(name);
 		this.setPriority(priority);
 		this.setActivity(activity);
@@ -133,6 +134,10 @@ public class T implements IPerform, ITerminate {
 		return this.priority;
 	}
 	
+	public void reducePriority() {
+		this.setPriority(this.getPriority() - 20);
+	}
+	
 	protected void setCubes(int[] cube) {
 		this.cube = cube;
 	}
@@ -143,7 +148,11 @@ public class T implements IPerform, ITerminate {
 	
 	protected void setActivity(S activity) {
 		this.activity = activity;
-		this.setIterator();
+		try {
+			this.setIterator();
+		} catch (IllegalArgumentException e) {
+			
+		}
 	}
 	
 	protected S getActivity() {
@@ -173,6 +182,7 @@ public class T implements IPerform, ITerminate {
 	public void removeUnit() {
 		if (this.isAssigned()) {
 			this.performer = null;
+			this.reducePriority();
 		}
 	}
 	
@@ -182,29 +192,37 @@ public class T implements IPerform, ITerminate {
 		
 	}
 	
-	protected boolean isValidStatement(S s) {
-		if (!(s instanceof SequenceStatement) && !(s instanceof ActionStatement))
-			return false;
-		Iterator<S> iterS = ((SequenceStatement)s).iterator();
-		while (iterS.hasNext()) {
-			S next = iterS.next();
-			if (!isValidSubStatement(next))
-				return false;
-		}
-		return true;
-		
-			
+	private boolean isValidStatement(S s) {
+		return s != null;
 	}
 	
-	protected boolean isValidSubStatement(S statement) {
-		if (statement instanceof SequenceStatement)
-			return isValidStatement(statement);
-		if (statement instanceof BreakStatement)
-			return false;
-		return true;
-		
-		
+	private boolean isValidPosition(int[] p) {
+		return p != null;
 	}
+	
+//	protected boolean isValidStatement(S s) {
+//		if (!(s instanceof SequenceStatement) && !(s instanceof ActionStatement))
+//			return false;
+//		Iterator<S> iterS = ((SequenceStatement)s).iterator();
+//		while (iterS.hasNext()) {
+//			S next = iterS.next();
+//			if (!isValidSubStatement(next))
+//				return false;
+//		}
+//		return true;
+//		
+//			
+//	}
+//	
+//	protected boolean isValidSubStatement(S statement) {
+//		if (statement instanceof SequenceStatement)
+//			return isValidStatement(statement);
+//		if (statement instanceof BreakStatement)
+//			return false;
+//		return true;
+//		
+//		
+//	}
 	
 	public void addAssignStatements() {
 		addAssignStatements(this.getActivity());
@@ -262,15 +280,17 @@ public class T implements IPerform, ITerminate {
 	}
 	
 	public boolean isWellFormed(S s) {
-		return this.hasValidBreaks(s) && this.hasValidBreaks(s);
+		return this.hasValidVariables(s) && this.hasValidBreaks(s);
 	}
 	
 	public Map<String,SourceLocation> getReadVariables() {
 		return this.readVariables;
 	}
 	
-	public boolean hasValidVariables() {
-		for(AssignStatement variable:this.getVariables().values()) {
+	public boolean hasValidVariables(S s) {
+		addAssignStatements(s);
+		addReadExpressions(s);
+		for (AssignStatement variable: this.getVariables().values()) {
 			SourceLocation source2 = this.getReadVariables().get(variable.getName());
 			if (!variable.getSource().precedes(source2))
 				return false;

@@ -2,7 +2,8 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class PrintStatement extends S {
+public class PrintStatement extends S implements IExpressionCheck {
+	
 	/**
 	 * Initialization of a PrintStatement
 	 * 
@@ -11,10 +12,14 @@ public class PrintStatement extends S {
 	 * @param source
 	 *   	The column and line of the PrintExpression in its Task
 	 */
-	public PrintStatement(E<?> expression, SourceLocation source) {
+	public PrintStatement(E<?> expression, SourceLocation source) throws IllegalSourceException, 
+			IllegalExpressionException {
 		super(source);
+		if (!isValidExpression(expression))
+			throw new IllegalExpressionException();
 		this.expression = expression;
 	}
+
 	/**
 	 * Evaluates the print statement
 	 * 
@@ -24,6 +29,7 @@ public class PrintStatement extends S {
 	public void execute() {
 		System.out.println(this.getExpression().evaluate());
 	}
+	
 	/**
 	 * 
 	 * @return Returns the expression of the PrintStatement

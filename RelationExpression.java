@@ -25,6 +25,34 @@ public abstract class RelationExpression extends BooleanExpression implements IP
 		return this.unitToPerformTaskOn;
 	}
 	
+	/**
+	 * 
+	 * @param unit The unit that has to be checked
+	 */
+	@Override
+	public void setUnit(Unit unit) {
+		this.performer = unit;
+	}
+	/**
+	 * 
+	 * @return Returns the unit that has to be checked
+	 */
+	@Override
+	public Unit getUnit() {
+		return this.performer;
+	}
+	/**
+	 * 
+	 * @return Returns whether or not a unit is yet assigned to the CheckFriendExpression
+	 */
+	@Override
+	public boolean isAssigned() {
+		return (this.performer != null);
+	}
+	
+	private Unit performer;
+	
+	
 	
 	private final UnitExpression unitToPerformTaskOn;
 }

@@ -1850,7 +1850,10 @@ public class Unit implements ITerminate {
 			throw new IllegalArgumentException("Given seconds should be a double value between 0 and 0.2");
 		if (this.isTerminated())
 			throw new IllegalStateException("The unit is terminated");
-					
+		
+		if (hasTask())
+			this.setLastStatementTime(this.getLastStatementTime() + seconds);
+			
 		
 		
 		// Falling:
@@ -1920,13 +1923,15 @@ public class Unit implements ITerminate {
 				this.controlSprinting();
 			} 
 			return;
+			} 	
 		} else {
 			if (!this.isFalling())
 				this.setSpeed(0);
 			if (this.shouldWorkAfterMoving()) {
-				this.work();
+					this.work();
 			}
 		}
+		
 		
 	
 		
@@ -2249,8 +2254,9 @@ public class Unit implements ITerminate {
 	private void startDefaultBehavior() {
 		
 		try {
-			if (this.hasTask())
+			if (this.hasTask() && this.checkLastStatementTime())
 				this.executeTask();
+			this.updateLastStatementTime();
 		} catch (NoStatementsLeftException e) {
 			try { 
 				this.pickTask();
@@ -2301,11 +2307,14 @@ public class Unit implements ITerminate {
 	}
 	
 	
-	private void taskWasInterruped() {
+	
+	private void taskWasInterrupted() {
 		if (!hasTask())
 			return;
 		this.getTask().removeUnit();
 		this.removeTask();
+		if (this.getDefaultBehavior())
+			this.startDefaultBehavior();
 	}
 	
 	
@@ -2413,7 +2422,7 @@ public class Unit implements ITerminate {
 		this.setAttacking(false);
 		this.workAfterMoving(false);
 		if (this.hasTask())
-			this.taskWasInterruped();
+			this.taskWasInterrupted();
 		
 		return true;
 		
@@ -2871,6 +2880,27 @@ public class Unit implements ITerminate {
 		return this.notRestTime;
 	}
 	
+	private void setLastStatementTime(double time) {
+		this.timeLastStatement = time;
+	}
+	
+	private double getLastStatementTime() {
+		return this.timeLastStatement;
+	}
+	
+	private boolean checkLastStatementTime() {
+		return (this.getLastStatementTime() >= 0.001);
+	}
+	
+	private void resetLastStatementTime() {
+		this.setLastStatementTime(0);
+	}
+	
+	private void updateLastStatementTime() {
+		if (this.checkLastStatementTime())
+			this.resetLastStatementTime();
+	}
+ 	
 	/**
 	 * 
 	 * @param value
@@ -2994,6 +3024,7 @@ public class Unit implements ITerminate {
 	private Unit unitToFollow;
 	private T task;
 	private boolean taskInterrupted;
+	private double timeLastStatement;
 	
 
 

@@ -4,7 +4,8 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class MoveToStatement extends MoveStatement {
 	
-	public MoveToStatement(PositionExpression position, SourceLocation source) {
+	public MoveToStatement(PositionExpression position, SourceLocation source) throws 
+			IllegalSourceException, IllegalExpressionException {
 		super(position, source);
 	}
 

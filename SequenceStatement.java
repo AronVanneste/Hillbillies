@@ -7,12 +7,19 @@ import java.util.NoSuchElementException;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class SequenceStatement extends S {
+public class SequenceStatement extends S implements IStatementCheck {
 	
-	public SequenceStatement(List<S> statements, SourceLocation source) {
+	public SequenceStatement(List<S> statements, SourceLocation source) throws
+			IllegalSourceException, IllegalStatementException {
 		super(source);
+		for (S s: statements) {
+			if (!isValidStatement(s))
+				throw new IllegalStatementException();
+		}
 		this.statements.addAll(statements);
 	}
+
+	
 	/**
 	 * Executes the SequenceStatement
 	 * 

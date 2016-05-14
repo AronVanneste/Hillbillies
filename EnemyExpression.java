@@ -37,33 +37,5 @@ public class EnemyExpression extends UnitExpression {
 		
 	}
 	
-	/**
-	 *
-	 * @param unit
-	 * 		The unit assigned to the expression
-	 */
-	@Override
-	public void setUnit(Unit unit) {
-		this.performer = unit;
-	}
 	
-	/**
-	 * 
-	 * @return Returns the unit of the expression
-	 */
-	@Override
-	public Unit getUnit() {
-		return this.performer;
-	}
-	/**
-	 * 
-	 * @return Returns whether or not the expression has a unit assigned
-	 */
-	@Override
-	public boolean isAssigned() {
-		return (this.performer != null);
-	}
-	
-	private Unit performer;
-
 }

@@ -9,6 +9,7 @@ public class SelectedExpression extends PositionExpression {
 	public SelectedExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
 	}
+
 	/**
 	 * Evaluates the SelectedExpression
 	 * 

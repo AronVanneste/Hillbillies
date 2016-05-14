@@ -2,11 +2,16 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class WhileStatement extends EvaluateStatement {
+public class WhileStatement extends EvaluateStatement implements IExpressionCheck, 
+		IStatementCheck {
 
 	public WhileStatement(BooleanExpression condition, S body, SourceLocation source) 
-			throws IllegalArgumentException {
+			throws IllegalSourceException, IllegalExpressionException {
 		super(source);
+		if (!isValidExpression(condition))
+			throw new IllegalExpressionException();
+		if (!isValidStatement(body))
+			throw new IllegalStatementException();
 		this.condition = condition;
 		this.body = body;
 	}
@@ -31,30 +36,10 @@ public class WhileStatement extends EvaluateStatement {
 		return this.body;
 	}
 	
-	@Override
-	public void setUnit(Unit unit) {
-		this.unit = unit;
-		this.getBody().setUnit(unit);
-	}
-
-
-	@Override
-	public Unit getUnit() {
-		return this.unit;
-	}
-
-
-	@Override
-	public boolean isAssigned() {
-		return this.getUnit() != null;
-	}
-
 	
-
 		
 	
 	private final BooleanExpression condition;
 	private final S body;
-	private Unit unit;
 
 }

@@ -4,6 +4,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class BoulderExpression extends PositionExpression {
 	
+
 	/**
 	 * Initialisation of a BoulderExpression
 	 * 
@@ -12,7 +13,10 @@ public class BoulderExpression extends PositionExpression {
 	 */
 	public BoulderExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
+		// TODO Auto-generated constructor stub
 	}
+
+	
 	/**
 	 * Evaluates the given BoulderExpression
 	 * 

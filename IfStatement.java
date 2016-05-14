@@ -2,7 +2,8 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class IfStatement extends EvaluateStatement {
+public class IfStatement extends EvaluateStatement implements IExpressionCheck, IStatementCheck {
+
 	/**
 	 * Initialization of an IfStatement
 	 * 
@@ -15,9 +16,13 @@ public class IfStatement extends EvaluateStatement {
 	 * @param source
 	 *  		The line and column of the IfStatement in its Task
 	 */
-	
-	public IfStatement(BooleanExpression condition, S ifBody, S elseBody, SourceLocation source) {
+	public IfStatement(BooleanExpression condition, S ifBody, S elseBody, SourceLocation source) 
+			throws IllegalSourceException, IllegalStatementException, IllegalExpressionException {
 		super(source);
+		if (!isValidStatement(ifBody) | !isValidStatement(elseBody))
+			throw new IllegalStatementException();
+		if (!isValidExpression(condition))
+			throw new IllegalExpressionException();
 		this.condition = condition;
 		this.ifBody = ifBody;
 		this.elseBody = elseBody;
@@ -47,6 +52,7 @@ public class IfStatement extends EvaluateStatement {
 			}
 		}
 	}
+	
 	/**
 	 * 
 	 * @return Returns the condition of the IfStatement
@@ -54,6 +60,7 @@ public class IfStatement extends EvaluateStatement {
 	public BooleanExpression getCondition() {
 		return this.condition;
 	}
+	
 	/**
 	 * 
 	 * @return Returns the IfBody of the IfStatement
@@ -69,38 +76,8 @@ public class IfStatement extends EvaluateStatement {
 	public S getElseBody() {
 		return this.elseBody;
 	}
-	/**
-	 * 
-	 * @param unit
-	 * 		The unit of the IfStatement
-	 */
-	@Override
-	public void setUnit(Unit unit) {
-		this.unit = unit;
-		this.getIfBody().setUnit(unit);
-		this.getElseBody().setUnit(unit);
-	}
-
-	/**
-	 * 
-	 * @return Returns the unit of the IfStatement
-	 */
-	@Override
-	public Unit getUnit() {
-		return this.unit;
-	}
-
-	/**
-	 * 
-	 * @return Returns whether or not the IfStatement has a unit assigned
-	 */
-	@Override
-	public boolean isAssigned() {
-		return this.getUnit() != null;
-	}
-		
 	
-
+	
 
 	
 
@@ -108,6 +85,5 @@ public class IfStatement extends EvaluateStatement {
 	private final BooleanExpression condition;
 	private final S ifBody;
 	private final S elseBody;
-	private Unit unit;
 	
 }

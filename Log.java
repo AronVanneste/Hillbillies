@@ -58,5 +58,3 @@ public class Log extends Raw {
 	}
 	
 }
-
-
