@@ -181,27 +181,10 @@ public class World implements ITerminate {
 		
 	}
 	
-	/**
-	 * Returns an Integer indicating the TerrainType
-	 * 
-	 * @param X
-	 * 		The X-coordinate
-	 * @param Y
-	 * 		The Y-coordinate
-	 * @param Z
-	 * 		The Z-coordinate
-	 * @return Returns an Integer indicating the TerrainType
-	 */
 	public int getTypeTerrain(int X, int Y, int Z) {
 		return getTerrainType(X, Y, Z).getInt();
 	}
 	
-	/**
-	 * Returns a valid position next to the given position
-	 * @param position
-	 * 		The position of which is searched a position next to it
-	 * @return Returns a valid position next to the given position
-	 */
 	public int[] getNextPosition(int[] position) {
 		int X = position[0];
 		int Y = position[1];
@@ -567,8 +550,8 @@ public class World implements ITerminate {
 	 */
 	protected boolean logAvailable(int[] position) {
 		for (Log log: this.getLogs()) {
-			if (log.getCube()[0] == position[0] && log.getCube()[1] == position[1]
-					&& log.getCube()[2] == position[2])
+			if (log.getCubeInt()[0] == position[0] && log.getCubeInt()[1] == position[1]
+					&& log.getCubeInt()[2] == position[2])
 				return true;
 		}
 		return false;
@@ -583,8 +566,8 @@ public class World implements ITerminate {
 	 */
 	protected boolean boulderAvailable(int[] position) {
 		for (Boulder boulder: this.getBoulders()) {
-			if (boulder.getCube()[0] == position[0] && boulder.getCube()[1] == position[1]
-					&& boulder.getCube()[2] == position[2])
+			if (boulder.getCubeInt()[0] == position[0] && boulder.getCubeInt()[1] == position[1]
+					&& boulder.getCubeInt()[2] == position[2])
 				return true;
 		}
 		return false;
@@ -683,14 +666,6 @@ public class World implements ITerminate {
 		this.toCave.addAll(solidToPassable);
 	}
 	
-	/**
-	 * Returns the closest unit to a given unit satisfying a given condition
-	 * @param condition
-	 * 		The condition the unit must satisfy
-	 * @param performer
-	 * 		The unit of which the closest unit is searched
-	 * @return Returns the closest unit to a given unit satisfying a given condition
-	 */
 	public Unit getClosestUnit(Predicate<Unit> condition, Unit performer) {
 		List<Unit> unitList = new ArrayList<>();
 		this.getUnits().stream().filter(condition).forEach(unitList::add);
@@ -709,14 +684,7 @@ public class World implements ITerminate {
 		
 		return closestUnit;
 	}
-	/**
-	 * Returns the closest boulder to a given unit
-	 * 
-	 * @param unit
-	 * 		The unit for which the closest boulder is searched
-	 * 
-	 * @return Returns the closest boulder to a given unit
-	 */
+	
 	public Boulder getClosestBoulder(Unit unit) {
 		
 		double minDistance = Double.MAX_VALUE;
@@ -733,14 +701,6 @@ public class World implements ITerminate {
 		return closestBoulder;
 	}
 	
-	/**
-	 * Returns the closest log to a given unit
-	 * 
-	 * @param unit
-	 * 		The unit for which the closest log is searched
-	 * 
-	 * @return Returns the closest log to a given unit
-	 */
 	public Log getClosestLog(Unit unit) {
 		
 		double minDistance = Double.MAX_VALUE;
@@ -757,16 +717,6 @@ public class World implements ITerminate {
 		return closestLog;
 	}
 	
-	/**
-	 * Returns the closest cube with a certain TerrainType
-	 * 
-	 * @param terrain
-	 * 		The TerrainType of the cube
-	 * @param unit
-	 * 		The unit for which the closest cube is searched
-	 * 
-	 * @return Returns the closest cube with a certain TerrainType
-	 */
 	public int[] getClosestTerrainType(TerrainType terrain, Unit unit) {
 		
 		int[] position = null;
@@ -790,16 +740,6 @@ public class World implements ITerminate {
 		return position;
 	}
 	
-	/**
-	 * Returns the distance between a unit and a cube
-	 * 
-	 * @param unit
-	 *		The unit
-	 * @param pos
-	 * 		The cube
-	 * 
-	 * @return Returns the distance between a unit and a cube
-	 */
 	public double getDistanceBetweenPosAndUnit(Unit unit, int[] pos) {
 		
 		double X = Math.pow(unit.getPosition().getX() - (double) pos[0], 2);
@@ -810,16 +750,7 @@ public class World implements ITerminate {
 
 	}
 	
-	/**
-	 * Returns the distance between a unit and a raw
-	 * 
-	 * @param unit
-	 *		The unit
-	 * @param Raw
-	 * 		The raw
-	 * 
-	 * @return Returns the distance between a unit and a raw
-	 */
+	
 	
 	public double getDistanceBetweenRawAndUnit(Unit unit, Raw raw) {
 		
@@ -831,17 +762,6 @@ public class World implements ITerminate {
 
 	}
 	
-	
-	/**
-	 * Returns the distance between two units
-	 * 
-	 * @param unit1
-	 *		The first unit
-	 * @param unit2
-	 * 		The second unit
-	 * 
-	 * @return Returns the distance between two units
-	 */
 	public double getDistanceBetweenUnits(Unit unit1, Unit unit2) {
 		
 		double X = Math.pow(unit1.getPosition().getX() - unit2.getPosition().getX(), 2);
@@ -862,10 +782,7 @@ public class World implements ITerminate {
 	}
 	
 	/**
-	 *@param raw
-	 *		The raw that has to be added to the world
-	 *@post
-	 *		The raw is in the world
+	 * 
 	 */
 	protected void addRaw(Raw raw) {
 		if (raw instanceof Boulder)
@@ -901,8 +818,8 @@ public class World implements ITerminate {
 	 */
 	public Boulder getBoulder(int[] cubeInt) {
 		for (Boulder boulder: this.getBoulders())
-			if (boulder.getCube()[0] == cubeInt[0] && boulder.getCube()[1] == cubeInt[1] 
-					&& boulder.getCube()[2] == cubeInt[2]) {
+			if (boulder.getCubeInt()[0] == cubeInt[0] && boulder.getCubeInt()[1] == cubeInt[1] 
+					&& boulder.getCubeInt()[2] == cubeInt[2]) {
 				return boulder;
 			}
 		return null;
@@ -915,8 +832,8 @@ public class World implements ITerminate {
 	 */
 	public Log getLog(int[] cubeInt) {
 		for (Log log: this.getLogs())
-			if (log.getCube()[0] == cubeInt[0] && log.getCube()[1] == cubeInt[1]
-					&& log.getCube()[2] == cubeInt[2]) {
+			if (log.getCubeInt()[0] == cubeInt[0] && log.getCubeInt()[1] == cubeInt[1]
+					&& log.getCubeInt()[2] == cubeInt[2]) {
 				return log;
 			}
 		return null;
@@ -1138,8 +1055,6 @@ public class World implements ITerminate {
 	 * 		A new unit is added to the world, and is assigned to a faction
 	 * @throws IllegalArgumentException
 	 * 		Throws IllegalArgumentException if the world is full
-	 * @throws IllegalStateException
-	 * 		Throws IllegalStateException if the world is terminated
 	 */
 	public Unit spawnUnit(boolean defaultBehavior) throws IllegalArgumentException, IllegalStateException {
 		if (this.getNbUnits() >= 100)
@@ -1205,15 +1120,15 @@ public class World implements ITerminate {
 		List<Object> allObjectsOccupyingCube = new ArrayList<>();;
 		
 		for(Boulder boulder: BoulderList) {
-			if (boulder.getCube()[0] == cube[0] && boulder.getCube()[1] == cube[1]
-					&& boulder.getCube()[2] == cube[2]) {
+			if (boulder.getCubeInt()[0] == cube[0] && boulder.getCubeInt()[1] == cube[1]
+					&& boulder.getCubeInt()[2] == cube[2]) {
 				allObjectsOccupyingCube.add(boulder);
 			}
 		}
 		
 		for(Log log: LogList) {
-			if (log.getCube()[0] == cube[0] && log.getCube()[1] == cube[1]
-					&& log.getCube()[2] == cube[2]) {
+			if (log.getCubeInt()[0] == cube[0] && log.getCubeInt()[1] == cube[1]
+					&& log.getCubeInt()[2] == cube[2]) {
 				allObjectsOccupyingCube.add(log);
 			}
 		}
@@ -1229,13 +1144,7 @@ public class World implements ITerminate {
 	}
 	
 	/**
-	 * Removes a raw material from the world
 	 * 
-	 *@param The raw to be remove
-	 *
-	 *@post
-	 *		The raw material is removed
-	 *
 	 */
 	protected void removeRaw(Raw raw) {
 		if (raw instanceof Boulder) 

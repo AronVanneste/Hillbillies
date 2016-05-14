@@ -6,7 +6,7 @@ public class SelectedExpression extends PositionExpression {
 	
 	
 
-	public SelectedExpression(SourceLocation sourceLocation) {
+	public SelectedExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);
 	}
 

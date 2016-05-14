@@ -2,7 +2,7 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public class NextToExpression extends PositionExpression {
+public class NextToExpression extends PositionExpression implements IExpressionCheck {
 	
 	/**Initialization of a NextToExpression
 	 * 
@@ -11,8 +11,11 @@ public class NextToExpression extends PositionExpression {
 	 * @param sourceLocation
 	 *  		The column and line of the NextToExpression in its Task
 	 */
-	public NextToExpression(PositionExpression position, SourceLocation sourceLocation) {
+	public NextToExpression(PositionExpression position, SourceLocation sourceLocation) throws
+			IllegalSourceException, IllegalExpressionException {
 		super(sourceLocation);
+		if (!isValidExpression(position))
+			throw new IllegalExpressionException();
 		this.position = position;
 	}
 	/**

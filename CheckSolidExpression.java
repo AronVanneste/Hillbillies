@@ -12,7 +12,8 @@ public class CheckSolidExpression extends TerrainExpression {
 	 * @param sourceLocation
 	 *   		The column and line of the CheckSolidExpression in its Task
 	 */
-	public CheckSolidExpression(PositionExpression pos, SourceLocation sourceLocation) {
+	public CheckSolidExpression(PositionExpression pos, SourceLocation sourceLocation) 
+			throws IllegalSourceException, IllegalExpressionException {
 		super(pos, sourceLocation);
 	}
 	/**

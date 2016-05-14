@@ -9,7 +9,7 @@ public class EnemyExpression extends UnitExpression {
 	 * @param source
 	 * 		The column and line of the EnemyExpression in its Task
 	 */
-	public EnemyExpression(SourceLocation source) {
+	public EnemyExpression(SourceLocation source) throws IllegalSourceException {
 		super(source);
 	}
 	/**

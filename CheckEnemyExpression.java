@@ -11,7 +11,8 @@ public class CheckEnemyExpression extends RelationExpression {
 	 * @param source
 	 *  		The column and line of the CheckEnemyExpression in its Task
 	 */
-	public CheckEnemyExpression(UnitExpression unit, SourceLocation source) {
+	public CheckEnemyExpression(UnitExpression unit, SourceLocation source) throws
+			IllegalSourceException, IllegalExpressionException {
 		super(unit, source);
 	}
 	/**

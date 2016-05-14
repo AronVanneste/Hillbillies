@@ -4,8 +4,11 @@ import hillbillies.part3.programs.SourceLocation;
 
 public abstract class TerrainExpression extends BooleanExpression implements IPerform {
 
-	public TerrainExpression(PositionExpression position, SourceLocation sourceLocation) {
+	public TerrainExpression(PositionExpression position, SourceLocation sourceLocation) 
+			throws IllegalSourceException, IllegalExpressionException {
 		super(sourceLocation);
+		if (!isValidExpression(position))
+			throw new IllegalExpressionException();
 		this.position = position;
 	}
 	
@@ -29,7 +32,7 @@ public abstract class TerrainExpression extends BooleanExpression implements IPe
 	}
 	
 	private Unit performer;
-	private PositionExpression position;
+	private final PositionExpression position;
 	
 	
 

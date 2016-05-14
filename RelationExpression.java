@@ -12,8 +12,11 @@ public abstract class RelationExpression extends BooleanExpression implements IP
 	 * @param sourceLocation
 	 *   	The column and line of the RelationExpression in its Task
 	 */
-	public RelationExpression(UnitExpression unit, SourceLocation sourceLocation) {
+	public RelationExpression(UnitExpression unit, SourceLocation sourceLocation) throws 
+			IllegalSourceException, IllegalExpressionException {
 		super(sourceLocation);
+		if (!isValidExpression(unit))
+			throw new IllegalExpressionException();
 		this.unitToPerformTaskOn = unit;
 	}
 	
@@ -51,8 +54,5 @@ public abstract class RelationExpression extends BooleanExpression implements IP
 	}
 	
 	private Unit performer;
-	
-	
-	
 	private final UnitExpression unitToPerformTaskOn;
 }

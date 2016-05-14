@@ -11,9 +11,8 @@ public class BoulderExpression extends PositionExpression {
 	 * @param sourceLocation
 	 * 		The column and line of the BoulderExpression in its Task
 	 */
-	public BoulderExpression(SourceLocation sourceLocation) {
+	public BoulderExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -30,7 +29,7 @@ public class BoulderExpression extends PositionExpression {
 	public int[] evaluate() throws IllegalArgumentException, IllegalUnitException {
 		if (this.isAssigned()) {
 			try {
-				return this.getUnit().getWorld().getClosestBoulder(this.getUnit()).getCube();
+				return this.getUnit().getWorld().getClosestBoulder(this.getUnit()).getCubeInt();
 			} catch (NullPointerException e) {
 				throw new IllegalUnitException("Unit does not belong to a world");
 			}

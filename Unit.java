@@ -32,7 +32,7 @@ import hillbillies.model.Vector;
 
 
 
-public class Unit implements ITerminate {
+public class Unit implements ITerminate, IPartOfWorld {
 	
 	
 	
@@ -158,6 +158,7 @@ public class Unit implements ITerminate {
 	 * 
 	 * @return Returns the world the unit is in
 	 */
+	@Override
 	public World getWorld() {
 		try {
 			return this.getFaction().getWorld();
@@ -241,9 +242,7 @@ public class Unit implements ITerminate {
 		if (!isValidPosition(X,Y,Z))
 			throw new IllegalPositionException();
 		else {
-			this.POS.setX(X);
-			this.POS.setY(Y);
-			this.POS.setZ(Z);
+			this.POS = new Vector(X, Y, Z);
 		}	
 
 	}
@@ -303,6 +302,7 @@ public class Unit implements ITerminate {
 	 * 		   which the unit is located. 
 	 * 		   These are the coordinates of the top left corner of this cube.
 	 */
+	@Override
 	public int[] getCubeInt() {
 		int XCube = (int) Math.floor(this.getPosition().getX());
 		int YCube = (int) Math.floor(this.getPosition().getY());
@@ -602,9 +602,7 @@ public class Unit implements ITerminate {
 			throw new IllegalPositionException();
 		
 		else {
-			this.TARGET.setX(XTarget);
-			this.TARGET.setY(YTarget);
-			this.TARGET.setZ(ZTarget);
+			this.TARGET = new Vector(XTarget, YTarget, ZTarget);
 		}
 	}
 	
@@ -636,9 +634,7 @@ public class Unit implements ITerminate {
 		if (!this.isValidPosition(X, Y, Z))
 			throw new IllegalPositionException();
 		else {
-			this.finalTARGET.setX(X);
-			this.finalTARGET.setY(Y);
-			this.finalTARGET.setZ(Z);
+			this.finalTARGET = new Vector(X, Y, Z);
 		}
 	}
 	
@@ -855,12 +851,19 @@ public class Unit implements ITerminate {
 	 * 			If the unit is not part of a world, then the condition that X, Y and Z are not negative
 	 * 			is sufficient.	
 	 */
-	private boolean isValidPosition(double[] position) {
+	@Override
+	public boolean isValidPosition(double[] position) {
 		try {
 			return this.getWorld().isValidPosition(position);
 		} catch (NullPointerException e) {
 			return (position[0] >= 0 && position[1] >= 0 && position[2] >= 0);		}
 	}	
+	
+	@Override
+	public boolean isValidPosition(int[] position) {
+		double[] pos = {(double) position[0], (double) position[1], (double) position[2]};
+		return isValidPosition(pos);
+	}
 	
 	/**
 	 * Returns whether or not the position is passable
@@ -870,7 +873,8 @@ public class Unit implements ITerminate {
 	 * @return Returns whether or not the position is passable
 	 * 		
 	 */
-	private boolean isPassable(int[] position) {
+	@Override
+	public boolean isPassable(int[] position) {
 		try {
 			return this.getWorld().isPassable(position);
 		} catch (NullPointerException e) {
@@ -1827,13 +1831,6 @@ public class Unit implements ITerminate {
 	}
 	
 	
-	private void setTaskInterrupted(boolean bool) {
-		this.taskInterrupted = bool;
-	}
-	
-	private boolean isTaskInterrupted() {
-		return this.taskInterrupted;
-	}
 	
 
 	
@@ -3010,9 +3007,9 @@ public class Unit implements ITerminate {
 	private boolean attacking;
 	private boolean firstRest = true;
 	private Unit opponent;
-	private final Vector TARGET = new Vector(0,0,0);
-	private final Vector POS = new Vector(0,0,0);
-	private final Vector finalTARGET = new Vector(0,0,0);
+	private Vector TARGET = new Vector(0,0,0);
+	private Vector POS = new Vector(0,0,0);
+	private Vector finalTARGET = new Vector(0,0,0);
 	private int experiencePoints;
 	private Faction faction;
 	private boolean  isTerminated;
@@ -3023,8 +3020,13 @@ public class Unit implements ITerminate {
 	private boolean workAfterMoving;
 	private Unit unitToFollow;
 	private T task;
-	private boolean taskInterrupted;
 	private double timeLastStatement;
+
+
+
+
+
+
 	
 
 

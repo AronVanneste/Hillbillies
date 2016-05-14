@@ -57,7 +57,9 @@ public class T implements IPerform, ITerminate {
 	 * 	|new.getScheduler() = null;
 	 */
 	public void terminate() {
-		this.getUnit().setTask(null);
+		try {
+		this.getUnit().removeTask();
+		} catch (NullPointerException e) {};
 		this.setUnit(null);
 		for (Scheduler s: this.getSchedulers()) {
 			s.removeTask(this);

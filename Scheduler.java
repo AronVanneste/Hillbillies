@@ -2,12 +2,10 @@ package hillbillies.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class Scheduler {
 	
@@ -171,7 +169,7 @@ public class Scheduler {
 	
 	
 	
-	private List<T> taskList = new ArrayList<>();
+	private final List<T> taskList = new ArrayList<>();
 	
 		
 }

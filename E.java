@@ -2,14 +2,16 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class E<K> {
+public abstract class E<K> implements ISourceCheck {
 	/**
 	 * Initialization of a new expression
 	 * 
 	 * @param sourceLocation
 	 *    		The column and line of the expression in its Task
 	 */
-	public E(SourceLocation sourceLocation) {
+	public E(SourceLocation sourceLocation) throws IllegalSourceException {
+		if (!isValidSourceLocation(sourceLocation))
+			throw new IllegalSourceException();
 		this.sourceLocation = sourceLocation;
 	}
 	

@@ -12,7 +12,8 @@ public class CarriesItemExpression extends StatusExpression {
 	 * @param source
 	 *  		The column and line of the CarriesItemExpression in its Task
 	 */
-	public CarriesItemExpression(UnitExpression unit, SourceLocation source) {
+	public CarriesItemExpression(UnitExpression unit, SourceLocation source) throws 
+			IllegalSourceException, IllegalExpressionException {
 		super(unit, source);
 	}
 	/**

@@ -2,7 +2,7 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class S implements IPerform {
+public abstract class S implements IPerform, ISourceCheck {
 	/**
 	 * Initialization of a Statement
 	 * 
@@ -11,7 +11,9 @@ public abstract class S implements IPerform {
 	 * @post
 	 * 		|new.getSource() = source 
 	 */
-	public S(SourceLocation source) {
+	public S(SourceLocation source) throws IllegalSourceException {
+		if (!isValidSourceLocation(source))
+			throw new IllegalSourceException();
 		this.source = source;
 	}
 	
@@ -55,7 +57,7 @@ public abstract class S implements IPerform {
 		return this.getUnit() != null;
 	}
 	
-	private SourceLocation source;
+	private final SourceLocation source;
 	private Unit unit;
 
 }

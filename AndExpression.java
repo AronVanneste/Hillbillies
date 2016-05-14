@@ -14,7 +14,8 @@ public class AndExpression extends BinaryExpression {
 	 * @param source
 	 * 		The column and line of the AndExpression in the task
 	 */
-	public AndExpression(BooleanExpression left, BooleanExpression right, SourceLocation source) {
+	public AndExpression(BooleanExpression left, BooleanExpression right, SourceLocation source) 
+			throws IllegalSourceException, IllegalExpressionException {
 		super(left, right, source);
 	}
 	/**

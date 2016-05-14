@@ -5,8 +5,10 @@ import hillbillies.part3.programs.SourceLocation;
 public abstract class UnaryExpression extends BooleanExpression {
 	
 	public UnaryExpression(BooleanExpression expression, SourceLocation sourceLocation) throws 
-			IllegalArgumentException {
+			IllegalSourceException, IllegalExpressionException {
 		super(sourceLocation);
+		if (!isValidExpression(expression))
+			throw new IllegalExpressionException();
 		this.expression = expression;
 		
 	}

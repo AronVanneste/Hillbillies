@@ -11,7 +11,8 @@ public class NotExpression extends UnaryExpression {
 	 * @param source
 	 *  	The column and line of the NotExpression in its Task
 	 */
-	public NotExpression(BooleanExpression expression, SourceLocation source) {
+	public NotExpression(BooleanExpression expression, SourceLocation source) throws 
+			IllegalSourceException, IllegalExpressionException {
 		super(expression, source);
 	}
 	/**

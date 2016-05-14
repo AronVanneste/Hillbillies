@@ -11,7 +11,8 @@ public class CheckPassableExpression extends TerrainExpression {
 	 * @param sourceLocation
 	 *   		The column and line of the CheckPassableExpression in its Task
 	 */
-	public CheckPassableExpression(PositionExpression pos, SourceLocation sourceLocation) {
+	public CheckPassableExpression(PositionExpression pos, SourceLocation sourceLocation) 
+			throws IllegalSourceException, IllegalExpressionException {
 		super(pos, sourceLocation);
 	}
 	/**

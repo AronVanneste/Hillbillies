@@ -11,7 +11,8 @@ public class CheckAliveExpression extends StatusExpression {
 	 * @param source
 	 *  		The column and line of the CheckAliveExpression in its Task
 	 */
-	public CheckAliveExpression(UnitExpression unit, SourceLocation source) {
+	public CheckAliveExpression(UnitExpression unit, SourceLocation source) throws 
+			IllegalSourceException, IllegalExpressionException {
 		super(unit, source);
 	}
 	/**

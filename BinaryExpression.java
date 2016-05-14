@@ -15,8 +15,11 @@ public abstract class BinaryExpression extends BooleanExpression {
 	 * 		The column and line of the BinaryExpression in its Task
 	 */
 	public BinaryExpression(BooleanExpression left, BooleanExpression right, 
-			SourceLocation sourceLocation) {
+			SourceLocation sourceLocation) throws IllegalSourceException, 
+			IllegalExpressionException {
 		super(sourceLocation);
+		if (!isValidExpression(left) | !isValidExpression(right))
+			throw new IllegalExpressionException();
 		this.left = left;
 		this.right = right;
 	}

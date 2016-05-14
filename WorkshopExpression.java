@@ -5,7 +5,7 @@ import hillbillies.part3.programs.SourceLocation;
 public class WorkshopExpression extends PositionExpression {
 	
 
-	public WorkshopExpression(SourceLocation sourceLocation) {
+	public WorkshopExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);
 	}
 

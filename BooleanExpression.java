@@ -2,7 +2,7 @@ package hillbillies.model;
 
 import hillbillies.part3.programs.SourceLocation;
 
-public abstract class BooleanExpression extends E<Boolean> {
+public abstract class BooleanExpression extends E<Boolean> implements IExpressionCheck {
 
 	/**
 	 * Initialization of a BooleanExpression
@@ -11,7 +11,7 @@ public abstract class BooleanExpression extends E<Boolean> {
 	 * 		The column and line of the BooleanExpression in its Task
 	 * 		
 	 */
-	public BooleanExpression(SourceLocation sourceLocation) {
+	public BooleanExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);
 	}
 	

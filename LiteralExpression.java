@@ -16,7 +16,7 @@ public class LiteralExpression extends PositionExpression {
 	 * @param source
 	 *  		The line and column of the LiteralExpression in its Task
 	 */
-	public LiteralExpression(int x, int y, int z, SourceLocation source) {
+	public LiteralExpression(int x, int y, int z, SourceLocation source) throws IllegalSourceException {
 		super(source);
 		this.x = x;
 		this.y = y;
@@ -56,6 +56,7 @@ public class LiteralExpression extends PositionExpression {
 	public int getZ() {
 		return this.z;
 	}
+	
 	
 	
 	

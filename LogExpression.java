@@ -10,7 +10,7 @@ public class LogExpression extends PositionExpression {
 	 * @param sourceLocation
 	 * 		The column and line of the LogExpression in its Task
 	 */
-	public LogExpression(SourceLocation sourceLocation) {
+	public LogExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);
 	}
 	/**
@@ -26,7 +26,7 @@ public class LogExpression extends PositionExpression {
 	public int[] evaluate() throws IllegalUnitException, IllegalArgumentException {
 		if (this.isAssigned()) {
 			try {
-				return this.getUnit().getWorld().getClosestLog(this.getUnit()).getCube();
+				return this.getUnit().getWorld().getClosestLog(this.getUnit()).getCubeInt();
 			} catch (NullPointerException e) {
 				throw new IllegalUnitException("Unit does not belong to a world");
 			}

@@ -4,7 +4,7 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class ThisExpression extends UnitExpression {
 	
-	public ThisExpression(SourceLocation source) {
+	public ThisExpression(SourceLocation source) throws IllegalSourceException {
 		super(source);
 	}
 

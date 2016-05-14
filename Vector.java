@@ -1,16 +1,10 @@
 package hillbillies.model;
 
-public class Vector {
-	
-	private double X;
-	private double Y;
-	private double Z;
-	
-	public Vector(double X, double Y, double Z) {
-		this.setVector(X,Y,Z);
-		
-	}
+import be.kuleuven.cs.som.annotate.Value;
 
+@Value
+public class Vector {	
+	
 	
 	/**
 	 * 
@@ -31,24 +25,16 @@ public class Vector {
 	 * 		| (!isValidPosition(X,Y,Z))
 	 * 
 	 */
-	
-	public void setVector(double X, double Y, double Z) {
-		this.setX(X);
-		this.setY(Y);
-		this.setZ(Z);
-	}
-	
-	
-	public void setX(double X) {
+	public Vector(double X, double Y, double Z) {
 		this.X = X;
-	}
-		
-	public void setY(double Y) {
 		this.Y = Y;
-	}
-	public void setZ(double Z) {
 		this.Z = Z;
+		
+		
 	}
+
+	
+	
 	/**
 	 * 
 	 * @return Returns the first value of the vector
@@ -79,5 +65,46 @@ public class Vector {
 		else
 			return false;
 	}
+	
+	public Vector sum(Vector vector) {
+		return new Vector(this.getX() + vector.getX(), this.getY() + vector.getY(),
+					this.getZ() + vector.getZ());
+	}
+	
+	public Vector sum(int x, int y, int z) {
+		return new Vector(this.getX() + x, this.getY() + y,
+				this.getZ() + z);
+	}
+	
+	public Vector sum(double x, double y, double z) {
+		return new Vector(this.getX() + x, this.getY() + y,
+				this.getZ() + z);
+	}
+	
+	public Vector subtract(Vector v) {
+		return new Vector(this.getX() - v.getX(), this.getY() - v.getY(), 
+				this.getZ() - v.getZ());
+	}
+	
+	public Vector subtract(int x, int y, int z) {
+		return new Vector(this.getX() - x, this.getY() - y,
+				this.getZ() - z);
+	}
+	
+	public Vector subtract(double x, double y, double z) {
+		return new Vector(this.getX() - x, this.getY() - y,
+				this.getZ() - z);
+	}
+	
+	public double distance(Vector v) {
+		double P = Math.pow(this.getX() - v.getX(), 2) + Math.pow(this.getY() - v.getY(), 2)
+			+ Math.pow(this.getZ() - v.getZ(), 2);
+		return Math.sqrt(P);
+	}
+	
+	private final double X;
+	private final double Y;
+	private final double Z;
+
 	
 }

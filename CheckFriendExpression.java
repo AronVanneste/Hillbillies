@@ -11,7 +11,8 @@ public class CheckFriendExpression extends RelationExpression {
 	 * @param source
 	 *  		The column and line of the CheckFriendExpression in its Task
 	 */
-	public CheckFriendExpression(UnitExpression friend, SourceLocation source) {
+	public CheckFriendExpression(UnitExpression friend, SourceLocation source) throws
+			IllegalSourceException, IllegalExpressionException {
 		super(friend, source);
 		
 	}

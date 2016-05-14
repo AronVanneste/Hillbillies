@@ -1,6 +1,6 @@
 package hillbillies.model;
 
-public abstract class Raw implements ITerminate {
+public abstract class Raw implements ITerminate, IPartOfWorld {
  
 		
 		/**
@@ -109,6 +109,7 @@ public abstract class Raw implements ITerminate {
 		/**
 		 * @return Returns the world of the raw
 		 */
+		@Override
 		public World getWorld() {
 			return this.world;
 		}
@@ -119,36 +120,44 @@ public abstract class Raw implements ITerminate {
 		/**
 		 * @return Returns true if the given position is within the range of the world of the raw else false
 		 */
-		private boolean isValidPosition(double[] position) {
+		@Override
+		public boolean isValidPosition(double[] position) {
 			return this.getWorld().isValidPosition(position);
 		}
 		
 		/**
 		 * @return Returns true if the given position is within the range of the world of the raw else false
 		 */
-		private boolean isValidPosition(int[] position) {
+		@Override
+		public boolean isValidPosition(int[] position) {
 			return this.getWorld().isValidPosition(position);
 		}
 		
 		/**
 		 * @return Returns whether or not the world is valid (i.e. not null)
 		 */
-		private boolean isValidWorld(World world) {
+		@Override
+		public boolean isValidWorld(World world) {
 			return (world != null);
 		}
 		
+		
+		public boolean isPassable() {
+			return this.isPassable(this.getCubeInt());
+		}
 		/**
 		 * @return Returns whether or not the current position of the raw is passable
 		 */
-		private boolean isPassable() {
-			return (this.getWorld().isPassable(this.getCube()));
+		@Override
+		public boolean isPassable(int[] cube) {
+			return (this.getWorld().isPassable(cube));
 		}
 		
 		/**
 		 * @return Returns whether or not the raw is supported by a solid cube
 		 */
 		private boolean isSolidBelow() {
-			return (this.getWorld().isSupported(this.getCube()));
+			return (this.getWorld().isSupported(this.getCubeInt()));
 		}
 		
 		/**
@@ -169,7 +178,8 @@ public abstract class Raw implements ITerminate {
 		/**
 		 * @return Returns the coordinates of the cube of the raw
 		 */
-		public int[] getCube() {
+		@Override
+		public int[] getCubeInt() {
 			
 			int X = (int) Math.floor(this.getPosition()[0]);
 			int Y = (int) Math.floor(this.getPosition()[1]);
