@@ -3,7 +3,15 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class CarriesItemExpression extends StatusExpression {
-
+	/**
+	 * Initialisation of a CarriesItemExpression
+	 * 
+	 * @param unit
+	 * 		The unit assigned to the expression
+	 * 
+	 * @param source
+	 *  		The column and line of the CarriesItemExpression in its Task
+	 */
 	public CarriesItemExpression(UnitExpression unit, SourceLocation source) {
 		super(unit, source);
 	}

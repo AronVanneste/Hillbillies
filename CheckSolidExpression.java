@@ -4,7 +4,14 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class CheckSolidExpression extends TerrainExpression {
 	
-
+	/**
+	 * Initialisation of a CheckSolidExpression
+	 * 
+	 * @param pos
+	 * 		The position that has to be checked
+	 * @param sourceLocation
+	 *   		The column and line of the CheckSolidExpression in its Task
+	 */
 	public CheckSolidExpression(PositionExpression pos, SourceLocation sourceLocation) {
 		super(pos, sourceLocation);
 	}

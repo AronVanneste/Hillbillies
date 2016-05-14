@@ -4,7 +4,12 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class LogExpression extends PositionExpression {
 	
-
+	/**
+	 * Initialization of a LogExpression
+	 * 
+	 * @param sourceLocation
+	 * 		The column and line of the LogExpression in its Task
+	 */
 	public LogExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
 	}

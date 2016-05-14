@@ -3,7 +3,12 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class EnemyExpression extends UnitExpression {
-	
+	/**
+	 * Initialization of an EnemyExpression
+	 * 
+	 * @param source
+	 * 		The column and line of the EnemyExpression in its Task
+	 */
 	public EnemyExpression(SourceLocation source) {
 		super(source);
 	}
@@ -31,17 +36,29 @@ public class EnemyExpression extends UnitExpression {
 		throw new IllegalArgumentException("Expression not assigned to Unit");
 		
 	}
-
+	
+	/**
+	 *
+	 * @param unit
+	 * 		The unit assigned to the expression
+	 */
 	@Override
 	public void setUnit(Unit unit) {
 		this.performer = unit;
 	}
-
+	
+	/**
+	 * 
+	 * @return Returns the unit of the expression
+	 */
 	@Override
 	public Unit getUnit() {
 		return this.performer;
 	}
-
+	/**
+	 * 
+	 * @return Returns whether or not the expression has a unit assigned
+	 */
 	@Override
 	public boolean isAssigned() {
 		return (this.performer != null);

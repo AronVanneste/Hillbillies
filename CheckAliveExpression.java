@@ -3,7 +3,14 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class CheckAliveExpression extends StatusExpression {
-	
+	/**
+	 * Initialization of a CheckAliveExpression
+	 * 
+	 * @param unit
+	 * 		The unit assigned to the Expression
+	 * @param source
+	 *  		The column and line of the CheckAliveExpression in its Task
+	 */
 	public CheckAliveExpression(UnitExpression unit, SourceLocation source) {
 		super(unit, source);
 	}

@@ -19,8 +19,8 @@ public abstract class Raw implements ITerminate {
 		 * 
 		 * @post The world will contain the raw in its raw list
 		 * 
-		 * @throws IllegalArgumentException
-		 * 		Throws an IllegalArgumentException if the given position is not valid
+		 * @throws IllegalPositionException
+		 * 		Throws an IllegalPositionException if the given position is not valid
 		 * 
 		 * @throws IllegalWorldException
 		 * 		Throws an IllegalWorldException if the given world is null

@@ -3,7 +3,14 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class CheckPassableExpression extends TerrainExpression {
-
+	/**
+	 * Initialisation of a CheckPassableExpression
+	 * 
+	 * @param pos
+	 * 		The position that has to be checked
+	 * @param sourceLocation
+	 *   		The column and line of the CheckPassableExpression in its Task
+	 */
 	public CheckPassableExpression(PositionExpression pos, SourceLocation sourceLocation) {
 		super(pos, sourceLocation);
 	}

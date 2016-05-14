@@ -3,7 +3,14 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class CheckEnemyExpression extends RelationExpression {
-	
+	/**
+	 * The initialization of a CheckEnemyExpression
+	 * 
+	 * @param unit
+	 * 		The unit that has to be checked
+	 * @param source
+	 *  		The column and line of the CheckEnemyExpression in its Task
+	 */
 	public CheckEnemyExpression(UnitExpression unit, SourceLocation source) {
 		super(unit, source);
 	}
@@ -23,17 +30,27 @@ public class CheckEnemyExpression extends RelationExpression {
 		
 		return false;
 	}
-	
+	/**
+	 * 
+	 * @param unit
+	 * 		The unit that has to be checked
+	 */
 	@Override
 	public void setUnit(Unit unit) {
 		this.performer = unit;
 	}
-
+	/**
+	 * 
+	 * @return Returns the unit that has to be checked
+	 */
 	@Override
 	public Unit getUnit() {
 		return this.performer;
 	}
-
+	/**
+	 * 
+	 * @return Returns whether or not a unit is yet assigned to the expression
+	 */
 	@Override
 	public boolean isAssigned() {
 		return (this.performer != null);

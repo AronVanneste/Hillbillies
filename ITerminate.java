@@ -1,13 +1,17 @@
 package hillbillies.model;
 
 public interface ITerminate {
+	
 	/**
-	 * An interface that gives Unit, World, Faction and Raw...
+	 * @post
+	 * 		The object is terminated
 	 */
-	 
-	 
 	public abstract void terminate();
 	
+	/**
+	 * 
+	 * @return Returns whether or not an object is terminated
+	 */
 	public abstract boolean isTerminated();
 
 }

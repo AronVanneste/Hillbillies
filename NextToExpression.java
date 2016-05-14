@@ -4,7 +4,13 @@ import hillbillies.part3.programs.SourceLocation;
 
 public class NextToExpression extends PositionExpression {
 	
-
+	/**Initialization of a NextToExpression
+	 * 
+	 * @param position
+	 * 		The position of the NextToExpression
+	 * @param sourceLocation
+	 *  		The column and line of the NextToExpression in its Task
+	 */
 	public NextToExpression(PositionExpression position, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		this.position = position;
@@ -31,9 +37,11 @@ public class NextToExpression extends PositionExpression {
 		throw new IllegalArgumentException("Not assigned to a unit");
 		
 	}
-	
-	
-	
+
+	/**
+	 * 
+	 * @return Returns the position of the NextToExpression
+	 */
 	public PositionExpression getPosition() {
 		return this.position;
 	}

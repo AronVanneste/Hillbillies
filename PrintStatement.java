@@ -3,7 +3,14 @@ package hillbillies.model;
 import hillbillies.part3.programs.SourceLocation;
 
 public class PrintStatement extends S {
-	
+	/**
+	 * Initialization of a PrintStatement
+	 * 
+	 * @param expression
+	 * 		The expression that has to be printed
+	 * @param source
+	 *   	The column and line of the PrintExpression in its Task
+	 */
 	public PrintStatement(E<?> expression, SourceLocation source) {
 		super(source);
 		this.expression = expression;
@@ -17,7 +24,10 @@ public class PrintStatement extends S {
 	public void execute() {
 		System.out.println(this.getExpression().evaluate());
 	}
-	
+	/**
+	 * 
+	 * @return Returns the expression of the PrintStatement
+	 */
 	public E<?> getExpression() {
 		return this.expression;
 	}

@@ -21,6 +21,7 @@ public class Scheduler {
 	 * Adds a task to the scheduler
 	 * 
 	 * @post The task is added to the scheduler and the scheduler is added to the task
+	 * 		
 	 */
 	public void addTask(T task) {
 		this.taskList.add(task);
