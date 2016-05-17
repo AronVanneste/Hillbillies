@@ -11,7 +11,6 @@ public class WorkshopExpression extends PositionExpression {
 	 * 		The column and line of the WorkShopExpression in its Task
 	 * @throws IllegalSourceException
 	 * 		Throws IllegalSourceException if the sourceLocation is not valid
-
 	 */
 	public WorkshopExpression(SourceLocation sourceLocation) throws IllegalSourceException {
 		super(sourceLocation);

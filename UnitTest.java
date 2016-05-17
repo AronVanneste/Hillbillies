@@ -2,22 +2,45 @@
 
 import static org.junit.Assert.*;
 
-
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Assert;
 
 import hillbillies.model.IllegalPositionException;
+import hillbillies.model.IllegalSourceException;
 import hillbillies.model.IllegalTargetException;
+import hillbillies.model.LiteralExpression;
 import hillbillies.model.Log;
+import hillbillies.model.MoveToStatement;
+import hillbillies.model.NotExpression;
+import hillbillies.model.S;
+import hillbillies.model.Scheduler;
+import hillbillies.model.SequenceStatement;
+import hillbillies.model.T;
+import hillbillies.model.TerrainType;
+import hillbillies.model.TrueExpression;
+import hillbillies.model.AnyExpression;
+import hillbillies.model.BooleanExpression;
 import hillbillies.model.Boulder;
+import hillbillies.model.BoulderExpression;
+import hillbillies.model.E;
 import hillbillies.model.Faction;
+import hillbillies.model.FollowStatement;
+import hillbillies.model.IfStatement;
 import hillbillies.model.IllegalNameException;
 import hillbillies.model.Unit;
+import hillbillies.model.UnitExpression;
 import ogp.framework.util.Util;
 
 import org.junit.Test;
 import hillbillies.model.Vector;
+import hillbillies.model.WhileStatement;
 import hillbillies.model.World;
+import hillbillies.part2.listener.TerrainChangeListener;
+import hillbillies.part3.programs.SourceLocation;
+import javafx.concurrent.Task;
 
 public class UnitTest {
 
@@ -261,15 +284,15 @@ public class UnitTest {
 
 	}
 	
-	@Test
-	public void assertUnitSpawned() {
-		int[][][] field = {{{1,0,3},{0,2,2},{3,1,1}},
-						   {{1,0,3},{0,2,2},{3,1,1}},
-						   {{1,0,3},{0,2,2},{3,1,1}}};
-		World world = new World(field, null);
-		world.spawnUnit();
-		Assert.assertSame(world.getUnits().size(), 1);
-	}
+//	@Test
+//	public void assertUnitSpawned() {
+//		int[][][] field = {{{1,0,3},{0,2,2},{3,1,1}},
+//						   {{1,0,3},{0,2,2},{3,1,1}},
+//						   {{1,0,3},{0,2,2},{3,1,1}}};
+//		World world = new World(field, null);
+//		world.spawnUnit();
+//		Assert.assertSame(world.getUnits().size(), 1);
+//	}
 	
 	@Test
 	public void assertUnitMoveTo() {
@@ -555,6 +578,272 @@ public class UnitTest {
 
 
 	}
+	
+	@Test (expected = ClassCastException.class)
+	public void assertTypeSafety() {
+		SourceLocation source = new SourceLocation(1, 5);
+		E<?> expression = new BoulderExpression(source);
+		NotExpression not = new NotExpression((BooleanExpression) expression, source);
+	}
+	
+	@Test (expected = IllegalSourceException.class)
+	public void assertSourceException() {
+		new NotExpression(null, null);
+	}
+	
+	
+	
+	World createRandomWorld() {
+		int[][][] world = {{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},{0, 0, 0, 0, 0}},{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},{0, 0, 0, 0, 0}},{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},{0, 0, 0, 0, 0}},{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},{0, 0, 0, 0, 0}},{{0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0},{0, 0, 0, 0, 0}}}; 
+		for (int x = 0; x < 5; x++) {
+			for (int y = 0; y < 5; y++) {
+				for (int z = 0; z < 5; z++) {
+					int P = (int) Math.round(Math.random() * 3);
+					world[x][y][z] = P;
+				}
+			}
+		}
+		TerrainChangeListener t = null;
+		return new World(world, t);
+	}
+	
+	int[] getPassableCube(World w) {
+		for (int x = 0; x < 5; x++) {
+			for (int y = 0; y < 5; y++) {
+					int[] position = {x, y, 0};
+					if (w.isPassable(position))
+						return position;
+				}
+			}
+		return null;
+	}
+	
+	S createRandomStatement() {
+		World world = createRandomWorld();
+		for (int i = 0; i < 3; i++) {
+			world.spawnUnit();
+		}
+		int[] pos = getPassableCube(world);
+		Unit unit = world.getUnits().iterator().next();
+		SourceLocation source = new SourceLocation((int) Math.round(Math.random() * 100), 
+				(int) Math.round(Math.random() * 100));
+		S s = new MoveToStatement(new LiteralExpression(pos[0], pos[1], pos[2], source), source);
+		s.setUnit(unit);
+		return s;
+
+	}
+	
+	S createRandomFollowStatement() {
+		World world = createRandomWorld();
+		for (int i = 0; i < 3; i++) {
+			world.spawnUnit();
+		}
+		Unit unit = world.getUnits().iterator().next();
+		SourceLocation source = new SourceLocation((int) Math.round(Math.random() * 100), 
+				(int) Math.round(Math.random() * 100));
+		AnyExpression unitE = new AnyExpression(source);
+		unitE.setUnit(unit);
+		FollowStatement s = new FollowStatement(unitE, source);
+		s.setUnit(unit);
+		return s;
+	}
+	
+	T createRandomTask() {
+		int[] pos = {(int) Math.round(Math.random() * 4), (int) Math.round(Math.random() * 4),
+					(int) Math.round(Math.random() * 4)};
+		return new T("Name", (int) Math.round(Math.random() * 100 - 50), 
+				createRandomStatement(), pos);
+	}
+	
+	T createRandomTask(int priority) {
+		int[] pos = {(int) Math.round(Math.random() * 4), (int) Math.round(Math.random() * 4),
+					(int) Math.round(Math.random() * 4)};
+		return new T("Name", priority, 
+				createRandomStatement(), pos);
+	}
+
+	@Test
+	public void assertSequenceIterator() {
+		List<S> s = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			s.add(createRandomStatement());
+		}
+		SequenceStatement seq = new SequenceStatement(s, new SourceLocation(5, 8));
+		Iterator<S> iter = seq.iterator();
+		int check = 0;
+		while (iter.hasNext()) {
+			check += 1;
+			iter.next();
+		}
+		Assert.assertEquals(seq.getStatements().size(), check);
+	}
+	
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void assertAddSchedulerToFaction1() {
+		World w = createRandomWorld();
+		Faction f = new Faction(w);
+		Scheduler sd = new Scheduler(f);
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void assertAddSchedulerToFaction2() {
+		World w = createRandomWorld();
+		Scheduler sd = new Scheduler(new Faction(w));
+		Faction f = new Faction(w, sd);
+	}
+	
+	@Test
+	public void assertAddSchedulerToFaction3() {
+		World w = createRandomWorld();
+		Scheduler sd = new Scheduler();
+		Faction f = new Faction(w, sd);
+		Assert.assertEquals(sd, f.getScheduler());
+	}
+	
+	@Test (expected = IllegalPositionException.class)
+	public void assertAddTask() {
+		World w = createRandomWorld();
+		Faction f = new Faction(w);
+		Scheduler s = f.getScheduler();
+		int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
+		T t = new T("Name", 50, createRandomStatement(), pos);
+		s.addTask(t);
+	}
+	
+	@Test
+	public void assertUpdateTask() {
+		Scheduler s = new Scheduler();
+		int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
+		T t = new T("Name", 50, createRandomStatement(), pos);
+		s.addTask(t);
+		Assert.assertEquals(1, s.getTasks().size());
+	}
+	
+	@Test
+	public void assertUpdateTask2() {
+		World w = createRandomWorld();
+		Scheduler s = new Scheduler();
+		int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
+		T t = new T("Name", 50, createRandomStatement(), pos);
+		s.addTask(t);
+		Faction f = new Faction(w, s);
+		Assert.assertEquals(0, s.getTasks().size());
+	}
+	
+	
+	@Test
+	public void assertSchedulerLambdas() {
+		Scheduler s = new Scheduler();
+		World w = createRandomWorld();
+		for (int i = 0; i < 5; i++) {
+			s.addTask(createRandomTask());
+		}
+		for (int i = 0; i < 2; i++) {
+			s.addTask(createRandomTask(200));
+		}
+		Assert.assertEquals(2, s.getAllTaskPriorityLargerThan(150).size());
+	}
+	
+	@Test
+	public void assertSchedulerLambdas2() {
+		Scheduler s = new Scheduler();
+		World w = createRandomWorld();
+		for (int i = 0; i < 5; i++) {
+			s.addTask(createRandomTask());
+		}
+		for (int i = 0; i < 2; i++) {
+			s.addTask(createRandomTask(-200));
+		}
+		Assert.assertEquals(2, s.getAllTaskPrioritySmallerThan(-150).size());
+	}
+	
+	@Test
+	public void assertSchedulerLambdas3() {
+		Scheduler s = new Scheduler();
+		World w = createRandomWorld();
+		for (int i = 0; i < 5; i++) {
+			s.addTask(createRandomTask());
+		}
+		for (int i = 0; i < 2; i++) {
+			s.addTask(createRandomTask(-200));
+		}
+		List<T> tasks = s.getAllTasksSatisfyingCondition((T t) -> 
+				(t.getActivity() instanceof MoveToStatement));
+		Assert.assertEquals(7, tasks.size());
+	}
+	
+	@Test
+	public void assertSchedulerLambdas4() {
+		Scheduler s = new Scheduler();
+		World w = createRandomWorld();
+		for (int i = 0; i < 5; i++) {
+			s.addTask(createRandomTask());
+		}
+		for (int i = 0; i < 2; i++) {
+			s.addTask(createRandomTask(-200));
+		}
+		List<T> tasks = s.getAllTasksSatisfyingCondition((T t) -> 
+				(t.getActivity() instanceof WhileStatement));
+		Assert.assertEquals(0, tasks.size());
+	}
+	
+	@Test
+	public void assertAssignTaskToUnit() {
+		Scheduler s = new Scheduler();
+		World w = createRandomWorld();
+		Faction f = new Faction(w, s);
+		int[] pos = getPassableCube(w);
+		Unit unit = new Unit("Name", pos, 50, 50, 50, 50, true);
+		f.addUnit(unit);
+		Assert.assertTrue(f.getUnits().contains(unit));
+	}
+	
+	@Test
+	public void assertAssignTaskToUnit2() {
+		Scheduler s = new Scheduler();
+		World w = createRandomWorld();
+		Faction f = new Faction(w, s);
+		int[] pos = getPassableCube(w);
+		for (int i = 0; i < 2; i++) {
+			s.addTask(createRandomTask());
+		}
+		Unit unit = new Unit("Name", pos, 50, 50, 50, 50, true);
+		f.addUnit(unit);
+		unit.pickTask();
+		Assert.assertTrue(unit.hasTask());
+	}
+	
+	@Test 
+	public void assertMoveToStatement() {
+		MoveToStatement moveTo = (MoveToStatement) createRandomStatement();
+		World w = createRandomWorld();
+		Unit unit = w.spawnUnit();
+		T t = new T("Name", 50, moveTo, getPassableCube(w));
+		Faction f = unit.getFaction();
+		Scheduler s = f.getScheduler();
+		s.addTask(t);
+		unit.pickTask();
+		unit.executeTask();
+		boolean b = (((int) moveTo.getUnit().getFinalTarget().getX()) == 
+					moveTo.getPosition().evaluate()[0] && 
+					((int) moveTo.getUnit().getFinalTarget().getY()) == 
+					moveTo.getPosition().evaluate()[1] &&
+					((int) moveTo.getUnit().getFinalTarget().getY()) == 
+					moveTo.getPosition().evaluate()[1]);
+		Assert.assertTrue(b);
+	}
+
+	
+	
+	
+	
+	
 	
 
 	

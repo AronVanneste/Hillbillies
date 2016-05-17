@@ -67,4 +67,3 @@ public class LiteralExpression extends PositionExpression {
 	private final int z;
 	
 }
-

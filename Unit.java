@@ -519,7 +519,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 *		|		then new.getExperiencePoints() == this.getExperiencePoints() + 10
 	 * 
 	 */
-	public void updateExperiencePoints() {
+	protected void updateExperiencePoints() {
 		
 		if (this.getExperiencePoints() % 10 >= 0) {  
 			this.setExperiencePoints(this.getExperiencePoints() - 10);
@@ -965,6 +965,18 @@ public class Unit implements ITerminate, IPartOfWorld {
 				(Math.abs(attacker.getCube().getZ()- defender.getCube().getZ()) <= 1) &&
 				(attacker.getFaction() != defender.getFaction()) && 
 				(!attacker.isFalling() && !defender.isFalling()));
+	}
+	
+	
+	/**
+	 * Checks whether an object is not null
+	 * @param o
+	 * 			The object to be checked
+	 * @return
+	 * 		Returns true if the object is not null, else false
+	 */
+	public boolean isValidArgument(Object o) {
+		return (o != null);
 	}
 	
 	/**
@@ -1683,7 +1695,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * 
 	 * @return Returns the unit the unit is following
 	 */
-	private Unit getUnitToFollow() {
+	public Unit getUnitToFollow() {
 		return unitToFollow;
 	}
 

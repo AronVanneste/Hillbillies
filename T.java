@@ -33,13 +33,21 @@ public class T implements IPerform, ITerminate {
 	 * 		The cube of the task will be the given cube
 	 * 		|new.getCube() = cube
 	 * @throws IllegalStatementException
-	 * 		Throws IllegalStatementException is the activity is not well formed
+	 * 		Throws IllegalStatementException if the activity is not well formed or invalid
+	 * @throws IllegalNameException
+	 * 		Throws IllegalNameException if the name is invalid
+	 * @throws IllegalPositionException
+	 * 		Throws IllegalPositionException if the position is invalid
 	 */
-	public T(String name, int priority, S activity, int[] cube) throws IllegalStatementException {
-		if (!isWellFormed(activity) | !isValidStatement(activity))
+	public T(String name, int priority, S activity, int[] cube) throws IllegalStatementException,
+				IllegalPositionException, IllegalNameException {
+		if (!isValidStatement(activity) | !isWellFormed(activity))
 			throw new IllegalStatementException("Not a valid statement");
 		if (!isValidPosition(cube))
-		this.setName(name);
+			throw new IllegalPositionException("Not a valid position");
+		if (!isValidArgument(name))
+			throw new IllegalNameException("Not a valid name");
+		this.name = name;
 		this.setPriority(priority);
 		this.setActivity(activity);
 		this.setCubes(cube);
@@ -58,9 +66,9 @@ public class T implements IPerform, ITerminate {
 	 */
 	public void terminate() {
 		try {
-		this.getUnit().removeTask();
+			this.getUnit().removeTask();
+			this.setUnit(null);
 		} catch (NullPointerException e) {};
-		this.setUnit(null);
 		for (Scheduler s: this.getSchedulers()) {
 			s.removeTask(this);
 			this.removeScheduler(s);
@@ -75,29 +83,13 @@ public class T implements IPerform, ITerminate {
 	public Map<String, AssignStatement> getVariables() {
 		return this.variables;
 	}
-	/**
-	 * Executes the task
-	 * 
-	 * @post The activities of the task are executed and have a unit assigned
-	 * 	|new.getActivity().getUnit() = this.getUnit();
-	 * 
-	 * @throws IllegalArgumentsException if the task is not assigned
-	 *
-	 */
-	public void executeTask() throws IllegalArgumentException{
-		if (!isAssigned())
-			throw new IllegalArgumentException("Task not assigned");
-		if (!(this.getActivity() instanceof SequenceStatement)) {
-			this.getActivity().setUnit(this.getUnit());
-			this.getActivity().execute();
-		}
-	}
+	
 	/**
 	 * Returns the next statement
 	 * 
-	 * @return Returns the statement that's not yet eecuted
+	 * @return Returns the statement that is not yet executed
 	 * 
-	 * @throws NoStatementsLeftException if there's no statements left
+	 * @throws NoStatementsLeftException if there are no statements left
 	 */
 	public S getNextStatement() throws NoStatementsLeftException {
 		if (this.getActivity() instanceof SequenceStatement) {
@@ -119,16 +111,7 @@ public class T implements IPerform, ITerminate {
 	
 	
 	
-	/**
-	 * 
-	 * @param name
-	 * 		The name of the task
-	 * @post
-	 * 		|new.getName() = name
-	 */
-	protected void setName(String name) {
-		this.name = name;
-	}
+	
 	/**
 	 * 
 	 * @return Returns the name of the task
@@ -143,7 +126,7 @@ public class T implements IPerform, ITerminate {
 	 * @post
 	 * 		|new.getPriority() = priority
 	 */
-	protected void setPriority(int priority) {
+	private void setPriority(int priority) {
 		this.priority = priority;
 	}
 	
@@ -160,7 +143,7 @@ public class T implements IPerform, ITerminate {
 	 * @post
 	 * 		|new.getPriority() = (this.getPriority-20)
 	 */
-	public void reducePriority() {
+	protected void reducePriority() {
 		this.setPriority(this.getPriority() - 20);
 	}
 	
@@ -171,14 +154,14 @@ public class T implements IPerform, ITerminate {
 	 * @post
 	 * 		|new.getCube() = cube
 	 */
-	protected void setCubes(int[] cube) {
+	private void setCubes(int[] cube) {
 		this.cube = cube;
 	}
 	/**
 	 * 
 	 * @return returns the cube assigned to the task
 	 */
-	protected int[] getCube() {
+	public int[] getCube() {
 		return this.cube;
 	}
 	
@@ -189,7 +172,7 @@ public class T implements IPerform, ITerminate {
 	 * @post
 	 * 		|new.getActivity() = activity
 	 */
-	protected void setActivity(S activity) {
+	private void setActivity(S activity) {
 		this.activity = activity;
 		try {
 			this.setIterator();
@@ -202,7 +185,7 @@ public class T implements IPerform, ITerminate {
 	 * 
 	 * @return Returns the Activity of which the task consists
 	 */
-	protected S getActivity() {
+	public S getActivity() {
 		return this.activity;
 	}
 
@@ -250,32 +233,21 @@ public class T implements IPerform, ITerminate {
 	 * 		The priority of the task is reduced
 	 * 		|new.getPriority() = (this.getPriority() - 20)
 	 */
-	public void removeUnit() {
+	protected void removeUnit() {
 		if (this.isAssigned()) {
 			this.performer = null;
 			this.reducePriority();
 		}
 	}
 	
-	/**
-	 *
-	 * @param statement
-	 * @throws IllegalArgumentException
-	 */
-	??
-	//TODO ????
-	public void performTask(S statement) throws IllegalArgumentException {
-		if (!this.isAssigned())
-			throw new IllegalArgumentException("Not assigned to a unit");
-		
-	}
+
 	/**
 	 * 
 	 * @param s
 	 * 		The statement to be checked
 	 * @return Returns true if the statement is not true
 	 */
-	private boolean isValidStatement(S s) {
+	public boolean isValidStatement(S s) {
 		return s != null;
 	}
 	/**
@@ -284,33 +256,9 @@ public class T implements IPerform, ITerminate {
 	 * 		The position to be checked
 	 * @return Returns true is the position is not null
 	 */
-	private boolean isValidPosition(int[] p) {
+	public boolean isValidPosition(int[] p) {
 		return p != null;
 	}
-	
-//	protected boolean isValidStatement(S s) {
-//		if (!(s instanceof SequenceStatement) && !(s instanceof ActionStatement))
-//			return false;
-//		Iterator<S> iterS = ((SequenceStatement)s).iterator();
-//		while (iterS.hasNext()) {
-//			S next = iterS.next();
-//			if (!isValidSubStatement(next))
-//				return false;
-//		}
-//		return true;
-//		
-//			
-//	}
-//	
-//	protected boolean isValidSubStatement(S statement) {
-//		if (statement instanceof SequenceStatement)
-//			return isValidStatement(statement);
-//		if (statement instanceof BreakStatement)
-//			return false;
-//		return true;
-//		
-//		
-//	}
 	
 	/**
 	 * Adds the activity's name of the Task to its variables
@@ -319,7 +267,7 @@ public class T implements IPerform, ITerminate {
 	 * 		if this.getActivity() instanceof AssignStatement
 	 * 			variables.contains(this.getActivity().getName())
 	 */
-	public void addAssignStatements() {
+	protected void addAssignStatements() {
 		addAssignStatements(this.getActivity());
 	}
  	/**
@@ -330,7 +278,7 @@ public class T implements IPerform, ITerminate {
  	 * 		|if (s instanceof AssignStatement)
  	 * 		|	variables.contains(s.getName())
  	 */
-	public void addAssignStatements(S s) {
+	private void addAssignStatements(S s) {
 		if (s instanceof AssignStatement)
 			variables.put(((AssignStatement) s).getName(), (AssignStatement) s);
 		if (s instanceof SequenceStatement) {
@@ -354,7 +302,7 @@ public class T implements IPerform, ITerminate {
 	 * @post
 	 * 		|
 	 */
-	public void addReadExpressions(S s) {
+	protected void addReadExpressions(S s) {
 		if (s instanceof IfStatement) {
 			if (((IfStatement) s).getCondition().wasReadVariableExpression())
 				readVariables.put(((IfStatement) s).getCondition().getVariableName(), 
@@ -398,6 +346,13 @@ public class T implements IPerform, ITerminate {
 	 */
 	public boolean isWellFormed(S s) {
 		return this.hasValidVariables(s) && this.hasValidBreaks(s);
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean isValidArgument(Object s) {
+		return (s != null);
 	}
 	/**
 	 * 
@@ -486,7 +441,7 @@ public class T implements IPerform, ITerminate {
 	 * @throws IllegalArgumentException
 	 * 		Throws IllegalArgumentException if the Activity is no instance of SequenceStatement
 	 */
-	public void setIterator() throws IllegalArgumentException {
+	private void setIterator() throws IllegalArgumentException {
 		if (!(this.getActivity() instanceof SequenceStatement))
 			throw new IllegalArgumentException();
 		this.iter = ((SequenceStatement) this.getActivity()).iterator();
@@ -524,7 +479,7 @@ public class T implements IPerform, ITerminate {
 	 * @post
 	 * 		|new.getScheduler().contains(sch)
 	 */
-	public void addScheduler(Scheduler sch) {
+	protected void addScheduler(Scheduler sch) {
 		this.schedulers.add(sch);
 	}
 	
@@ -535,22 +490,22 @@ public class T implements IPerform, ITerminate {
 	 * @post
 	 * 		|new.getScheduler().contains(s) == false
 	 */
-	public void removeScheduler(Scheduler s) {
+	protected void removeScheduler(Scheduler s) {
 		this.schedulers.remove(s);
 	}
 
 	
 	
 	private Unit performer;
-	private String name;
+	private final String name;
 	private int priority;
 	private S activity;
 	private int[] cube;
-	private Map<String, AssignStatement> variables = new HashMap<>();
-	private Map<String, SourceLocation> readVariables = new HashMap<>();
+	private final Map<String, AssignStatement> variables = new HashMap<>();
+	private final Map<String, SourceLocation> readVariables = new HashMap<>();
 	private Iterator<S> iter;
 	private boolean taskRead;
-	private Set<Scheduler> schedulers = new HashSet<>();;
+	private final Set<Scheduler> schedulers = new HashSet<>();;
 	
 	
 }

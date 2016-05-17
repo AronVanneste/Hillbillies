@@ -77,9 +77,9 @@ public class SequenceStatement extends S implements IStatementCheck {
 				if (!hasNext())
 					throw new NoSuchElementException();
 				for (S s: getStatements()) {
-					if (s.getSource().getLine() < currentPos.getLine() | 
+					if (!passedS.contains(s) && (s.getSource().getLine() < currentPos.getLine() || 
 							(s.getSource().getLine() == currentPos.getLine() &&
-							s.getSource().getColumn() < currentPos.getColumn())) {
+							s.getSource().getColumn() <= currentPos.getColumn()))) {
 						currentS = s;
 						currentPos = s.getSource();
 					}
@@ -92,7 +92,7 @@ public class SequenceStatement extends S implements IStatementCheck {
 			}
 			private List<S> passedS = new ArrayList<>();
 			
-			private S currentS;
+			private S currentS = null;
 			private SourceLocation currentPos = new SourceLocation(Integer.MAX_VALUE, 
 					Integer.MAX_VALUE);
 			

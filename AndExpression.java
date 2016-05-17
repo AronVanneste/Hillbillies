@@ -22,6 +22,7 @@ public class AndExpression extends BinaryExpression {
 			throws IllegalSourceException, IllegalExpressionException {
 		super(left, right, source);
 	}
+	
 	/**
 	 * 
 	 * Evaluates the AndExpression

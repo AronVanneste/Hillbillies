@@ -7,7 +7,7 @@ public class WorkStatement extends MoveStatement {
 	 * Initializes a WorkStatement
 	 * 
 	 * @param position
-	 * 		The position of th WorkStatement
+	 * 		The position of the WorkStatement
 	 * @param source
 	 *		The column and line of the WorkStatement in its Task
 	 * @throws IllegalSourceException

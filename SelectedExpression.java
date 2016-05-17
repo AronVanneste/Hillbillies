@@ -40,9 +40,7 @@ public class SelectedExpression extends PositionExpression {
 	
 	
 	
+	
 	private int[] selectedPosition;
 
 }
-
-
-

@@ -42,7 +42,7 @@ public class Faction {
 		if (!isValidWorld(world))
 			throw new IllegalWorldException("World is null");
 		this.setWorld(world);
-		this.setScheduler(new Scheduler());
+		this.setScheduler(new Scheduler(this));
 	}
 
 	
@@ -71,6 +71,7 @@ public class Faction {
 	 */
 	private void setScheduler(Scheduler scheduler) {
 		this.scheduler = scheduler;
+		this.getScheduler().setFaction(this);
 	}
 	/**
 	 * @return Returns the scheduler of the faction
@@ -106,8 +107,20 @@ public class Faction {
 			throw new IllegalUnitException("Unit already belongs to faction");
 		if (this.isTerminated())
 			throw new IllegalStateException("Faction is terminated");
-		this.unitInFaction.add(unit);
-		
+		if (unit.getWorld() == null)
+			try {
+				this.unitInFaction.add(unit);
+				unit.setFaction(this);
+				this.getWorld().addUnit(unit);
+			} catch (IllegalWorldException w) {
+				throw w;
+			} catch (IllegalUnitException u) {
+				throw u;
+			} catch (IllegalStateException s) {
+				throw s;
+			}
+		if (unit.getWorld() == this.getWorld())
+			this.unitInFaction.add(unit);
 	}
 	
 	/**
@@ -167,7 +180,8 @@ public class Faction {
 	 * @return Returns true if both the unit and the faction belong to the same world and if their world is not null
 	 */
 	private boolean isInSameWorld(Unit unit) {
-		return (this.getWorld() == unit.getWorld() && this.getWorld() != null);
+		return (this.getWorld() == unit.getWorld() && this.getWorld() != null)
+				| unit.getWorld() == null;
 	}
 	
 	/**
@@ -185,10 +199,10 @@ public class Faction {
 	}
 	
 	/**
-	 * @return Returns false is the scheduler is null
+	 * @return Returns false is the scheduler is null or it belongs to another faction
 	 */
 	public boolean isValidScheduler(Scheduler scheduler) {
-		return scheduler != null;
+		return scheduler != null && scheduler.getFaction() == null;
 	}
 	
 	/**

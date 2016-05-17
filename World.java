@@ -545,6 +545,29 @@ public class World implements ITerminate {
 	}
 	
 	/**
+	 * Checks whether the faction is valid
+	 * @param f
+	 * 			The given faction
+	 * @return
+	 * 		Returns true if the faction is not null and is part of this world
+	 * 
+	 */
+	public boolean isValidFaction(Faction f) {
+		return (isValidArgument(f) && this.getActiveFactions().contains(f));
+	}
+	
+	/**
+	 * Checks whether the given object is not null
+	 * @param o
+	 * 			The object to be checked
+	 * @return
+	 * 		Returns true if the given object is not null
+	 */
+	public boolean isValidArgument(Object o) {
+		return o != null;
+	}
+	
+	/**
 	 * Checks whether two cubes are adjacent
 	 * 
 	 * @param cube1
@@ -805,8 +828,6 @@ public class World implements ITerminate {
 	 * 		The raw material
 	 * @return Returns the distance between a Raw and unit
 	 */
-	public
-	
 	public double getDistanceBetweenRawAndUnit(Unit unit, Raw raw) {
 		
 		double X = Math.pow(unit.getPosition().getX() - raw.getPosition()[0], 2);
@@ -955,11 +976,16 @@ public class World implements ITerminate {
 	 * 		The faction will be in the factionlist of the world, if the maximum nb of faction in not reached
 	 * @throws IllegalFactionException
 	 * 		If the number of factions in the world exceeds five
+	 * @throws IllegalArgumentException
+	 * 		If the given faction is null
 	 */
-	protected void addFaction(Faction faction) throws IllegalFactionException {
+	protected void addFaction(Faction faction) throws IllegalFactionException,
+			IllegalArgumentException {
 		
 		if (this.getNbFaction() >= 5) 
 			throw new IllegalFactionException();
+		if (!isValidArgument(faction))
+			throw new IllegalArgumentException();
 		if (!this.getActiveFactions().contains(faction))
 			this.activeFactions.add(faction);
 		
@@ -1034,6 +1060,38 @@ public class World implements ITerminate {
 		return this.getUnits().size();
 	}
 	
+	
+	/**
+	 * Tries to add unit to world from a faction
+	 * 
+	 * @param unit
+	 * 		The unit that has to be added to the world
+	 * @post
+	 * 		The unitsInWorldSet contains unit
+	 * @throws IllegalWorldException
+	 * 		Throws IllegalWorldException if the world is full
+	 * @throws IllegalUnitException
+	 * 		Throws IllegalUnitException if the unit is not valid
+	 * @throws IllegalFactionException
+	 * 		Throws IllegalFactionException if the faction is not valid
+	 * 
+	 */
+	public void addUnitFromFaction(Unit unit, Faction faction) throws IllegalWorldException, 
+			IllegalUnitException {
+		
+		if (worldIsFull())
+			throw new IllegalWorldException("World is full");
+		if (!isValidUnit(unit))
+			throw new IllegalUnitException("Unit cannot be added to this world");
+		if (this.isTerminated())
+			throw new IllegalStateException("The world is terminated");
+		if (!isValidFaction(faction))
+			throw new IllegalFactionException("Not a valid faction");
+		this.addToUnitList(unit);
+		
+		
+		
+	}
 	/**
 	 * Tries to add unit to world
 	 * 
@@ -1055,7 +1113,6 @@ public class World implements ITerminate {
 			throw new IllegalUnitException("Unit cannot be added to this world");
 		if (this.isTerminated())
 			throw new IllegalStateException("The world is terminated");
-		
 		if (unit.getFaction() == null)
 			unit.setFaction(this.getRightFaction());
 		

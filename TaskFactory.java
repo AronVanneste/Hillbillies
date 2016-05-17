@@ -20,7 +20,7 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 		else  {
 			int i = 0;
 			for (S s: ((SequenceStatement) activity).getStatements()) {
-				tasks.add(new T(name, priority, activity, selectedCubes.get(i)));
+				tasks.add(new T(name, priority, s, selectedCubes.get(i)));
 				i+=1;
 
 			}
@@ -66,7 +66,7 @@ public class TaskFactory implements ITaskFactory<E<?>, S, T> {
 
 	@Override
 	public S createWork(E<?> position, SourceLocation sourceLocation) {
-		return new WorkStatement(position, sourceLocation);
+		return new WorkStatement((PositionExpression)position, sourceLocation);
 	}
 
 	@Override

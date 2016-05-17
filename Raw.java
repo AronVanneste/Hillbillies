@@ -381,5 +381,3 @@ public abstract class Raw implements ITerminate, IPartOfWorld {
 		private boolean isTerminated;
 
 	}
-
-
