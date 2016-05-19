@@ -66,11 +66,9 @@ public class Scheduler {
 	 * @param task
 	 * 		The task that has to be removed
 	 * 
-	 * @return
-	 * 		Return true if the element is removed from the list, else false
 	 */
-	public boolean removeTask(T task) {
-		return this.getTasks().remove(task);
+	public void removeTask(T task) {
+		this.getTasks().remove(task);
 	}
 	/**
 	 *Replaces an old task by a new task
@@ -81,8 +79,9 @@ public class Scheduler {
 	 * 		The task that's removed
 	 */
 	public void replaceTask(T newTask, T oldTask) {
-		if (removeTask(oldTask)) {
+		if (this.getTasks().contains(oldTask)) {
 			try {
+				this.removeTask(oldTask);
 				addTask(newTask);
 			} catch (IllegalArgumentException e) {};
 		}
@@ -162,7 +161,7 @@ public class Scheduler {
 	 * @throws NoSuchElementException
 	 * 		Throws NoSuchElementException if there's no available task in the scheduler left
 	 */
-	public void assignTaskToUnit(Unit unit) throws NoSuchElementException {
+	protected void assignTaskToUnit(Unit unit) throws NoSuchElementException {
 		
 		try {
 			T task = getHighestPriorityTaskNotYetAssigned();
@@ -189,7 +188,7 @@ public class Scheduler {
 	 * @throws IllegalFactionException
 	 * 		Throws IllegalFactionException if the unit and scheduler are part of a different faction
 	 */
-	public void assignTaskToUnit(Unit unit, T task) throws IllegalArgumentException, 
+	protected void assignTaskToUnit(Unit unit, T task) throws IllegalArgumentException, 
 		IllegalUnitException, IllegalTaskException, IllegalFactionException {
 		
 		if (!this.getTasks().contains(task))
@@ -334,7 +333,7 @@ public class Scheduler {
 	 * 
 	 * @post All tasks part of this world have a valid position
 	 */
-	public void updateTasks() {
+	protected void updateTasks() {
 		
 		int i = 0;
 		while (i < this.getTasks().size()) {

@@ -765,7 +765,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * @post
 	 * 		|new.getTask() = task
 	 */
-	public void setTask(T task) {
+	protected void setTask(T task) {
 		this.task = task;
 	}
 	/**
@@ -1383,7 +1383,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * @throws IllegalPositionException
 	 * 		Throws IllegalPositionException is the target is unreachable
 	 */
-	public void pathFindingAlgorithm() throws IllegalPositionException {
+	private void pathFindingAlgorithm() throws IllegalPositionException {
 		
 		int X = (int) Math.round(this.getFinalTarget().getX());
 		int Y = (int) Math.round(this.getFinalTarget().getY());
@@ -2290,6 +2290,46 @@ public class Unit implements ITerminate, IPartOfWorld {
 	
 	
 	/**
+	 * The unit starts to behave in a default way
+	 * @post If the unit has a task and it is ready to read a new statement, it starts executing
+	 * 		the new part of the task
+	 * 		| if (this.hasTask() && this.checkLastStatementTime())
+	 * 			then this.executeTask()
+	 * @post If the task of the unit is out of statements, the unit tries to pick a new task. If
+	 * 		 there is one, this unit has a new tasks.
+	 * 		| new.hasTask() == true
+	 * @post If the unit previously did not have a task, it will try to pick one
+	 * 		| if (!this.hasTask())
+	 * 		| 	then new.hasTask() == true
+	 * 
+	 */
+	private void startDefaultBehavior() {
+		
+		
+		if (this.hasTask() && this.checkLastStatementTime())
+			try {
+				this.executeTask();
+				this.updateLastStatementTime();
+			} catch (NoStatementsLeftException e) {
+				try { 
+					this.pickTask();
+					this.updateLastStatementTime();
+				} catch (NoSuchElementException n) {
+					this.standardDefaultBehavior();
+				} 
+			}
+		
+		
+		if (!this.hasTask())
+			try {
+				this.pickTask();
+			} catch (NoSuchElementException n) {
+				this.standardDefaultBehavior();
+			}
+			
+	}
+	
+	/**
 	 * Lets the unit behave in a random way
 	 * 
 	 * @post The unit starts to behave in a random way,  it can move to a random position,
@@ -2302,35 +2342,18 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * 		|	then new.isWorking() == true
 	 * 		| else if (P <= 0,75)
 	 * 		|	then new.isResting() == true
-	 */
-	private void startDefaultBehavior() {
+	*/
+	private void standardDefaultBehavior() {
 		
-		try {
-			if (this.hasTask() && this.checkLastStatementTime())
-				this.executeTask();
-			this.updateLastStatementTime();
-		} catch (NoStatementsLeftException e) {
-			try { 
-				this.pickTask();
-			} catch (NoSuchElementException n) {
-				double P = Math.random();
-				if (P <= 0.25)
-					this.moveToRandomPosition(); 
-				else if (P <= 0.50)
-					this.work();
-				else if (P <= 0.75)
-					this.resting();
-				else
-					this.fightPotentialEnemies();
-		} 
-			
-		}
-		
-		
-		
-		
-		
-				
+		double P = Math.random();
+		if (P <= 0.25)
+			this.moveToRandomPosition(); 
+		else if (P <= 0.50)
+			this.work();
+		else if (P <= 0.75)
+			this.resting();
+		else
+			this.fightPotentialEnemies();
 	}
 	
 	/**
@@ -2341,7 +2364,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * @throws NoSuchElementException
 	 * 		|Throws NoSuchElementException if there no suitable task for the unit
 	 */
-	public void pickTask() throws NoSuchElementException {
+	private void pickTask() throws NoSuchElementException {
 		try {
 			this.getFaction().giveTaskToUnit(this);
 		} catch (NoSuchElementException exc) {
@@ -2355,7 +2378,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * @throws NoStatementsLeftException
 	 * 		Throws NoStatementsLeftException if there are no statements left to be executed
 	 */
-	public void executeTask() throws NoStatementsLeftException {
+	private void executeTask() throws NoStatementsLeftException {
 		
 		T task = this.getTask();
 		try {
@@ -2517,10 +2540,17 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * 		|new.getCarryingLog() == log
 	 * @throws IllegalLogException
 	 * 		Throws IllegalLogException if the log is null
+	 * @throws IllegalArgumentException
+	 * 		If the unit and the log are not at the same position
+
 	 */	
-	public void carryLog(Log log) throws IllegalLogException {
+	public void carryLog(Log log) throws IllegalLogException, IllegalArgumentException {
 		if (!isValidLog(log))
 			throw new IllegalLogException("Log is null");
+		if ((this.getCubeInt()[0] != log.getCubeInt()[0]) && (this.getCubeInt()[1] != log.getCubeInt()[1])
+				&& (this.getCubeInt()[2] != log.getCubeInt()[2]))
+			throw new IllegalArgumentException("Unit and log are not at the same position");
+
 		
 		this.carriedLog = log;
 		log.setOwner(this);
@@ -2549,7 +2579,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 			carryBoulder(this.getWorld().getBoulder(this.getCubeInt()));
 		} catch (NullPointerException noWorld) {
 			throw noWorld;
-		}
+		} catch (IllegalBoulderException b) {};
 		
 	}
 	
@@ -2567,7 +2597,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 			carryLog(this.getWorld().getLog(this.getCubeInt()));
 		} catch (NullPointerException noWorld) {
 			throw noWorld;
-		}
+		} catch (IllegalLogException l) {};
 		
 	}
 	
@@ -2582,10 +2612,16 @@ public class Unit implements ITerminate, IPartOfWorld {
 	 * 		|new.getCarryingboulder() == boulder 
 	 * @throws IllegalBoulderException
 	 * 		Throws illegalBoulderException when the boulder is null
+	 * @throws IllegalArgumentException
+	 * 		If the unit and the boulder are not at the same position
 	 */
 	public void carryBoulder(Boulder boulder) throws IllegalBoulderException {
 		if (!isValidBoulder(boulder))
 			throw new IllegalBoulderException("Boulder is null");
+		if ((this.getCubeInt()[0] != boulder.getCubeInt()[0]) && 
+				(this.getCubeInt()[1] != boulder.getCubeInt()[1])
+				&& (this.getCubeInt()[2] != boulder.getCubeInt()[2]))
+			throw new IllegalArgumentException("Unit and boulder are not at the same position");
 			
 		this.carriedBoulder = boulder;
 		boulder.setOwner(this);
@@ -3037,7 +3073,7 @@ public class Unit implements ITerminate, IPartOfWorld {
 	/**
 	 * @return Returns a set with all the directly adjacent cubes of the given unit
 	 */
-	public Set<int[]> getDirectlyAdjacentCubes() {
+	protected Set<int[]> getDirectlyAdjacentCubes() {
 		
 		int X = this.getCubeInt()[0];
 		int Y = this.getCubeInt()[1];
@@ -3058,13 +3094,13 @@ public class Unit implements ITerminate, IPartOfWorld {
 	/**
 	 * @return Returns a list with all the  adjacent cubes of the given unit
 	 */
-	public ArrayList<int[]> getAdjacentCubes() {
+	protected  ArrayList<int[]> getAdjacentCubes() {
 		return this.getAdjacentCubes(this.getCubeInt());
 	}
 	/**
 	 * @return Returns a list with all the  adjacent cubes of the given cube
 	 */
-	public ArrayList<int[]> getAdjacentCubes(int[] position) {
+	private ArrayList<int[]> getAdjacentCubes(int[] position) {
 		ArrayList<int[]> adjacentCubes = new ArrayList<>();
 		
 		int X = position[0];
