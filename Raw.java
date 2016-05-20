@@ -100,7 +100,7 @@ public abstract class Raw implements ITerminate, IPartOfWorld {
 		 *		Throws an IllegalWorldException if the world is not valid
 		 */
 		private void setWorld(World world) throws IllegalWorldException {
-			if (!isValidWorld(world))
+			if (!isValidWorld(world) && !this.isTerminated())
 				throw new IllegalWorldException("This world is not valid");
 			this.world = world;
 			world.addRaw(this);
@@ -251,7 +251,7 @@ public abstract class Raw implements ITerminate, IPartOfWorld {
 		 * 		The owner of the raw will be the given owner
 		 */
 		protected void setOwner(Unit owner) throws IllegalStateException {
-			if (this.isTerminated())
+			if (this.isTerminated() && owner != null)
 				throw new IllegalStateException("Terminated");
 			this.owner = owner;
 			this.changeInWorld();
@@ -336,9 +336,9 @@ public abstract class Raw implements ITerminate, IPartOfWorld {
 		 */
 		public void terminate() {
 			if (!this.isTerminated()) {
+				this.isTerminated = true;
 				this.removeOwner();
 				this.removeWorld();
-				this.isTerminated = true;
 			}
 		}
 		

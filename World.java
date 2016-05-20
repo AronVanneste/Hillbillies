@@ -715,10 +715,12 @@ public class World implements ITerminate {
 		Unit closestUnit = null;
 		
 		for (Unit unit: unitList) {
-			double distance = getDistanceBetweenUnits(unit, performer);
-			if (distance < minDistance) {
-				minDistance = distance;
-				closestUnit = unit;
+			if (unit != performer) {
+				double distance = getDistanceBetweenUnits(unit, performer);
+				if (distance < minDistance) {
+					minDistance = distance;
+					closestUnit = unit;
+				}
 			}
 				
 		}
